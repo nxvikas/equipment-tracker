@@ -15,7 +15,7 @@
     <title>@yield('title','УчетТМЦ')</title>
 </head>
 <body>
-{{--@auth()--}}
+@auth()
     <div class="d-flex">
         @include('partials.sidebar')
         <div class="main-content">
@@ -26,12 +26,12 @@
 
         </div>
     </div>
-{{--@endauth--}}
-{{--@guest()--}}
-{{--    <div class="guest-content">--}}
-{{--        @yield('content')--}}
-{{--    </div>--}}
-{{--@endguest--}}
+@endauth
+@guest()
+    <div class="guest-content">
+        @yield('content')
+    </div>
+@endguest
 
 @include('partials.footer')
 </body>

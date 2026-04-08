@@ -39,13 +39,13 @@
             <button class="user-profile dropdown-toggle" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="user-info">
-                    <div class="user-name">{{ Auth::user()->name ?? 'Виктория Ерыкалова' }}</div>
+                    <div class="user-name">{{ auth()->user()->name ?? 'Не указано' }}</div>
                     <div class="user-role">
-                        Администратор
+                        {{auth()->user()->role->display_name ?? 'Не указано'}}
                     </div>
                 </div>
                 <div class="user-avatar">
-                    {{ strtoupper(substr(Auth::user()->name ?? 'АВ', 0, 2)) }}
+                    {{ strtoupper(substr(auth()->user()->name ?? 'НУ', 0, 2)) }}
                 </div>
             </button>
             <ul class="dropdown-menu dropdown-menu-end profile-menu">

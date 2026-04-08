@@ -1,7 +1,8 @@
-@include('layouts.app')
+@extends('layouts.app')
 @section('title')
 
 @endsection
 @section('content')
-hi
+<h1 class="text-center">hi
+</h1>
 @endsection

@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +101,7 @@ return [
 
     'previous_keys' => [
         ...array_filter(
-            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+            explode(',', (string)env('APP_PREVIOUS_KEYS', ''))
         ),
     ],
 
@@ -122,5 +122,24 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Company Info
+    |--------------------------------------------------------------------------
+    |
+    | Данные компании для отображения в интерфейсе.
+    | Компания может изменить данные в файле .env
+    | без необходимости менять верстку.
+    |
+    */
+    'company' => [
+        'name' => env('COMPANY_NAME'),
+        'short_name'=>env('COMPANY_SHORT_NAME'),
+        'description' => env('COMPANY_DESCRIPTION'),
+        'email' => env('COMPANY_EMAIL'),
+        'phone' => env('COMPANY_PHONE'),
+        'logo' => env('COMPANY_LOGO'),
+    ]
 
 ];

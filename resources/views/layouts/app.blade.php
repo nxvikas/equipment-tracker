@@ -12,7 +12,9 @@
     <script src="{{asset('js/bootstrap.bundle.js')}}"></script>
     <script src="{{asset('js/toggleTheme.js')}}"></script>
 
-    <title>@yield('title','УчетТМЦ')</title>
+    <title> {{config('app.company.name')}}@hasSection('title')
+            | @yield('title')
+        @endif</title>
 </head>
 <body>
 @auth()

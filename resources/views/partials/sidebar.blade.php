@@ -2,9 +2,9 @@
     <div class="sidebar-header">
         <div class="logo flex-column">
             <div>
-                <span class="logo-name">УчетТМЦ</span>
+                <span class="logo-name">{{config('app.company.name')}}</span>
             </div>
-            <small>Система учета оборудования и ТМЦ</small>
+            <small>{{config('app.company.description')}}</small>
         </div>
     </div>
 

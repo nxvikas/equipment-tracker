@@ -404,7 +404,6 @@ body.light .search-input {
 }
 
 
-
 /* ОСНОВНОЙ КОНТЕНТ - СПРАВА ОТ ЛЕВОЙ ПАНЕЛИ (от sidebar) */
 .main-content {
     margin-left: var(--sidebar-width);
@@ -415,12 +414,190 @@ body.light .search-input {
     overflow: hidden;
 }
 
-/* ГОСТЕВОЙ КОНТЕНТ - АВТОРИЗАЦИЯ/РЕГИСТРАЦИЯ (без sidebar) */
-.guest-content {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
+
+/* СТРАНИЦА РЕГИСТРАЦИИ*/
+.register-wrapper {
+    min-height: 100vh;
+    padding: 40px 16px;
+    background: radial-gradient(circle at 15% 20%, rgba(190, 242, 100, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(190, 242, 100, 0.05), transparent 40%),
+    linear-gradient(180deg, var(--bg-dark), #02040a);
 }
+.register-card {
+    width: 100%;
+    max-width: 580px;
+    background: rgba(17, 20, 31, 0.88);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    padding: 40px;
+    transition: 0.2s;
+}
+.register-card:hover {
+    border-color: rgba(190, 242, 100, 0.25);
+}
+
+.logo-text {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: -0.4px;
+}
+.logo-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.position-relative {
+    position: relative;
+}
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 20%;
+    transform: translateY(6px);
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+
+
+.form-control-custom {
+    width: 100%;
+    padding: 10px 14px 10px 42px;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: 14px;
+}
+.form-control-custom:focus {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    font-weight: 300;
+    background: rgba(190, 242, 100, 0.04);
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+}
+.form-control-custom::placeholder {
+    color: var(--text-secondary);
+}
+
+.btn-primary-custom {
+    background: var(--accent);
+    color: #02040a;
+    border: none;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 18px;
+
+}
+.btn-primary-custom:hover {
+    background: var(--accent-hover);
+}
+
+.auth-link {
+    text-decoration: none;
+    color: var(--accent);
+    font-weight: 500;
+}
+.auth-link:hover {
+    color: var(--accent-hover);
+}
+
+.form-label-custom {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    margin-left: 8px;
+}
+
+.form-control-custom:focus + .form-label-custom {
+    color: var(--accent);
+}
+
+
+.remember-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember-wrapper input {
+    display: none;
+}
+
+.remember-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+.remember-check::after {
+    content: "";
+    width: 6px;
+    height: 10px;
+    border-right: 2px solid #02040a;
+    border-bottom: 2px solid #02040a;
+    transform: rotate(45deg) scale(0);
+    transition: 0.15s;
+}
+
+.remember-wrapper input:checked + .remember-check {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.remember-wrapper input:checked + .remember-check::after {
+    transform: rotate(45deg) scale(1);
+}
+
+.remember-wrapper:hover .remember-check {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(190,242,100,0.08);
+}
+
+/* Ошибки валидации */
+.form-control.invalid,
+.form-control.is-invalid {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.05);
+    color: var(--text-primary);
+}
+.input-icon.invalid,
+.input-icon.is-invalid {
+    color: var(--danger);
+}
+.invalid-feedback {
+    display: block;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 4px;
+    margin-left: 8px;
+}
+
+.form-control.invalid + .form-label-custom,
+.form-control.is-invalid + .form-label-custom {
+    color: var(--danger);
+}
+
+
+
+
 
 /*АДАПТИВНОСТЬ*/
 @media (max-width: 768px) {

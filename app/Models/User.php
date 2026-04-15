@@ -21,6 +21,9 @@ class User extends Authenticatable
         'department_id',
         'role_id'
     ];
+    protected $casts = [
+        'status' => UserStatus::class,
+    ];
 
     public function role()
     {

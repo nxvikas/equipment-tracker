@@ -16,14 +16,20 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
+
+        if (!Auth::check()) {
+            return redirect()->route('auth.login');
+        }
         $user = Auth::user();
 
-        if (!$user) {
-            return redirect()->route('login');
+        if ($user->status !== \App\Http\Enums\UserStatus::ACTIVE) {
+            Auth::logout();
+            return redirect()->route('auth.login')->with('error', 'Ваш аккаунт не активирован');
         }
         if ($user->role->name !== $role) {
-            abort(403, 'Доступ запрещен');
+            abort(403, 'Доступ запрещен. Требуется роль: ' . $role);
         }
+
         return $next($request);
     }
 }

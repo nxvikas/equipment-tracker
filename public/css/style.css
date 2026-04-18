@@ -1,4 +1,3 @@
-/*ОСНОВНОЙ ФАЙЛ СТИЛЕЙ*/
 /*MAIN STYLES FILE*/
 
 /* core / глобальные */
@@ -9,10 +8,14 @@
 @import 'layouts/sidebar.css';
 @import 'layouts/header.css';
 
+/* components */
+@import 'components/form.css';
+
 /* pages / страницы */
 @import 'pages/auth.css';
 @import 'pages/waiting.css';
-@import 'pages/admin.css';
+@import 'pages/dashboard.css';
+@import 'pages/equipment.css';
 @import 'pages/employee.css';
 
 /* responsive */

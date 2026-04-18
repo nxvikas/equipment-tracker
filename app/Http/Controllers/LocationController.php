@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LocationController extends Controller
 {
@@ -28,7 +29,35 @@ class LocationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:office,warehouse,service'
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->input('return_to') === 'equipment') {
+                return redirect()->back()
+                    ->withErrors($validator, 'locationModal')
+                    ->with('open_location_modal', true)
+                    ->withInput();
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $location = Location::create([
+            'name' => $request->name,
+            'type' => $request->type
+        ]);
+
+        if ($request->input('return_to') === 'equipment') {
+            return redirect()->route('admin.equipment')
+                ->with('success', 'Локация "' . $location->name . '" успешно добавлена')
+                ->with('reopen_equipment_modal', true)
+                ->with('new_location_id', $location->id);
+        }
+
+        return redirect()->back()->with('success', 'Локация добавлена');
+
     }
 
     /**

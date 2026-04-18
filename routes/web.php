@@ -33,9 +33,20 @@ Route::get('/', function () {
     return redirect()->route('auth.login');
 })->name('welcome');
 
+
+Route::middleware(['auth', 'check.role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/equipment', [\App\Http\Controllers\AdminController::class, 'equipment'])->name('equipment');
+    Route::post('/equipment', [\App\Http\Controllers\EquipmentController::class, 'store'])->name('equipment.store');
+
+    Route::post('/equipment/category', [\App\Http\Controllers\CategoryController::class, 'store'])->name('category.store');
+    Route::post('/equipment/location', [\App\Http\Controllers\LocationController::class, 'store'])->name('location.store');
+
+    Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');
+});
+
+
 Route::middleware('auth')->group(function () {
-    Route::get('/admin/dashboard', [\App\Http\Controllers\PageController::class, 'adminDashboard'])
-        ->name('admin.dashboard')->middleware('check.role:admin');
 
 
     Route::get('/employee/dashboard', [\App\Http\Controllers\PageController::class, 'employeeDashboard'])

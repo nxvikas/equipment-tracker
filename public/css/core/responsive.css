@@ -1,0 +1,37 @@
+/* RESPONSIVE STYLES */
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .header {
+        padding: 12px 16px;
+    }
+
+    .search-wrapper {
+        width: 200px;
+    }
+
+    .user-info {
+        display: none;
+    }
+
+    .user-profile {
+        padding: 6px;
+    }
+
+    .notification-menu {
+        width: 320px;
+    }
+}

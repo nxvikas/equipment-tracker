@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('title', 'Регистрация')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/pages/auth.css') }}">
+@endpush
 
 @section('content')
     <div class="register-wrapper d-flex align-items-center justify-content-center">

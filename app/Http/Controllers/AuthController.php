@@ -30,6 +30,20 @@ class AuthController extends Controller
 
     public function showWaitingPage()
     {
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->status === UserStatus::ACTIVE) {
+                return match ($user->role->name) {
+                    'admin' => redirect()->route('admin.dashboard'),
+                    'employee' => redirect()->route('employee.dashboard'),
+                    default => redirect()->route('auth.login')
+                };
+            }
+
+            Auth::logout();
+        }
+
         if (!session()->has('pending_user_id')) {
             return redirect()->route('auth.register');
         }
@@ -45,10 +59,22 @@ class AuthController extends Controller
             session()->forget('pending_user_id');
 
             if ($user->status === UserStatus::ACTIVE) {
-                return redirect()->route('auth.login')->with('success', 'Ваша заявка одобрена! Теперь вы можете войти.');
+
+                Auth::login($user);
+                return match ($user->role->name) {
+                    'admin' => redirect()->route('admin.dashboard'),
+                    'employee' => redirect()->route('employee.dashboard'),
+                    default => redirect()->route('auth.login')
+                };
             }
 
-            return redirect()->route('auth.login')->with('error', 'Ваша заявка отклонена.');
+            if ($user->status === UserStatus::REJECTED) {
+                return redirect()->route('auth.register')->with('error', 'Ваша заявка отклонена.');
+            }
+
+            if ($user->status === UserStatus::BLOCKED) {
+                return redirect()->route('auth.login')->with('error', 'Ваш аккаунт заблокирован.');
+            }
         }
 
         return view('auth.waiting', ['user' => $user]);
@@ -69,9 +95,20 @@ class AuthController extends Controller
 
         if ($user->status === UserStatus::ACTIVE) {
             session()->forget('pending_user_id');
+
+
+            Auth::login($user);
+
+
+            $redirect = match ($user->role->name) {
+                'admin' => route('admin.dashboard'),
+                'employee' => route('employee.dashboard'),
+                default => route('auth.login')
+            };
+
             return response()->json([
                 'status' => 'active',
-                'redirect' => route('auth.login')
+                'redirect' => $redirect
             ]);
         }
 

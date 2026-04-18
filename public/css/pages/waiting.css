@@ -1,0 +1,112 @@
+/* WAITING PAGE STYLES */
+
+.waiting-wrapper {
+    min-height: 100vh;
+    padding: 40px 16px;
+    background: radial-gradient(circle at 15% 20%, rgba(190, 242, 100, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(190, 242, 100, 0.05), transparent 40%),
+    linear-gradient(180deg, var(--bg-dark), #02040a);
+}
+
+.waiting-card {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(17, 20, 31, 0.88);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    padding: 40px;
+    transition: 0.2s;
+}
+
+.waiting-card:hover {
+    border-color: rgba(190, 242, 100, 0.25);
+}
+
+.status-icon i {
+    font-size: 4rem;
+    color: var(--accent);
+}
+
+.waiting-card h2 {
+    color: var(--text-primary);
+}
+
+.waiting-text {
+    color: var(--text-secondary);
+}
+
+.waiting-email {
+    color: var(--accent);
+}
+
+.status-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.status-label {
+    color: var(--text-secondary);
+}
+
+.status-badge {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 40px;
+}
+
+.notification-text {
+    color: var(--text-secondary);
+}
+
+.btn-outline-custom {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 40px;
+    padding: 8px 20px;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-outline-custom:hover {
+    background: rgba(190, 242, 100, 0.08);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary-custom {
+    background: var(--accent);
+    color: #02040a;
+    border: none;
+    border-radius: 40px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.btn-primary-custom:hover {
+    background: var(--accent-hover);
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+    .waiting-card {
+        padding: 28px 20px;
+    }
+
+    .status-icon i {
+        font-size: 3rem;
+    }
+
+    .waiting-card h2 {
+        font-size: 1.5rem;
+    }
+}

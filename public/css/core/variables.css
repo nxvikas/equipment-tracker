@@ -1,0 +1,29 @@
+/* CSS VARIABLES - ТЕМЫ */
+
+:root {
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 80px;
+    --bg-dark: #03050b;
+    --bg-surface: #0c0f17;
+    --bg-card: #11141f;
+    --accent: #bef264;
+    --accent-hover: #a3e635;
+    --border: rgba(255, 255, 255, 0.06);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --success: #10b981;
+    --warning: #f59e0b;
+}
+
+body.light {
+    --bg-dark: #f5f7fb;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --border: rgba(0, 0, 0, 0.08);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --accent: #84cc16;
+    --accent-hover: #65a30d;
+}

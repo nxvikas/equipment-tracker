@@ -1,0 +1,35 @@
+/* BASE STYLES */
+
+body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+}
+
+/* Основной контент */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Гостевой контент (без сайдбара) */
+.guest-content {
+    min-height: 100vh;
+}
+
+/* Общие классы */
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+.small {
+    font-size: 0.875rem;
+}

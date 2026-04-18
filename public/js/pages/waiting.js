@@ -1,153 +1,187 @@
 
-class WaitingPage {
-    constructor() {
-        this.checkInterval = null;
-        this.init();
+let checkCount = 0;
+const maxChecks = 60;
+let interval = null;
+
+function checkStatus() {
+    const checkUrl = document.getElementById('checkStatusBtn')?.dataset.checkUrl;
+
+    if (!checkUrl) {
+        console.error('URL для проверки статуса не найден');
+        return;
     }
 
-    init() {
-
-        this.startAutoCheck();
-
-
-        const checkBtn = document.getElementById('checkStatusBtn');
-        if (checkBtn) {
-            checkBtn.addEventListener('click', () => this.manualCheck());
-        }
-
-
-        window.addEventListener('beforeunload', () => this.stopAutoCheck());
-    }
-
-    startAutoCheck() {
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-        }
-        this.checkInterval = setInterval(() => this.checkStatus(), 10000);
-    }
-
-    stopAutoCheck() {
-        if (this.checkInterval) {
-            clearInterval(this.checkInterval);
-            this.checkInterval = null;
-        }
-    }
-
-    async manualCheck() {
-        const btn = document.getElementById('checkStatusBtn');
-        const originalHtml = btn.innerHTML;
-
-        btn.innerHTML = '<i class="bi bi-arrow-repeat me-1 spinner"></i> Проверка...';
-        btn.disabled = true;
-
-        await this.checkStatus();
-
-        setTimeout(() => {
-            btn.innerHTML = originalHtml;
-            btn.disabled = false;
-        }, 2000);
-    }
-
-    async checkStatus() {
-        try {
-            const response = await fetch('/check-status', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
+    fetch(checkUrl)
+        .then(response => response.json())
+        .then(data => {
 
             if (data.redirect) {
-                this.stopAutoCheck();
                 window.location.href = data.redirect;
                 return;
             }
 
-            this.handleStatus(data);
 
-        } catch (error) {
-            console.error('Ошибка при проверке статуса:', error);
+            if (data.status === 'active') {
+                handleActiveStatus(data);
+            }
+
+            else if (data.status === 'rejected') {
+                handleRejectedStatus(data);
+            }
+
+            else if (data.status === 'blocked') {
+                handleBlockedStatus(data);
+            }
+        })
+        .catch(error => console.error('Ошибка при проверке статуса:', error));
+}
+
+
+function handleActiveStatus(data) {
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+
+    if (statusBadge) {
+        statusBadge.style.background = 'rgba(40, 167, 69, 0.12)';
+        statusBadge.style.color = '#28a745';
+    }
+
+    if (statusText) {
+        statusText.innerHTML = '<i class="bi bi-check-circle me-1"></i> Одобрено! Перенаправление...';
+    }
+
+    if (interval) {
+        clearInterval(interval);
+        interval = null;
+    }
+
+
+    setTimeout(() => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
         }
+    }, 1500);
+}
+
+
+function handleRejectedStatus(data) {
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const checkBtn = document.getElementById('checkStatusBtn');
+
+    if (statusBadge) {
+        statusBadge.style.background = 'rgba(220, 53, 69, 0.12)';
+        statusBadge.style.color = '#dc3545';
     }
 
-    handleStatus(data) {
-        switch (data.status) {
-            case 'active':
-                this.stopAutoCheck();
-                this.showSuccessAndRedirect();
-                break;
-            case 'rejected':
-                this.stopAutoCheck();
-                this.showRejected();
-                break;
-            case 'blocked':
-                this.stopAutoCheck();
-                this.showBlocked();
-                break;
-            default:
+    if (statusText) {
+        statusText.innerHTML = '<i class="bi bi-x-circle me-1"></i> Отклонено';
+    }
 
-                break;
+
+    if (checkBtn) {
+        checkBtn.disabled = true;
+        checkBtn.style.opacity = '0.5';
+        checkBtn.style.cursor = 'not-allowed';
+    }
+
+
+    if (interval) {
+        clearInterval(interval);
+        interval = null;
+    }
+
+
+    setTimeout(() => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
         }
+    }, 3000);
+}
+
+
+function handleBlockedStatus(data) {
+    const statusBadge = document.getElementById('statusBadge');
+    const statusText = document.getElementById('statusText');
+    const checkBtn = document.getElementById('checkStatusBtn');
+
+    if (statusBadge) {
+        statusBadge.style.background = 'rgba(255, 193, 7, 0.12)';
+        statusBadge.style.color = '#ffc107';
     }
 
-    showSuccessAndRedirect() {
-        const statusCard = document.querySelector('.status-card');
-        statusCard.innerHTML = `
-            <div class="text-center">
-                <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: var(--accent);"></i>
-                <h5 class="mt-2" style="color: var(--text-primary);">Заявка одобрена!</h5>
-                <p style="color: var(--text-secondary);">Перенаправление на страницу входа...</p>
-            </div>
-        `;
-
-        setTimeout(() => {
-            window.location.href = '/login';
-        }, 2000);
+    if (statusText) {
+        statusText.innerHTML = '<i class="bi bi-shield-exclamation me-1"></i> Заблокирован';
     }
 
-    showRejected() {
-        const statusCard = document.querySelector('.status-card');
-        statusCard.innerHTML = `
-            <div class="text-center">
-                <i class="bi bi-x-circle-fill" style="font-size: 2rem; color: var(--danger);"></i>
-                <h5 class="mt-2" style="color: var(--text-primary);">В доступе отказано</h5>
-                <p style="color: var(--text-secondary);">Свяжитесь с администратором для получения подробной информации</p>
-                <a href="/register" class="btn mt-2" style="background: var(--accent); color: #02040a; border-radius: 40px; padding: 8px 20px; font-weight: 600;">Подать новую заявку</a>
-            </div>
-        `;
+
+    if (checkBtn) {
+        checkBtn.disabled = true;
+        checkBtn.style.opacity = '0.5';
+        checkBtn.style.cursor = 'not-allowed';
     }
 
-    showBlocked() {
-        const statusCard = document.querySelector('.status-card');
-        statusCard.innerHTML = `
-            <div class="text-center">
-                <i class="bi bi-shield-exclamation" style="font-size: 2rem; color: var(--danger);"></i>
-                <h5 class="mt-2" style="color: var(--text-primary);">Аккаунт заблокирован</h5>
-                <p style="color: var(--text-secondary);">Обратитесь к администратору системы</p>
-            </div>
-        `;
+
+    if (interval) {
+        clearInterval(interval);
+        interval = null;
+    }
+
+
+    setTimeout(() => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        }
+    }, 3000);
+}
+
+
+function stopChecking() {
+    if (interval) {
+        clearInterval(interval);
+        interval = null;
     }
 }
 
 
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+function manualCheck() {
+    checkCount = 0;
+    checkStatus();
+}
+
+
+function initWaitingPage() {
+    const checkBtn = document.getElementById('checkStatusBtn');
+    if (checkBtn) {
+        checkBtn.addEventListener('click', manualCheck);
     }
 
-    .spinner {
-        animation: spin 1s linear infinite;
-        display: inline-block;
-    }
-`;
-document.head.appendChild(style);
+
+    checkStatus();
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    new WaitingPage();
-});
+    interval = setInterval(() => {
+        checkCount++;
+
+
+        if (checkCount >= maxChecks) {
+            stopChecking();
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                statusText.innerHTML = '<i class="bi bi-hourglass me-1"></i> Проверка приостановлена. Нажмите "Проверить статус"';
+            }
+        } else {
+            checkStatus();
+        }
+    }, 5000);
+
+
+    window.addEventListener('beforeunload', stopChecking);
+}
+
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWaitingPage);
+} else {
+    initWaitingPage();
+}

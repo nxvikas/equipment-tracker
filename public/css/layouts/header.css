@@ -1,0 +1,186 @@
+/*ШАПКА - в дашбордах*/
+.header {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-surface);
+    flex-shrink: 0;
+}
+
+body.light .header {
+    background: var(--bg-surface);
+}
+
+.search-wrapper {
+    position: relative;
+    width: 340px;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 14px;
+    z-index: 1;
+}
+
+.search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 16px 10px 44px;
+    font-size: 13px;
+    color: var(--text-primary);
+
+}
+
+body.light .search-input {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(190, 242, 100, 0.05);
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.notification-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 18px;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-btn:hover {
+    color: var(--accent);
+    background: rgba(190, 242, 100, 0.1);
+}
+
+.notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+}
+
+.user-profile {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-radius: 40px;
+    color: var(--text-primary);
+}
+
+.user-profile:hover {
+    background: rgba(190, 242, 100, 0.1);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.user-role {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.dropdown-menu {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 8px 0;
+    margin-top: 8px;
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: rgba(190, 242, 100, 0.08);
+    color: var(--accent);
+}
+
+.dropdown-item i {
+    font-size: 14px;
+    width: 18px;
+}
+
+.dropdown-divider {
+    border-color: var(--border);
+    margin: 6px 0;
+}
+
+.dropdown-header {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+}
+
+.notification-menu {
+    width: 360px;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    white-space: normal;
+}
+
+.notification-item i {
+    font-size: 18px;
+    margin-top: 2px;
+}
+
+.notification-item.unread {
+    background: rgba(190, 242, 100, 0.05);
+}
+
+.profile-menu {
+    width: 240px;
+}

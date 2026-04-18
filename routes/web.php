@@ -11,14 +11,14 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\PageController::class, 'login'])->name('auth.login');
     Route::get('/register', [\App\Http\Controllers\PageController::class, 'register'])->name('auth.register');
 
-    Route::get('/waiting', [\App\Http\Controllers\AuthController::class, 'showWaitingPage'])->name('auth.waiting');
-
     Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register'])->name('register');
     Route::post('/auth', [\App\Http\Controllers\AuthController::class, 'auth'])->name('auth');
 
-    Route::get('/check-status', [\App\Http\Controllers\AuthController::class, 'checkStatus'])->name('check.status');
-
 });
+
+Route::get('/waiting', [\App\Http\Controllers\AuthController::class, 'showWaitingPage'])->name('auth.waiting');
+Route::get('/check-status', [\App\Http\Controllers\AuthController::class, 'checkStatus'])->name('check.status');
+
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -35,10 +35,11 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [\App\Http\Controllers\PageController::class, 'adminDashboard'])
-        ->name('admin.dashboard');
+        ->name('admin.dashboard')->middleware('check.role:admin');
 
-    Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
     Route::get('/employee/dashboard', [\App\Http\Controllers\PageController::class, 'employeeDashboard'])
-        ->name('employee.dashboard');
+        ->name('employee.dashboard')->middleware('check.role:employee');
+
+    Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 });

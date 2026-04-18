@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{asset('css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
+    @stack('styles')
 
     <script src="{{asset('js/bootstrap.bundle.js')}}"></script>
     <script src="{{asset('js/toggleTheme.js')}}"></script>

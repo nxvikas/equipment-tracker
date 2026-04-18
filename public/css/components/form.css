@@ -1,0 +1,135 @@
+/*Стили форм и валидации*/
+
+.form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+
+.form-control-custom,
+select.form-control-custom,
+input.form-control-custom,
+textarea.form-control-custom {
+    width: 100%;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+
+
+select.form-control-custom:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+    background-color: var(--bg-surface);
+}
+
+
+select.form-control-custom option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 10px;
+}
+
+select.form-control-custom option:hover {
+    background: rgba(190, 242, 100, 0.1);
+}
+
+
+.form-control-custom:focus,
+select.form-control-custom:focus,
+input.form-control-custom:focus,
+textarea.form-control-custom:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+}
+
+
+.form-control-custom.is-invalid,
+.form-control-custom.error,
+select.form-control-custom.is-invalid,
+input.form-control-custom.is-invalid,
+textarea.form-control-custom.is-invalid {
+    border-color: var(--danger) !important;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.invalid-feedback {
+    color: var(--danger);
+    font-size: 11px;
+    margin-top: 4px;
+    display: block;
+}
+
+.text-danger {
+    color: var(--danger);
+}
+
+.alert.alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: var(--danger);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.alert.alert-danger ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.form-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    display: block;
+}
+
+
+.btn-primary {
+    background: var(--accent);
+    color: #02040a;
+    border: none;
+    border-radius: 40px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 8px 20px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+
+

@@ -151,26 +151,4 @@
     box-shadow: 0 0 0 3px rgba(190,242,100,0.08);
 }
 
-/* Ошибки валидации */
-.form-control.invalid,
-.form-control.is-invalid {
-    border-color: var(--danger);
-    background: rgba(239, 68, 68, 0.05);
-    color: var(--text-primary);
-}
-.input-icon.invalid,
-.input-icon.is-invalid {
-    color: var(--danger);
-}
-.invalid-feedback {
-    display: block;
-    font-size: 13px;
-    color: var(--danger);
-    margin-top: 4px;
-    margin-left: 8px;
-}
 
-.form-control.invalid + .form-label-custom,
-.form-control.is-invalid + .form-label-custom {
-    color: var(--danger);
-}

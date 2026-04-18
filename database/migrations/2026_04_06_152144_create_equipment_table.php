@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,17 +16,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('manufacturer')->nullable();
             $table->string('model')->nullable();
-            $table->string('serial_number')->unique();
+            $table->string('serial_number')->nullable()->unique();
             $table->enum('status', \App\Http\Enums\StatusEquipment::values());
             $table->date('purchase_date')->nullable();
-            $table->decimal('purchase_price')->nullable();
+            $table->decimal('purchase_price', 12, 2)->nullable();
             $table->date('warranty_date')->nullable();
             $table->string('qr_code')->nullable()->unique();
             $table->string('notes')->nullable();
             $table->string('status_comment')->nullable();
-            $table->foreignIdFor(\App\Models\User::class,'current_user_id')->nullable()->constrained();
-            $table->foreignIdFor(\App\Models\Location::class)->nullable()->constrained();
-            $table->foreignIdFor(\App\Models\Category::class)->nullable()->constrained();
+            $table->foreignIdFor(\App\Models\User::class, 'current_user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignIdFor(\App\Models\Location::class)->constrained()->restrictOnDelete();
+            $table->foreignIdFor(\App\Models\Category::class)->constrained()->restrictOnDelete();
 
 
             $table->timestamps();

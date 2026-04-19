@@ -29,41 +29,84 @@
         </div>
 
         <div class="filters-bar">
-            <div class="search-input-wrapper">
-                <i class="bi bi-search"></i>
-                <input type="text" id="searchEquipment" class="search-input"
-                       placeholder="Поиск по названию, инв. номеру...">
-            </div>
-            <div class="filters-group">
-                <div class="dropdown custom-select">
-                    <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="selected-text">Все категории</span>
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
-                    <ul class="dropdown-menu custom-select-menu">
-                        <li><a class="dropdown-item" href="#" data-value="">Все категории</a></li>
-                        @foreach($categories as $category)
-                            <li><a class="dropdown-item" href="#"
-                                   data-value="{{ $category->id }}">{{ $category->name }}</a></li>
-                        @endforeach
-                    </ul>
-                    <input type="hidden" name="category_id" class="custom-select-input" value="">
+            <form method="GET" action="{{ route('admin.equipment') }}" id="filterForm" class="d-flex w-100 gap-3 justify-content-between">
+
+                <div class="search-input-wrapper">
+                    <i class="bi bi-search"></i>
+                    <input type="text"
+                           id="searchEquipment"
+                           class="search-input"
+                           placeholder="Поиск по названию, инв. номеру...">
                 </div>
-                <div class="dropdown custom-select">
-                    <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="selected-text">Все статусы</span>
-                        <i class="bi bi-chevron-down"></i>
+
+                <div class="filters-group">
+
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="selected-text">
+                        @if(request('category_id'))
+                            {{ $categories->find(request('category_id'))->name ?? 'Все категории' }}
+                        @else
+                            Все категории
+                        @endif
+                    </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu custom-select-menu">
+                            <li><a class="dropdown-item" href="#" data-value="">Все категории</a></li>
+                            @foreach($categories as $category)
+                                <li>
+                                    <a class="dropdown-item {{ request('category_id') == $category->id ? 'active' : '' }}"
+                                       href="#"
+                                       data-value="{{ $category->id }}">
+                                        {{ $category->name }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <input type="hidden" name="category_id" class="custom-select-input"
+                               value="{{ request('category_id') }}">
+                    </div>
+
+
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="selected-text">
+                        @php
+                            $statusLabels = [
+                                'in_stock' => 'На складе',
+                                'in_use' => 'В работе',
+                                'repair' => 'В ремонте',
+                                'written' => 'Списано',
+                            ];
+                        @endphp
+                        {{ request('status') ? $statusLabels[request('status')] : 'Все статусы' }}
+                    </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu custom-select-menu">
+                            <li><a class="dropdown-item" href="#" data-value="">Все статусы</a></li>
+                            <li><a class="dropdown-item {{ request('status') == 'in_stock' ? 'active' : '' }}" href="#"
+                                   data-value="in_stock">На складе</a></li>
+                            <li><a class="dropdown-item {{ request('status') == 'in_use' ? 'active' : '' }}" href="#"
+                                   data-value="in_use">В работе</a></li>
+                            <li><a class="dropdown-item {{ request('status') == 'repair' ? 'active' : '' }}" href="#"
+                                   data-value="repair">В ремонте</a></li>
+                            <li><a class="dropdown-item {{ request('status') == 'written' ? 'active' : '' }}" href="#"
+                                   data-value="written">Списано</a></li>
+                        </ul>
+                        <input type="hidden" name="status" class="custom-select-input" value="{{ request('status') }}">
+                    </div>
+
+
+                    <button type="submit" class="btn-primary" style="padding: 10px 20px;">
+                        <i class="bi bi-funnel"></i> Применить
                     </button>
-                    <ul class="dropdown-menu custom-select-menu">
-                        <li><a class="dropdown-item active" href="#" data-value="">Все статусы</a></li>
-                        <li><a class="dropdown-item" href="#" data-value="in_stock">На складе</a></li>
-                        <li><a class="dropdown-item" href="#" data-value="in_use">В работе</a></li>
-                        <li><a class="dropdown-item" href="#" data-value="repair">В ремонте</a></li>
-                        <li><a class="dropdown-item" href="#" data-value="written_off">Списано</a></li>
-                    </ul>
-                    <input type="hidden" id="filterStatus" class="custom-select-input" value="">
+                    <a href="{{ route('admin.equipment') }}" class="btn-outline" style="padding: 10px 20px;">
+                        <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                    </a>
                 </div>
-            </div>
+            </form>
         </div>
 
         <div class="table-wrapper">
@@ -97,41 +140,35 @@
                             <td class="inv-number">{{ $item->inventory_number }}</td>
                             <td class="equipment-name">{{ $item->name }}</td>
                             <td>{{ $item->category->name ?? '—' }}</td>
-                            <td class="serial-number">{{ $item->serial_number }}</td>
+                            <td class="serial-number">{{ $item->serial_number ?? '—' }}</td>
                             <td>
                                 @php
                                     $statusClass = match($item->status) {
                                         'in_use' => 'success',
                                         'in_stock' => 'neutral',
                                         'repair' => 'warning',
-                                        'written_off' => 'danger',
+                                        'written' => 'danger',
                                         default => 'neutral'
                                     };
                                     $statusText = match($item->status) {
                                         'in_use' => 'В работе',
                                         'in_stock' => 'На складе',
                                         'repair' => 'В ремонте',
-                                        'written_off' => 'Списано',
+                                        'written' => 'Списано',
                                         default => $item->status
                                     };
                                 @endphp
                                 <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                             </td>
-                            <td>{{ $item->currentUser?->name ?? '—' }}</td>
+                            <td>{{ $item->currentUser ? $item->currentUser->surname . ' ' . $item->currentUser->name : '—' }}</td>
                             <td>
-                                <button class="action-btn" onclick="viewEquipment({{ $item->id }})" title="Просмотр">
+                                <a href="{{ route('admin.equipment.show', $item->id) }}"
+                                   class="action-button"
+                                   style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; text-decoration: none;">
                                     <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="action-btn" onclick="editEquipment({{ $item->id }})"
-                                        title="Редактировать">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                @if($item->status === 'in_stock')
-                                    <button class="action-btn assign" onclick="assignEquipment({{ $item->id }})"
-                                            title="Выдать сотруднику">
-                                        <i class="bi bi-person-check"></i>
-                                    </button>
-                                @endif
+                                    <span>Открыть</span>
+                                </a>
+
                             </td>
                         </tr>
                     @empty
@@ -331,6 +368,21 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                            <div class="col-md-6 mb-3 user-field" style="display: none;">
+                                <label class="form-label">Сотрудник</label>
+                                <select name="current_user_id"
+                                        class="form-control-custom custom-dark-select @error('current_user_id') is-invalid @enderror">
+                                    <option value="">Выберите сотрудника</option>
+                                    @foreach($users as $user)
+                                        <option
+                                            value="{{ $user->id }}" {{ old('current_user_id') == $user->id ? 'selected' : '' }}>
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('current_user_id')
+                                <div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -430,6 +482,7 @@
                                 <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Сервис
                                     (Ремонт)
                                 </option>
+                                <option value="remote" {{ old('type') == 'remote' ? 'selected' : '' }}>Удаленно</option>
                             </select>
                             @error('type', 'locationModal')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -518,11 +571,11 @@
         }
 
         function showFormErrors(form, errors) {
-            // Очищаем старые ошибки
+
             form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
-            // Показываем новые
+
             for (let field in errors) {
                 const input = form.querySelector(`[name="${field}"]`);
                 if (input) {
@@ -561,7 +614,7 @@
 
             const categoryForm = document.querySelector('#addCategoryModal form');
             if (categoryForm) {
-                categoryForm.addEventListener('submit', function(e) {
+                categoryForm.addEventListener('submit', function (e) {
                     e.preventDefault();
                     submitModalForm(this, 'addCategoryModal', 'category_id');
                 });
@@ -570,7 +623,7 @@
 
             const locationForm = document.querySelector('#addLocationModal form');
             if (locationForm) {
-                locationForm.addEventListener('submit', function(e) {
+                locationForm.addEventListener('submit', function (e) {
                     e.preventDefault();
                     submitModalForm(this, 'addLocationModal', 'location_id');
                 });
@@ -595,6 +648,47 @@
                     });
                 });
             });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusSelect = document.querySelector('#addEquipmentModal select[name="status"]');
+            const userField = document.querySelector('#addEquipmentModal .user-field');
+
+            if (statusSelect && userField) {
+                function toggleUserField() {
+                    const userLabel = userField.querySelector('.form-label');
+                    if (statusSelect.value === 'in_use') {
+                        userField.style.display = 'block';
+                        if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
+                    } else {
+                        userField.style.display = 'none';
+                        userField.querySelector('select').value = '';
+                        if (userLabel) userLabel.innerHTML = 'Сотрудник';
+                    }
+                }
+
+                statusSelect.addEventListener('change', toggleUserField);
+                toggleUserField();
+            }
+
+            const searchInput = document.getElementById('searchEquipment');
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('.custom-table tbody tr');
+
+                    rows.forEach(row => {
+                        const invNumber = row.querySelector('.inv-number')?.textContent.toLowerCase() || '';
+                        const name = row.querySelector('.equipment-name')?.textContent.toLowerCase() || '';
+                        const serial = row.querySelector('.serial-number')?.textContent.toLowerCase() || '';
+
+                        if (invNumber.includes(searchTerm) || name.includes(searchTerm) || serial.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
         });
     </script>
 @endpush

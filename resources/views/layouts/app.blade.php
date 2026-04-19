@@ -38,5 +38,6 @@
 
 @include('partials.footer')
 @stack('scripts')
+<script src="{{ asset('js/pages/sidebar.js') }}"></script>
 </body>
 </html>

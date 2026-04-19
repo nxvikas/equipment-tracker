@@ -1,0 +1,4 @@
+/* DASHBOARD STYLES — АГРЕГАТОР */
+
+@import '../../pages/dashboard/_base.css';
+@import '../../pages/dashboard/admin.css';

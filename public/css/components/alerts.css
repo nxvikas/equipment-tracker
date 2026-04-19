@@ -1,0 +1,27 @@
+/* УВЕДОМЛЕНИЯ И АЛЕРТЫ */
+
+.custom-alert-success {
+    background: rgba(190, 242, 100, 0.1);
+    border: 1px solid rgba(190, 242, 100, 0.3);
+    color: var(--accent);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.custom-alert-success .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.custom-alert-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}

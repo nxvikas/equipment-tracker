@@ -1,0 +1,103 @@
+/* КАСТОМНЫЕ DROPDOWN */
+
+.custom-select {
+    position: relative;
+}
+
+.custom-select-btn {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 36px 10px 20px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 160px;
+    position: relative;
+}
+
+.custom-select-btn i {
+    color: var(--text-secondary);
+    font-size: 14px;
+    transition: transform 0.2s;
+    position: absolute;
+    right: 16px;
+}
+
+.custom-select-btn:hover {
+    border-color: var(--accent);
+}
+
+.custom-select-btn:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+}
+
+.custom-select-btn[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.custom-select-menu {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    min-width: 100%;
+}
+
+.custom-select-menu .dropdown-item {
+    color: var(--text-primary);
+    padding: 10px 20px;
+    font-size: 13px;
+    transition: all 0.15s;
+    cursor: pointer;
+}
+
+.custom-select-menu .dropdown-item:hover {
+    background: rgba(190, 242, 100, 0.08);
+    color: var(--accent);
+}
+
+.custom-select-menu .dropdown-item.active {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.filter-select {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 10px 36px 10px 20px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.filter-select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+body.light .filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}

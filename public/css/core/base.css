@@ -33,3 +33,16 @@ body {
 .small {
     font-size: 0.875rem;
 }
+
+/* АДАПТИВ ДЛЯ MAIN-CONTENT */
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: var(--sidebar-collapsed) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
+}

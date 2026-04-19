@@ -35,25 +35,24 @@ class EquipmentController extends Controller
 
     public function getQrCode(Equipment $equipment)
     {
-
         if (!$equipment->qr_code) {
             abort(404, 'QR-код не найден');
         }
 
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->writerOptions([])
-            ->data($equipment->qr_code) // Ссылка из базы данных
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(ErrorCorrectionLevel::High) // Высокий уровень коррекции (читается даже если часть затерта)
-            ->size(300) // Размер картинки 300x300 px
-            ->margin(10) // Отступы от краев
-            ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
-            ->build();
+        $result = new Builder(
+            writer: new PngWriter(),
+            data: $equipment->qr_code,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin
+        );
 
-        // Отдаем картинку прямо в браузер с правильным заголовком
-        return response($result->getString())
-            ->header('Content-Type', $result->getMimeType());
+        $qrCode = $result->build();
+
+        return response($qrCode->getString())
+            ->header('Content-Type', $qrCode->getMimeType());
     }
 
     public function store(StoreEquipmentRequest $request)
@@ -72,7 +71,7 @@ class EquipmentController extends Controller
 
 
         $equipment->update([
-            'qr_code' => url('/admin/equipment/' . $equipment->id)
+            'qr_code' => route('admin.equipment.qrcode', $equipment->id)
         ]);
 
 

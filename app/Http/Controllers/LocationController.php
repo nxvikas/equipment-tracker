@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreLocationRequest;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -30,34 +31,46 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:office,warehouse,service'
+            'name' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'string', 'in:office,warehouse,service'],
+            'address' => ['nullable', 'string', 'max:500']
+        ], [
+            'name.required' => 'Название локации обязательно для заполнения',
+            'type.required' => 'Тип локации обязателен для выбора',
+            'type.in' => 'Выбран недопустимый тип локации',
         ]);
 
         if ($validator->fails()) {
-            if ($request->input('return_to') === 'equipment') {
-                return redirect()->back()
-                    ->withErrors($validator, 'locationModal')
-                    ->with('open_location_modal', true)
-                    ->withInput();
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()->toArray()
+                ], 422);
             }
-            return redirect()->back()->withErrors($validator)->withInput();
+
+            return redirect()->back()
+                ->withErrors($validator, 'locationModal')
+                ->with('open_location_modal', true)
+                ->withInput();
         }
 
+        $validated = $validator->validated();
+
         $location = Location::create([
-            'name' => $request->name,
-            'type' => $request->type
+            'name' => $validated['name'],
+            'type' => $validated['type'],
+            'address' => $validated['address'] ?? null
         ]);
 
-        if ($request->input('return_to') === 'equipment') {
-            return redirect()->route('admin.equipment')
-                ->with('success', 'Локация "' . $location->name . '" успешно добавлена')
-                ->with('reopen_equipment_modal', true)
-                ->with('new_location_id', $location->id);
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Локация "' . $location->name . '" добавлена',
+                'item' => $location
+            ]);
         }
 
         return redirect()->back()->with('success', 'Локация добавлена');
-
     }
 
     /**

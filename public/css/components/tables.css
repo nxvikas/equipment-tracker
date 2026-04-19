@@ -1,0 +1,138 @@
+/* ТАБЛИЦЫ */
+
+.table-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.custom-table th {
+    text-align: left;
+    padding: 16px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border);
+}
+
+.custom-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.custom-table tbody tr {
+    transition: background 0.2s;
+}
+
+.custom-table tbody tr:hover {
+    background: rgba(190, 242, 100, 0.03);
+}
+
+.inv-number {
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.equipment-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.serial-number {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.date {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.table-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-head h3 {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+}
+
+.table-head h3 i {
+    color: var(--accent);
+}
+
+.table-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.pagination-wrapper {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.pagination-wrapper nav {
+    display: flex;
+    gap: 8px;
+}
+
+.pagination-wrapper .pagination {
+    margin: 0;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pagination-wrapper .page-item .page-link {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.pagination-wrapper .page-item.active .page-link {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #02040a;
+}
+
+.pagination-wrapper .page-item .page-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}

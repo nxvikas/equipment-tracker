@@ -23,17 +23,18 @@
                 @csrf
                 @method('post')
 
-                <div class="mb-3 position-relative">
+                <div class="mb-3">
                     <label for="email" class="form-label-custom">Email</label>
-                    <div class="input-wrapper">
-                        <i class="bi bi-envelope input-icon"></i>
+                    <div class="input-group">
+            <span class="input-group-text">
+                <i class="bi bi-envelope"></i>
+            </span>
                         <input type="email"
                                name="email"
                                id="email"
                                value="{{ old('email') }}"
-                               class="form-control form-control-lg form-control-custom @error('email') is-invalid @enderror">
+                               class="form-control form-control-lg @error('email') is-invalid @enderror">
                     </div>
-
                     @error('email')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -42,16 +43,23 @@
                 </div>
 
 
-                <div class="mb-3 position-relative">
+                <div class="mb-3">
                     <label for="password" class="form-label-custom">Пароль</label>
-                    <div class="input-wrapper">
-                        <i class="bi bi-lock input-icon"></i>
+                    <div class="input-group">
+            <span class="input-group-text">
+                <i class="bi bi-lock"></i>
+            </span>
                         <input type="password"
                                name="password"
                                id="password"
-                               class="form-control form-control-lg form-control-custom @error('password') is-invalid @enderror">
+                               class="form-control form-control-lg @error('password') is-invalid @enderror">
+                        <button class="btn btn-outline-secondary border-start-0"
+                                type="button"
+                                id="togglePassword"
+                                style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
                     </div>
-
                     @error('password')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -61,20 +69,13 @@
 
 
                 <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
-
                     <div class="form-check" style="padding-left: 0 !important;">
-
                         <label class="remember-wrapper">
                             <input type="checkbox" name="remember">
                             <span class="remember-check"></span>
-
-                            <span class="small text-secondary">
-            Запомнить меня
-        </span>
+                            <span class="small text-secondary">Запомнить меня</span>
                         </label>
                     </div>
-
-
                 </div>
 
 
@@ -86,15 +87,16 @@
 
                 <div class="text-center mt-3 small">
                     <span class="text-secondary">Нет аккаунта?</span>
-
                     <a href="{{ route('auth.register') }}" class="auth-link ms-1">
                         Отправить заявку
                     </a>
                 </div>
-
             </form>
 
         </div>
 
     </div>
 @endsection
+@push('scripts')
+    <script src="{{asset('js/pages/auth/eyePassword.js')}}"></script>
+@endpush

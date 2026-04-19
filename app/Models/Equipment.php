@@ -24,7 +24,7 @@ class Equipment extends Model
         'category_id'
     ];
 
-    public function user()
+    public function currentUser()
     {
         return $this->belongsTo(User::class, 'current_user_id');
     }

@@ -1,4 +1,4 @@
-/*Стили форм и валидации*/
+/* СТИЛИ ФОРМ И ВАЛИДАЦИИ */
 
 .form-label {
     font-size: 12px;
@@ -7,7 +7,6 @@
     margin-bottom: 6px;
     display: block;
 }
-
 
 .form-control-custom,
 select.form-control-custom,
@@ -23,15 +22,12 @@ textarea.form-control-custom {
     transition: all 0.2s;
 }
 
-
-
 select.form-control-custom:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
     background-color: var(--bg-surface);
 }
-
 
 select.form-control-custom option {
     background: var(--bg-card);
@@ -43,7 +39,6 @@ select.form-control-custom option:hover {
     background: rgba(190, 242, 100, 0.1);
 }
 
-
 .form-control-custom:focus,
 select.form-control-custom:focus,
 input.form-control-custom:focus,
@@ -52,7 +47,6 @@ textarea.form-control-custom:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
 }
-
 
 .form-control-custom.is-invalid,
 .form-control-custom.error,
@@ -95,41 +89,76 @@ textarea.form-control-custom.is-invalid {
     display: block;
 }
 
-
-.btn-primary {
-    background: var(--accent);
-    color: #02040a;
-    border: none;
-    border-radius: 40px;
-    padding: 10px 24px;
-    font-weight: 600;
+.form-label-custom {
+    display: block;
     font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background: var(--accent-hover);
-    transform: translateY(-1px);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 40px;
-    padding: 8px 20px;
+    font-weight: 500;
     color: var(--text-secondary);
+    margin-bottom: 6px;
+    margin-left: 8px;
+}
+
+.custom-dark-select {
+    color-scheme: dark;
+}
+
+body.light .custom-dark-select {
+    color-scheme: light;
+}
+
+.input-group .form-control,
+.input-group .input-group-text {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    box-shadow: none;
     transition: all 0.2s;
-    cursor: pointer;
+    font-size: 15px;
 }
 
-.btn-outline:hover {
+.input-group .input-group-text {
+    border-right: none;
+    border-radius: 14px 0 0 14px;
+    padding: 10px 14px;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 14px 14px 0;
+    padding: 10px 14px;
+}
+
+.input-group .input-group-text i {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.input-group:focus-within .input-group-text,
+.input-group:focus-within .form-control {
     border-color: var(--accent);
-    color: var(--accent);
+    background-color: rgba(190, 242, 100, 0.04) !important;
 }
 
+.input-group .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+}
 
+.input-group .form-control.is-invalid,
+.input-group .form-control.is-invalid:focus {
+    border-color: var(--danger) !important;
+}
 
+.input-group:has(.is-invalid) .input-group-text {
+    border-color: var(--danger) !important;
+}
+
+.input-group .form-control:focus,
+.input-group .input-group-text:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
+}
+
+.input-wrapper,
+.input-icon {
+    display: none;
+}

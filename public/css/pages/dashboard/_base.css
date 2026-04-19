@@ -246,7 +246,9 @@
 .legend-dot.orange {
     background: #f59e0b;
 }
-
+.legend-dot.red {
+    background: #ef4444;
+}
 .chart-legend span {
     font-size: 13px;
     color: var(--text-secondary);

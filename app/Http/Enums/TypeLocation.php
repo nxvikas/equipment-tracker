@@ -7,6 +7,7 @@ enum TypeLocation: string
     case OFFICE = 'office';
     case WAREHOUSE = 'warehouse';
     case SERVICE = 'service';
+    case REMOTE = 'remote';
 
     public static function values()
     {
@@ -19,6 +20,7 @@ enum TypeLocation: string
             self::OFFICE->value => 'Офис',
             self::WAREHOUSE->value => 'Склад',
             self::SERVICE->value => 'Сервис',
+            self::REMOTE->value => 'Удаленно',
         ];
     }
 }

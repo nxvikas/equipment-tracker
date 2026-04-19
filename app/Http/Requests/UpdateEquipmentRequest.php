@@ -2,26 +2,23 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreEquipmentRequest extends FormRequest
+class UpdateEquipmentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-
     public function rules(): array
     {
+        $equipmentId = $this->route('equipment')->id;
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'serial_number' => ['nullable', 'string', 'unique:equipment,serial_number', 'max:255'],
-            'inventory_number' => ['nullable', 'string', 'unique:equipment,inventory_number', 'max:255'],
+            'serial_number' => ['nullable', 'string', 'max:255', 'unique:equipment,serial_number,' . $equipmentId],
+            'inventory_number' => ['nullable', 'string', 'max:255', 'unique:equipment,inventory_number,' . $equipmentId],
             'manufacturer' => ['nullable', 'string', 'max:255'],
             'model' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
@@ -44,21 +41,21 @@ class StoreEquipmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'required' => 'Поле обязательно для заполнения',
-            'string' => 'Поле должно быть текстовым',
-            'max' => 'Максимальная длина не должна превышать :max символов',
-            'unique' => 'Запись с таким значением уже существует',
+            'name.required' => 'Название обязательно для заполнения',
             'serial_number.unique' => 'Оборудование с таким серийным номером уже существует',
             'inventory_number.unique' => 'Оборудование с таким инвентарным номером уже существует',
-            'category_id.exists' => 'Выбранная категория не найдена в базе',
-            'location_id.exists' => 'Выбранная локация не найдена в базе',
-            'status.in' => 'Выбран недопустимый статус оборудования',
+            'category_id.required' => 'Выберите категорию',
+            'category_id.exists' => 'Выбранная категория не найдена',
+            'location_id.required' => 'Выберите местоположение',
+            'location_id.exists' => 'Выбранная локация не найдена',
+            'status.required' => 'Выберите статус',
+            'status.in' => 'Выбран недопустимый статус',
             'current_user_id.required' => 'Для статуса "В работе" необходимо выбрать сотрудника',
             'current_user_id.exists' => 'Выбранный сотрудник не найден',
-            'purchase_date.date' => 'Введите корректную дату покупки',
+            'purchase_date.date' => 'Введите корректную дату',
             'purchase_price.numeric' => 'Стоимость должна быть числом',
             'purchase_price.min' => 'Стоимость не может быть отрицательной',
-            'warranty_date.date' => 'Введите корректную дату окончания гарантии',
+            'warranty_date.date' => 'Введите корректную дату',
             'warranty_date.after_or_equal' => 'Дата гарантии не может быть раньше даты покупки',
         ];
     }

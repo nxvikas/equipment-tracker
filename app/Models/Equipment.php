@@ -23,7 +23,10 @@ class Equipment extends Model
         'location_id',
         'category_id'
     ];
-
+    protected $casts = [
+        'purchase_date' => 'date',
+        'warranty_date' => 'date',
+    ];
     public function currentUser()
     {
         return $this->belongsTo(User::class, 'current_user_id');

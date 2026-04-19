@@ -37,14 +37,23 @@ Route::get('/', function () {
 Route::middleware(['auth', 'check.role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/equipment', [\App\Http\Controllers\AdminController::class, 'equipment'])->name('equipment');
+    Route::get('/history', [\App\Http\Controllers\AdminController::class, 'history'])->name('history');
     Route::post('/equipment', [\App\Http\Controllers\EquipmentController::class, 'store'])->name('equipment.store');
+    Route::put('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'update'])->name('equipment.update');
+    Route::delete('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'destroy'])->name('equipment.destroy');
 
     Route::post('/equipment/category', [\App\Http\Controllers\CategoryController::class, 'store'])->name('category.store');
     Route::post('/equipment/location', [\App\Http\Controllers\LocationController::class, 'store'])->name('location.store');
 
     Route::get('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'show'])->name('equipment.show');
-
     Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');
+
+
+    Route::post('/equipment/{equipment}/assign', [\App\Http\Controllers\EquipmentController::class, 'assign'])->name('equipment.assign');
+    Route::post('/equipment/{equipment}/return', [\App\Http\Controllers\EquipmentController::class, 'return'])->name('equipment.return');
+    Route::post('/equipment/{equipment}/repair', [\App\Http\Controllers\EquipmentController::class, 'repair'])->name('equipment.repair');
+    Route::post('/equipment/{equipment}/return-from-repair', [\App\Http\Controllers\EquipmentController::class, 'returnFromRepair'])->name('equipment.return-from-repair');
+    Route::post('/equipment/{equipment}/write-off', [\App\Http\Controllers\EquipmentController::class, 'writeOff'])->name('equipment.write-off');
 });
 
 

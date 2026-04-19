@@ -22,6 +22,12 @@
                     <span>Оборудование</span>
                 </a>
             </li>
+            <li class="nav-item {{ request()->routeIs('admin.history*') ? 'active' : '' }}">
+                <a href="{{ route('admin.history') }}" class="nav-link">
+                    <i class="bi bi-clock-history"></i>
+                    <span>История операций</span>
+                </a>
+            </li>
             <li class="nav-item {{ request()->routeIs('admin.employees*') ? 'active' : '' }}">
                 <a href="" class="nav-link">
                     <i class="bi bi-people"></i>

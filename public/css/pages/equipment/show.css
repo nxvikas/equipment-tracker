@@ -1,0 +1,266 @@
+
+/* СТРАНИЦА ПРОСМОТРА ОБОРУДОВАНИЯ  */
+
+.equipment-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    height: 100%;
+}
+
+.equipment-card-body {
+    padding: 24px;
+}
+
+.qr-code-image {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 16px;
+}
+
+.qr-placeholder {
+    color: var(--text-secondary);
+    padding: 40px 0;
+}
+
+.qr-placeholder i {
+    font-size: 48px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-item-full {
+    grid-column: span 2;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.info-value {
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.location-type-badge {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+/* Карточка действий */
+.actions-card {
+    margin-top: 24px;
+    padding: 20px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.actions-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions-title i {
+    color: var(--accent);
+}
+
+.actions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(190, 242, 100, 0.05);
+}
+
+.action-danger {
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.action-danger:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* История */
+.history-section {
+    margin-top: 32px;
+}
+
+.history-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.history-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-header h3 i {
+    color: var(--accent);
+}
+
+.history-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.history-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+}
+
+.history-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.history-table tbody tr:hover {
+    background: rgba(190, 242, 100, 0.02);
+}
+
+.history-date {
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.history-detail {
+    display: inline-block;
+    background: rgba(190, 242, 100, 0.08);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    margin-right: 6px;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 40px !important;
+    color: var(--text-secondary);
+}
+
+.history-empty i {
+    font-size: 32px;
+    margin-right: 8px;
+    opacity: 0.5;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .info-item-full {
+        grid-column: span 1;
+    }
+
+    .history-table th:nth-child(3),
+    .history-table td:nth-child(3) {
+        display: none;
+    }
+
+    .history-date {
+        white-space: normal;
+    }
+
+    .actions-grid {
+        flex-direction: column;
+    }
+
+    .action-button {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .equipment-card-body {
+        padding: 16px;
+    }
+
+    .actions-card {
+        padding: 16px;
+    }
+
+    .history-table th:nth-child(4),
+    .history-table td:nth-child(4) {
+        display: none;
+    }
+}

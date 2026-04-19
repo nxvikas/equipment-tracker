@@ -8,7 +8,6 @@
 
 @section('content')
     <div class="admin-dashboard">
-        <!-- Header -->
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">Панель управления</h1>
@@ -24,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="stats-container">
             <div class="stat-item">
                 <div class="stat-icon-wrapper blue">
@@ -68,7 +66,7 @@
             </div>
         </div>
 
-        <!-- Categories Section -->
+
         <div class="section-wrapper">
             <div class="section-head">
                 <div>
@@ -122,7 +120,7 @@
             </div>
         </div>
 
-        <!-- Charts Row -->
+
         <div class="charts-grid">
             <div class="chart-panel">
                 <div class="chart-head">
@@ -150,7 +148,7 @@
             </div>
         </div>
 
-        <!-- Recent Activity Table -->
+
         <div class="table-wrapper">
             <div class="table-head">
                 <div>

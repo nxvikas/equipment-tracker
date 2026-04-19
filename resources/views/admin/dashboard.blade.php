@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="admin-dashboard">
-        <!-- Header -->
+
         <div class="dashboard-header">
             <div>
                 <h1 class="dashboard-title">Панель управления</h1>

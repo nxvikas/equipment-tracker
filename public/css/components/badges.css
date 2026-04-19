@@ -1,0 +1,64 @@
+/* СТАТУСЫ И БЕЙДЖИ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 40px;
+    font-size: 11px;
+    font-weight: 500;
+    gap: 6px;
+}
+
+.status-badge.success {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.status-badge.warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.status-badge.neutral {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.status-badge.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+.status-badge.info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.operation {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.operation.assign {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.operation.receive {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.operation.return {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+.operation.repair {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}

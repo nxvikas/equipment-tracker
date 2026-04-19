@@ -31,22 +31,38 @@
         <div class="filters-bar">
             <div class="search-input-wrapper">
                 <i class="bi bi-search"></i>
-                <input type="text" id="searchEquipment" class="search-input" placeholder="Поиск по названию, инв. номеру...">
+                <input type="text" id="searchEquipment" class="search-input"
+                       placeholder="Поиск по названию, инв. номеру...">
             </div>
             <div class="filters-group">
-                <select id="filterCategory" class="filter-select custom-dark-select">
-                    <option value="">Все категории</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
-                <select id="filterStatus" class="filter-select custom-dark-select">
-                    <option value="">Все статусы</option>
-                    <option value="in_stock">На складе</option>
-                    <option value="in_use">В работе</option>
-                    <option value="repair">В ремонте</option>
-                    <option value="written_off">Списано</option>
-                </select>
+                <div class="dropdown custom-select">
+                    <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="selected-text">Все категории</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu custom-select-menu">
+                        <li><a class="dropdown-item" href="#" data-value="">Все категории</a></li>
+                        @foreach($categories as $category)
+                            <li><a class="dropdown-item" href="#"
+                                   data-value="{{ $category->id }}">{{ $category->name }}</a></li>
+                        @endforeach
+                    </ul>
+                    <input type="hidden" name="category_id" class="custom-select-input" value="">
+                </div>
+                <div class="dropdown custom-select">
+                    <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="selected-text">Все статусы</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <ul class="dropdown-menu custom-select-menu">
+                        <li><a class="dropdown-item active" href="#" data-value="">Все статусы</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="in_stock">На складе</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="in_use">В работе</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="repair">В ремонте</a></li>
+                        <li><a class="dropdown-item" href="#" data-value="written_off">Списано</a></li>
+                    </ul>
+                    <input type="hidden" id="filterStatus" class="custom-select-input" value="">
+                </div>
             </div>
         </div>
 
@@ -71,7 +87,8 @@
                             <td style="text-align: center;">
                                 @if($item->qr_code)
                                     <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('admin.equipment.qrcode', $item->id) }}" alt="QR" style="width: 40px; height: 40px;">
+                                        <img src="{{ route('admin.equipment.qrcode', $item->id) }}" alt="QR"
+                                             style="width: 40px; height: 40px;">
                                     </div>
                                 @else
                                     <span class="text-secondary">—</span>
@@ -105,11 +122,13 @@
                                 <button class="action-btn" onclick="viewEquipment({{ $item->id }})" title="Просмотр">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                <button class="action-btn" onclick="editEquipment({{ $item->id }})" title="Редактировать">
+                                <button class="action-btn" onclick="editEquipment({{ $item->id }})"
+                                        title="Редактировать">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                                 @if($item->status === 'in_stock')
-                                    <button class="action-btn assign" onclick="assignEquipment({{ $item->id }})" title="Выдать сотруднику">
+                                    <button class="action-btn assign" onclick="assignEquipment({{ $item->id }})"
+                                            title="Выдать сотруднику">
                                         <i class="bi bi-person-check"></i>
                                     </button>
                                 @endif
@@ -124,7 +143,8 @@
                                     </div>
                                     <h4 class="empty-title">Здесь пока пусто</h4>
                                     <p class="empty-desc">Самое время добавить первую технику в базу.</p>
-                                    <button class="btn-outline mt-3" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+                                    <button class="btn-outline mt-3" data-bs-toggle="modal"
+                                            data-bs-target="#addEquipmentModal">
                                         <i class="bi bi-plus-lg me-2"></i>Добавить оборудование
                                     </button>
                                 </div>
@@ -147,111 +167,179 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2" style="color: var(--accent);"></i>Добавление оборудования</h5>
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2" style="color: var(--accent);"></i>Добавление
+                        оборудования</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <form action="{{ route('admin.equipment.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        @if ($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal'))
-                            <div class="alert custom-alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Название <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control-custom @error('name') is-invalid @enderror" value="{{ old('name') }}">
+                                <input type="text"
+                                       name="name"
+                                       class="form-control-custom @error('name') is-invalid @enderror"
+                                       value="{{ old('name') }}">
+                                @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
                                     <label class="form-label mb-0">Категория <span class="text-danger">*</span></label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal"
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                        новую</a>
                                 </div>
-                                <select name="category_id" class="form-control-custom custom-dark-select">
+                                <select name="category_id"
+                                        class="form-control-custom custom-dark-select @error('category_id') is-invalid @enderror">
                                     <option value="">Выберите категорию</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ (old('category_id') == $category->id || session('new_category_id') == $category->id) ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ $category->id }}" {{ (old('category_id') == $category->id || session('new_category_id') == $category->id) ? 'selected' : '' }}>
                                             {{ $category->name }}
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('category_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Производитель</label>
-                                <input type="text" name="manufacturer" class="form-control-custom" value="{{ old('manufacturer') }}">
+                                <input type="text"
+                                       name="manufacturer"
+                                       class="form-control-custom @error('manufacturer') is-invalid @enderror"
+                                       value="{{ old('manufacturer') }}">
+                                @error('manufacturer')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Модель</label>
-                                <input type="text" name="model" class="form-control-custom" value="{{ old('model') }}">
+                                <input type="text"
+                                       name="model"
+                                       class="form-control-custom @error('model') is-invalid @enderror"
+                                       value="{{ old('model') }}">
+                                @error('model')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Серийный номер</label>
-                                <input type="text" name="serial_number" class="form-control-custom" value="{{ old('serial_number') }}">
+                                <input type="text"
+                                       name="serial_number"
+                                       class="form-control-custom @error('serial_number') is-invalid @enderror"
+                                       value="{{ old('serial_number') }}">
+                                @error('serial_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Инвентарный номер</label>
-                                <input type="text" name="inventory_number" class="form-control-custom" placeholder="Автоматически" value="{{ old('inventory_number') }}">
+                                <input type="text"
+                                       name="inventory_number"
+                                       class="form-control-custom @error('inventory_number') is-invalid @enderror"
+                                       placeholder="Автоматически"
+                                       value="{{ old('inventory_number') }}">
                                 <small class="form-hint">Оставьте пустым для автоматической генерации</small>
+                                @error('inventory_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Дата покупки</label>
-                                <input type="date" name="purchase_date" class="form-control-custom custom-dark-select" value="{{ old('purchase_date') }}">
+                                <input type="date"
+                                       name="purchase_date"
+                                       class="form-control-custom custom-dark-select @error('purchase_date') is-invalid @enderror"
+                                       value="{{ old('purchase_date') }}">
+                                @error('purchase_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Стоимость (₽)</label>
-                                <input type="number" step="0.01" name="purchase_price" class="form-control-custom" value="{{ old('purchase_price') }}">
+                                <input type="number"
+                                       step="0.01"
+                                       name="purchase_price"
+                                       class="form-control-custom @error('purchase_price') is-invalid @enderror"
+                                       value="{{ old('purchase_price') }}">
+                                @error('purchase_price')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Гарантия до</label>
-                                <input type="date" name="warranty_date" class="form-control-custom custom-dark-select" value="{{ old('warranty_date') }}">
+                                <input type="date"
+                                       name="warranty_date"
+                                       class="form-control-custom custom-dark-select @error('warranty_date') is-invalid @enderror"
+                                       value="{{ old('warranty_date') }}">
+                                @error('warranty_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
-                                <select name="status" class="form-control-custom custom-dark-select">
+                                <select name="status"
+                                        class="form-control-custom custom-dark-select @error('status') is-invalid @enderror">
                                     <option value="">Выберите статус</option>
-                                    <option value="in_stock" {{ old('status') == 'in_stock' ? 'selected' : '' }}>На складе</option>
-                                    <option value="in_use" {{ old('status') == 'in_use' ? 'selected' : '' }}>В работе</option>
-                                    <option value="repair" {{ old('status') == 'repair' ? 'selected' : '' }}>В ремонте</option>
+                                    <option value="in_stock" {{ old('status') == 'in_stock' ? 'selected' : '' }}>На
+                                        складе
+                                    </option>
+                                    <option value="in_use" {{ old('status') == 'in_use' ? 'selected' : '' }}>В работе
+                                    </option>
+                                    <option value="repair" {{ old('status') == 'repair' ? 'selected' : '' }}>В ремонте
+                                    </option>
                                 </select>
+                                @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Местоположение <span class="text-danger">*</span></label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal" style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
+                                    <label class="form-label mb-0">Местоположение <span
+                                            class="text-danger">*</span></label>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                        новую</a>
                                 </div>
-                                <select name="location_id" class="form-control-custom custom-dark-select">
+                                <select name="location_id"
+                                        class="form-control-custom custom-dark-select @error('location_id') is-invalid @enderror">
                                     <option value="">Выберите локацию</option>
                                     @foreach($locations as $location)
-                                        <option value="{{ $location->id }}" {{ (old('location_id') == $location->id || session('new_location_id') == $location->id) ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ $location->id }}" {{ (old('location_id') == $location->id || session('new_location_id') == $location->id) ? 'selected' : '' }}>
                                             {{ $location->name }}
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('location_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Примечание</label>
-                            <textarea name="notes" class="form-control-custom" rows="2">{{ old('notes') }}</textarea>
+                            <textarea name="notes" class="form-control-custom @error('notes') is-invalid @enderror"
+                                      rows="2">{{ old('notes') }}</textarea>
+                            @error('notes')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -275,22 +363,32 @@
                     <input type="hidden" name="return_to" value="equipment">
 
                     <div class="modal-body">
-                        @if ($errors->hasBag('categoryModal'))
-                            <div class="alert custom-alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->categoryModal->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
                         <div class="mb-3">
                             <label class="form-label">Название категории <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control-custom" placeholder="Например: Мониторы">
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name', 'categoryModal') is-invalid @enderror"
+                                   placeholder="Например: Мониторы"
+                                   value="{{ old('name') }}">
+                            @error('name', 'categoryModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Описание</label>
+                            <textarea name="description"
+                                      class="form-control-custom @error('description', 'categoryModal') is-invalid @enderror"
+                                      placeholder="Дополнительная информация о категории"
+                                      rows="2">{{ old('description') }}</textarea>
+                            @error('description', 'categoryModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
+
                     <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn-outline" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">Назад</button>
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
                         <button type="submit" class="btn-primary">Сохранить</button>
                     </div>
                 </form>
@@ -310,30 +408,48 @@
                     <input type="hidden" name="return_to" value="equipment">
 
                     <div class="modal-body">
-                        @if ($errors->hasBag('locationModal'))
-                            <div class="alert custom-alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->locationModal->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
                         <div class="mb-3">
                             <label class="form-label">Название локации <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control-custom" placeholder="Например: Склад №5">
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name', 'locationModal') is-invalid @enderror"
+                                   placeholder="Например: Склад №5"
+                                   value="{{ old('name') }}">
+                            @error('name', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Тип <span class="text-danger">*</span></label>
-                            <select name="type" class="form-control-custom custom-dark-select">
-                                <option value="office">Офис</option>
-                                <option value="warehouse">Склад</option>
-                                <option value="service">Сервис (Ремонт)</option>
+                            <select name="type"
+                                    class="form-control-custom custom-dark-select @error('type', 'locationModal') is-invalid @enderror">
+                                <option value="office" {{ old('type') == 'office' ? 'selected' : '' }}>Офис</option>
+                                <option value="warehouse" {{ old('type') == 'warehouse' ? 'selected' : '' }}>Склад
+                                </option>
+                                <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Сервис
+                                    (Ремонт)
+                                </option>
                             </select>
+                            @error('type', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Адрес</label>
+                            <textarea name="address"
+                                      class="form-control-custom @error('address', 'locationModal') is-invalid @enderror"
+                                      placeholder="Физический адрес (необязательно)"
+                                      rows="2">{{ old('address') }}</textarea>
+                            @error('address', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
+
                     <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn-outline" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">Назад</button>
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
                         <button type="submit" class="btn-primary">Сохранить</button>
                     </div>
                 </form>
@@ -344,21 +460,141 @@
 
 @push('scripts')
     <script>
-        function viewEquipment(id) { window.location.href = '/admin/equipment/' + id; }
-        function editEquipment(id) { window.location.href = '/admin/equipment/' + id + '/edit'; }
-        function assignEquipment(id) { window.location.href = '/admin/equipment/' + id + '/assign'; }
+        function viewEquipment(id) {
+            window.location.href = '/admin/equipment/' + id;
+        }
+
+        function editEquipment(id) {
+            window.location.href = '/admin/equipment/' + id + '/edit';
+        }
+
+        function assignEquipment(id) {
+            window.location.href = '/admin/equipment/' + id + '/assign';
+        }
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(session('open_category_modal') || $errors->hasBag('categoryModal'))
-            new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+        async function submitModalForm(form, modalId, selectName) {
+            const formData = new FormData(form);
 
-            @elseif(session('open_location_modal') || $errors->hasBag('locationModal'))
-            new bootstrap.Modal(document.getElementById('addLocationModal')).show();
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
 
-            @elseif(session('reopen_equipment_modal') || ($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal')))
+                const data = await response.json();
+
+                if (data.success) {
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                    modal.hide();
+
+
+                    const select = document.querySelector(`select[name="${selectName}"]`);
+                    const newOption = new Option(data.item.name, data.item.id, true, true);
+                    select.add(newOption);
+
+
+                    showToast(data.message, 'success');
+
+
+                    form.reset();
+
+
+                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+                } else {
+
+                    showFormErrors(form, data.errors);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showToast('Произошла ошибка', 'danger');
+            }
+        }
+
+        function showFormErrors(form, errors) {
+            // Очищаем старые ошибки
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+            // Показываем новые
+            for (let field in errors) {
+                const input = form.querySelector(`[name="${field}"]`);
+                if (input) {
+                    input.classList.add('is-invalid');
+                    const feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback';
+                    feedback.textContent = errors[field][0];
+                    input.closest('.mb-3')?.appendChild(feedback) || input.parentNode.appendChild(feedback);
+                }
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3`;
+            toast.style.zIndex = '9999';
+            toast.style.backgroundColor = type === 'success' ? 'rgba(190, 242, 100, 0.9)' : 'rgba(239, 68, 68, 0.9)';
+            toast.style.color = type === 'success' ? '#02040a' : '#fff';
+            toast.style.borderRadius = '12px';
+            toast.style.padding = '12px 20px';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            @if($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal'))
             new bootstrap.Modal(document.getElementById('addEquipmentModal')).show();
             @endif
+
+
+            @if(session('reopen_equipment_modal'))
+            new bootstrap.Modal(document.getElementById('addEquipmentModal')).show();
+            @endif
+
+            const categoryForm = document.querySelector('#addCategoryModal form');
+            if (categoryForm) {
+                categoryForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitModalForm(this, 'addCategoryModal', 'category_id');
+                });
+            }
+
+
+            const locationForm = document.querySelector('#addLocationModal form');
+            if (locationForm) {
+                locationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitModalForm(this, 'addLocationModal', 'location_id');
+                });
+            }
+
+            const customSelects = document.querySelectorAll('.custom-select');
+            customSelects.forEach(select => {
+                const btn = select.querySelector('.custom-select-btn');
+                const items = select.querySelectorAll('.dropdown-item');
+                const hiddenInput = select.querySelector('.custom-select-input');
+                const selectedText = btn.querySelector('.selected-text');
+
+                items.forEach(item => {
+                    item.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const value = this.dataset.value;
+                        const text = this.textContent;
+                        selectedText.textContent = text;
+                        if (hiddenInput) hiddenInput.value = value;
+                        items.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                });
+            });
         });
     </script>
 @endpush

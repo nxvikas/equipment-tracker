@@ -1,0 +1,37 @@
+/* КАРТОЧКИ */
+
+.register-card {
+    width: 100%;
+    max-width: 580px;
+    background: rgba(17, 20, 31, 0.88);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    padding: 40px;
+    transition: 0.2s;
+}
+
+.register-card:hover {
+    border-color: rgba(190, 242, 100, 0.25);
+}
+
+.waiting-card {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(17, 20, 31, 0.88);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(18px);
+    border-radius: 26px;
+    padding: 40px;
+    transition: 0.2s;
+}
+
+.waiting-card:hover {
+    border-color: rgba(190, 242, 100, 0.25);
+}
+
+.status-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}

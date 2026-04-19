@@ -1,4 +1,8 @@
 <header class="header">
+    <button class="burger-btn d-md-none" id="burgerBtn" type="button">
+        <i class="bi bi-list"></i>
+    </button>
+
     <div class="search-wrapper">
         <i class="bi bi-search"></i>
         <input type="text" id="globalSearch" class="search-input"
@@ -56,12 +60,10 @@
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <form method="POST" action="">
-                        @csrf
-                        <button type="submit" class="dropdown-item text-danger">
-                            <i class="bi bi-box-arrow-right me-2"></i> Выход
-                        </button>
-                    </form>
+
+                    <a class="dropdown-item text-danger" href="{{route('logout')}}">
+                        <i class="bi bi-box-arrow-right me-2"></i> Выход
+                    </a>
                 </li>
             </ul>
         </div>

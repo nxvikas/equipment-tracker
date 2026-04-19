@@ -42,6 +42,8 @@ Route::middleware(['auth', 'check.role:admin'])->prefix('admin')->name('admin.')
     Route::post('/equipment/category', [\App\Http\Controllers\CategoryController::class, 'store'])->name('category.store');
     Route::post('/equipment/location', [\App\Http\Controllers\LocationController::class, 'store'])->name('location.store');
 
+    Route::get('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'show'])->name('equipment.show');
+
     Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');
 });
 

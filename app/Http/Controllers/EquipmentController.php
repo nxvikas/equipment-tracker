@@ -93,7 +93,9 @@ class EquipmentController extends Controller
      */
     public function show(Equipment $equipment)
     {
-        //
+        $equipment->load(['category', 'location', 'currentUser', 'history.user']);
+
+        return view('admin.equipment.show', compact('equipment'));
     }
 
     /**

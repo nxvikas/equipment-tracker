@@ -14,12 +14,12 @@
                 <p class="dashboard-subtitle">Добро пожаловать! Вот сводка по оборудованию и активам</p>
             </div>
             <div class="dashboard-actions">
-                <button class="btn-icon" onclick="window.exportReport && exportReport()" title="Экспорт отчета">
+                <a href="#" class="btn-icon" id="exportReportBtn" title="Экспорт отчета">
                     <i class="bi bi-download"></i>
-                </button>
-                <button class="btn-icon" onclick="window.location.reload()" title="Обновить">
+                </a>
+                <a href="{{ url()->current() }}" class="btn-icon" title="Обновить">
                     <i class="bi bi-arrow-repeat"></i>
-                </button>
+                </a>
             </div>
         </div>
 
@@ -77,23 +77,23 @@
             </div>
             <div class="categories-container">
                 @forelse($categories as $category)
-                    <div class="category-item"
-                         onclick="window.location.href='{{ route('admin.equipment', ['category_id' => $category->id,'from'=>'dashboard']) }}'">
+                    <a href="{{ route('admin.equipment', ['category_id' => $category->id, 'from' => 'dashboard']) }}"
+                       class="category-item text-decoration-none">
                         <div class="category-icon">
                             <i class="bi bi-{{
-                                str_contains(strtolower($category->name), 'ноут') ? 'laptop' :
-                                (str_contains(strtolower($category->name), 'монитор') ? 'display' :
-                                (str_contains(strtolower($category->name), 'принтер') ? 'printer' :
-                                (str_contains(strtolower($category->name), 'планшет') ? 'tablet' :
-                                (str_contains(strtolower($category->name), 'сетево') ? 'router' :
-                                (str_contains(strtolower($category->name), 'перифери') ? 'mouse' : 'grid')))))
-                            }}"></i>
+                str_contains(strtolower($category->name), 'ноут') ? 'laptop' :
+                (str_contains(strtolower($category->name), 'монитор') ? 'display' :
+                (str_contains(strtolower($category->name), 'принтер') ? 'printer' :
+                (str_contains(strtolower($category->name), 'планшет') ? 'tablet' :
+                (str_contains(strtolower($category->name), 'сетево') ? 'router' :
+                (str_contains(strtolower($category->name), 'перифери') ? 'mouse' : 'grid')))))
+            }}"></i>
                         </div>
                         <div class="category-details">
                             <span class="category-name">{{ $category->name }}</span>
                             <span class="category-count">{{ $category->equipment_count }} <small>ед.</small></span>
                         </div>
-                    </div>
+                    </a>
                 @empty
                     <div class="text-secondary py-3">Нет категорий</div>
                 @endforelse
@@ -238,7 +238,7 @@
                         responsive: true,
                         maintainAspectRatio: true,
                         plugins: {
-                            legend: { display: false },
+                            legend: {display: false},
                             tooltip: {
                                 backgroundColor: 'rgba(17, 20, 31, 0.96)',
                                 titleColor: '#f1f5f9',
@@ -248,7 +248,7 @@
                                 padding: 10,
                                 cornerRadius: 8,
                                 callbacks: {
-                                    label: function(context) {
+                                    label: function (context) {
                                         const label = context.label || '';
                                         const value = context.raw || 0;
                                         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
@@ -271,7 +271,7 @@
                     monthlyData.forEach(item => {
                         const [year, month] = item.month.split('-');
                         const date = new Date(year, month - 1);
-                        labels.push(date.toLocaleString('ru', { month: 'short' }));
+                        labels.push(date.toLocaleString('ru', {month: 'short'}));
                         values.push(item.count);
                     });
                 } else {
@@ -303,7 +303,7 @@
                         maintainAspectRatio: true,
                         plugins: {
                             legend: {
-                                labels: { color: '#94a3b8', font: { size: 11 } }
+                                labels: {color: '#94a3b8', font: {size: 11}}
                             },
                             tooltip: {
                                 backgroundColor: 'rgba(17, 20, 31, 0.96)',
@@ -315,13 +315,13 @@
                         },
                         scales: {
                             y: {
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#94a3b8' },
+                                grid: {color: 'rgba(255, 255, 255, 0.05)'},
+                                ticks: {color: '#94a3b8'},
                                 beginAtZero: true
                             },
                             x: {
-                                grid: { display: false },
-                                ticks: { color: '#94a3b8' }
+                                grid: {display: false},
+                                ticks: {color: '#94a3b8'}
                             }
                         }
                     }

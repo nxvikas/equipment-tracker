@@ -26,9 +26,16 @@
 
         <div class="page-header">
             <div>
-                <a href="{{ route('admin.equipment') }}" class="text-secondary text-decoration-none">
-                    <i class="bi bi-arrow-left"></i> Назад к списку
-                </a>
+                @if(request('from_user'))
+                    <a href="{{ route('admin.users.show', request('from_user')) }}"
+                       class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к сотруднику
+                    </a>
+                @else
+                    <a href="{{ route('admin.equipment') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к списку
+                    </a>
+                @endif
                 <h1 class="page-title mt-2">{{ $equipment->name }}</h1>
                 <p class="page-subtitle">{{ $equipment->inventory_number }}</p>
             </div>
@@ -113,8 +120,16 @@
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Сотрудник</span>
-                                <span
-                                    class="info-value">{{ $equipment->currentUser ? $equipment->currentUser->surname . ' ' . $equipment->currentUser->name : '—' }}</span>
+                                <span class="info-value">
+        @if($equipment->currentUser)
+                                        <a href="{{ route('admin.users.show', ['user' => $equipment->currentUser->id, 'from_equipment' => $equipment->id]) }}"
+                                           class="text-decoration-none" style="color: var(--accent);">
+                {{ $equipment->currentUser->surname }} {{ $equipment->currentUser->name }}
+            </a>
+                                    @else
+                                        —
+                                    @endif
+    </span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Дата покупки</span>
@@ -244,7 +259,20 @@
                         <tr>
                             <td class="history-date">{{ $record->created_at->format('d.m.Y H:i') }}</td>
                             <td>{{ \App\Http\Enums\TypeEquipmentHistory::ruValues()[$record->action_type] ?? $record->action_type }}</td>
-                            <td>{{ $record->user->name ?? 'Система' }}</td>
+                            <td>
+                                @if($record->user)
+                                    @if($record->user->id === auth()->id())
+                                        {{ $record->user->name }} (это Вы)
+                                    @else
+                                        <a href="{{ route('admin.users.show', ['user' => $record->user->id, 'from_equipment' => $equipment->id]) }}"
+                                        >
+                                            {{ $record->user->name }}
+                                        </a>
+                                    @endif
+                                @else
+                                    Система
+                                @endif
+                            </td>
                             <td>
                                 @if($record->toUser)
                                     <span class="history-detail">→ {{ $record->toUser->name }}</span>

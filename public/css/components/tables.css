@@ -1,5 +1,7 @@
 /* ТАБЛИЦЫ */
 
+
+
 .table-wrapper {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -109,7 +111,7 @@
     gap: 8px;
 }
 
-/* Сброс стандартных стилей пагинации */
+
 .pagination-wrapper .pagination {
     margin: 0 !important;
     padding-left: 0 !important;
@@ -160,18 +162,19 @@
     pointer-events: none !important;
 }
 
-/* SVG иконки в пагинации */
+
 .pagination-wrapper .page-link svg {
     width: 16px !important;
     height: 16px !important;
     fill: currentColor !important;
 }
 
-/* Скрываем текст "Showing X to Y of Z results" */
+
 .pagination-wrapper .text-sm,
 .pagination-wrapper p.text-sm {
     display: none !important;
 }
+
 /* АДАПТИВ ДЛЯ ПАГИНАЦИИ */
 @media (max-width: 768px) {
     .pagination-wrapper {
@@ -182,4 +185,40 @@
         padding: 6px 10px !important;
         font-size: 12px !important;
     }
+}
+/* ССЫЛКИ В ТАБЛИЦАХ */
+.equipment-name a,
+a.equipment-name {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+}
+
+.equipment-name a:hover,
+a.equipment-name:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+/* Ссылки в истории */
+.history-table a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.history-table a:hover {
+    color: var(--accent-hover);
+}
+
+/* Ссылки в карточке оборудования */
+.info-value a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.info-value a:hover {
+    color: var(--accent-hover);
 }

@@ -78,28 +78,26 @@
                     <div class="dropdown custom-select">
                         <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="selected-text">
-                        @php
-                            $statusLabels = [
-                                'in_stock' => 'На складе',
-                                'in_use' => 'В работе',
-                                'repair' => 'В ремонте',
-                                'written' => 'Списано',
-                            ];
-                        @endphp
-                        {{ request('status') ? $statusLabels[request('status')] : 'Все статусы' }}
-                    </span>
+    @if(request('status'))
+                            {{ \App\Http\Enums\StatusEquipment::ruValues()[request('status')] ?? request('status') }}
+                        @else
+                            Все статусы
+                        @endif
+</span>
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu custom-select-menu">
-                            <li><a class="dropdown-item" href="#" data-value="">Все статусы</a></li>
-                            <li><a class="dropdown-item {{ request('status') == 'in_stock' ? 'active' : '' }}" href="#"
-                                   data-value="in_stock">На складе</a></li>
-                            <li><a class="dropdown-item {{ request('status') == 'in_use' ? 'active' : '' }}" href="#"
-                                   data-value="in_use">В работе</a></li>
-                            <li><a class="dropdown-item {{ request('status') == 'repair' ? 'active' : '' }}" href="#"
-                                   data-value="repair">В ремонте</a></li>
-                            <li><a class="dropdown-item {{ request('status') == 'written' ? 'active' : '' }}" href="#"
-                                   data-value="written">Списано</a></li>
+                            <li><a class="dropdown-item {{ !request('status') ? 'active' : '' }}" href="#"
+                                   data-value="">Все статусы</a></li>
+                            @foreach(\App\Http\Enums\StatusEquipment::cases() as $status)
+                                <li>
+                                    <a class="dropdown-item {{ request('status') == $status->value ? 'active' : '' }}"
+                                       href="#"
+                                       data-value="{{ $status->value }}">
+                                        {{ \App\Http\Enums\StatusEquipment::ruValues()[$status->value] }}
+                                    </a>
+                                </li>
+                            @endforeach
                         </ul>
                         <input type="hidden" name="status" class="custom-select-input" value="{{ request('status') }}">
                     </div>
@@ -131,50 +129,61 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @forelse($equipments as $item)
+                    @forelse($equipments as $equipment)
                         <tr>
                             <td style="text-align: center;">
-                                @if($item->qr_code)
+                                @if($equipment->qr_code)
                                     <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('admin.equipment.qrcode', $item->id) }}" alt="QR"
+                                        <img src="{{ route('admin.equipment.qrcode', $equipment->id) }}" alt="QR"
                                              style="width: 40px; height: 40px;">
                                     </div>
                                 @else
                                     <span class="text-secondary">—</span>
                                 @endif
                             </td>
-                            <td class="inv-number">{{ $item->inventory_number }}</td>
-                            <td class="equipment-name">{{ $item->name }}</td>
-                            <td>{{ $item->category->name ?? '—' }}</td>
-                            <td class="serial-number">{{ $item->serial_number ?? '—' }}</td>
+                            <td class="inv-number">{{ $equipment->inventory_number }}</td>
+                            <td class="equipment-name">
+                                <a href="{{ route('admin.equipment.show', $equipment->id) }}" class="equipment-name">
+                                    {{ $equipment->name }}
+                                </a>
+                            </td>
+                            <td>{{ $equipment->category->name ?? '—' }}</td>
+                            <td class="serial-number">{{ $equipment->serial_number ?? '—' }}</td>
                             <td>
                                 @php
-                                    $statusClass = match($item->status) {
+                                    $statusClass = match($equipment->status) {
                                         'in_use' => 'success',
                                         'in_stock' => 'neutral',
                                         'repair' => 'warning',
                                         'written' => 'danger',
                                         default => 'neutral'
                                     };
-                                    $statusText = match($item->status) {
-                                        'in_use' => 'В работе',
-                                        'in_stock' => 'На складе',
-                                        'repair' => 'В ремонте',
-                                        'written' => 'Списано',
-                                        default => $item->status
-                                    };
                                 @endphp
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                <span class="status-badge {{ $statusClass }}">
+        {{ \App\Http\Enums\StatusEquipment::ruValues()[$equipment->status] ?? $equipment->status }}
+    </span>
                             </td>
-                            <td>{{ $item->currentUser ? $item->currentUser->surname . ' ' . $item->currentUser->name : '—' }}</td>
+                            <td>{{ $equipment->currentUser ? $equipment->currentUser->surname . ' ' . $equipment->currentUser->name : '—' }}</td>
                             <td>
-                                <a href="{{ route('admin.equipment.show', $item->id) }}"
-                                   class="action-button"
-                                   style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; text-decoration: none;">
-                                    <i class="bi bi-eye"></i>
-                                    <span>Открыть</span>
-                                </a>
-
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editEquipmentModal{{ $equipment->id }}"
+                                        title="Редактировать">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                @php
+                                    $otherActions = $equipment->history->filter(function($record) {
+                                        return $record->action_type !== \App\Http\Enums\TypeEquipmentHistory::CREATED->value;
+                                    })->count();
+                                @endphp
+                                @if($otherActions === 0)
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteEquipmentModal{{ $equipment->id }}"
+                                            title="Удалить">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -343,7 +352,8 @@
                                     <option value="">Выберите статус</option>
                                     @foreach(\App\Http\Enums\StatusEquipment::cases() as $status)
                                         @if($status->value !== 'written')
-                                            <option value="{{ $status->value }}" {{ old('status') == $status->value ? 'selected' : '' }}>
+                                            <option
+                                                value="{{ $status->value }}" {{ old('status') == $status->value ? 'selected' : '' }}>
                                                 {{ \App\Http\Enums\StatusEquipment::ruValues()[$status->value] }}
                                             </option>
                                         @endif
@@ -375,7 +385,8 @@
                                         class="form-control-custom custom-dark-select @error('current_user_id') is-invalid @enderror">
                                     <option value="">Выберите сотрудника</option>
                                     @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ old('current_user_id') == $user->id ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ $user->id }}" {{ old('current_user_id') == $user->id ? 'selected' : '' }}>
                                             {{ $user->name }} ({{ $user->email }})
                                         </option>
                                     @endforeach
@@ -387,9 +398,11 @@
 
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
+                                    <label class="form-label mb-0">Выбор локации <span
+                                            class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                        новую</a>
                                 </div>
                                 <select name="location_id" id="locationSelect"
                                         class="form-control-custom custom-dark-select @error('location_id') is-invalid @enderror">
@@ -398,7 +411,9 @@
                                         <option value="{{ $location->id }}"
                                                 data-type="{{ $location->type }}"
                                             {{ (old('location_id') == $location->id || session('new_location_id') == $location->id) ? 'selected' : '' }}>
-                                            {{ $location->name }} ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
+                                            {{ $location->name }}
+                                            ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
+                                            )
                                         </option>
                                     @endforeach
                                 </select>
@@ -407,8 +422,6 @@
                                 @enderror
                             </div>
                         </div>
-
-
 
 
                         <div class="mb-3">
@@ -535,6 +548,222 @@
             </div>
         </div>
     </div>
+
+    @foreach($equipments as $equipment)
+        <div class="modal fade" id="editEquipmentModal{{ $equipment->id }}" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title">
+                            <i class="bi bi-pencil-square me-2" style="color: var(--accent);"></i>
+                            Редактирование оборудования
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form action="{{ route('admin.equipment.update', $equipment->id) }}" method="POST"
+                          class="edit-equipment-form">
+                        @csrf @method('PUT')
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Название <span class="text-danger">*</span></label>
+                                    <input type="text" name="name"
+                                           class="form-control-custom @error('name') is-invalid @enderror"
+                                           value="{{ old('name', $equipment->name) }}">
+                                    @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex justify-content-between align-items-end mb-2">
+                                        <label class="form-label mb-0">Категория <span
+                                                class="text-danger">*</span></label>
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal"
+                                           style="font-size: 12px; color: var(--accent); text-decoration: none;">+
+                                            Добавить
+                                            новую</a>
+                                    </div>
+                                    <select name="category_id"
+                                            class="form-control-custom custom-dark-select @error('category_id') is-invalid @enderror">
+                                        <option value="">Выберите категорию</option>
+                                        @foreach($categories as $category)
+                                            <option
+                                                value="{{ $category->id }}" {{ old('category_id', $equipment->category_id) == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('category_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Производитель</label>
+                                    <input type="text" name="manufacturer" class="form-control-custom"
+                                           value="{{ old('manufacturer', $equipment->manufacturer) }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Модель</label>
+                                    <input type="text" name="model" class="form-control-custom"
+                                           value="{{ old('model', $equipment->model) }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Серийный номер</label>
+                                    <input type="text" name="serial_number" class="form-control-custom"
+                                           value="{{ old('serial_number', $equipment->serial_number) }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Инвентарный номер</label>
+                                    <input type="text" name="inventory_number" class="form-control-custom"
+                                           value="{{ old('inventory_number', $equipment->inventory_number) }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Дата покупки</label>
+                                    <input type="date" name="purchase_date"
+                                           class="form-control-custom custom-dark-select"
+                                           value="{{ old('purchase_date', $equipment->purchase_date?->format('Y-m-d')) }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Стоимость (₽)</label>
+                                    <input type="number" step="0.01" name="purchase_price" class="form-control-custom"
+                                           value="{{ old('purchase_price', $equipment->purchase_price) }}">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Гарантия до</label>
+                                    <input type="date" name="warranty_date"
+                                           class="form-control-custom custom-dark-select"
+                                           value="{{ old('warranty_date', $equipment->warranty_date?->format('Y-m-d')) }}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Статус <span class="text-danger">*</span></label>
+                                    <select name="status" class="form-control-custom custom-dark-select">
+                                        @foreach(\App\Http\Enums\StatusEquipment::cases() as $status)
+                                            @if($status->value !== 'written')
+                                                <option
+                                                    value="{{ $status->value }}" {{ old('status', $equipment->status) == $status->value ? 'selected' : '' }}>
+                                                    {{ \App\Http\Enums\StatusEquipment::ruValues()[$status->value] }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Тип локации <span class="text-danger">*</span></label>
+                                    <select id="editLocationTypeSelect" class="form-control-custom custom-dark-select">
+                                        <option value="">Все типы</option>
+                                        @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
+                                            <option value="{{ $type->value }}">
+                                                {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-end">
+                                <div class="col-md-6 mb-3 user-field" style="display: none;">
+                                    <label class="form-label" id="editUserLabel">Сотрудник <span
+                                            class="text-danger">*</span></label>
+                                    <select name="current_user_id" class="form-control-custom custom-dark-select">
+                                        <option value="">Выберите сотрудника</option>
+                                        @foreach($users as $user)
+                                            <option
+                                                value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }} ({{ $user->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex justify-content-between align-items-end mb-2">
+                                        <label class="form-label mb-0">Выбор локации <span
+                                                class="text-danger">*</span></label>
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
+                                           style="font-size: 12px; color: var(--accent); text-decoration: none;">+
+                                            Добавить
+                                            новую</a>
+                                    </div>
+                                    <select name="location_id" id="editLocationSelect"
+                                            class="form-control-custom custom-dark-select">
+                                        <option value="">Выберите локацию</option>
+                                        @foreach($locations as $location)
+                                            <option value="{{ $location->id }}"
+                                                    data-type="{{ $location->type }}"
+                                                {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
+                                                {{ $location->name }}
+                                                ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
+                                                )
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Примечание</label>
+                                <textarea name="notes" class="form-control-custom"
+                                          rows="2">{{ old('notes', $equipment->notes) }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn-primary">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        @php
+            $otherActions = $equipment->history->filter(function($record) {
+                return $record->action_type !== \App\Http\Enums\TypeEquipmentHistory::CREATED->value;
+            })->count();
+        @endphp
+        @if($otherActions === 0)
+            <div class="modal fade" id="deleteEquipmentModal{{ $equipment->id }}" tabindex="-1"
+                 data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
+                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить оборудование?</p>
+                            <p class="text-secondary mt-2">
+                                <strong>{{ $equipment->name }}</strong><br>
+                                {{ $equipment->inventory_number }}
+                            </p>
+                            <p class="text-danger small mt-3">
+                                <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
+                            </p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                            <form action="{{ route('admin.equipment.destroy', $equipment->id) }}" method="POST"
+                                  class="delete-equipment-form">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-primary"
+                                        style="background: var(--danger); color: white;">
+                                    <i class="bi bi-trash"></i> Удалить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endsection
 
 @push('scripts')
@@ -657,6 +886,19 @@
                     submitAjaxForm(locationForm, 'addLocationModal', {selectName: 'location_id'});
                 });
             }
+        });
+        document.querySelectorAll('.edit-equipment-form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
+            });
+        });
+
+        document.querySelectorAll('.delete-equipment-form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
+            });
         });
     </script>
 @endpush

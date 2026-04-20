@@ -22,18 +22,38 @@
                     <span>Оборудование</span>
                 </a>
             </li>
+            <li class="nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
+                <a href="{{ route('admin.categories.index') }}" class="nav-link">
+                    <i class="bi bi-tags"></i>
+                    <span>Категории</span>
+                </a>
+            </li>
+            <li class="nav-item {{ request()->routeIs('admin.locations*') ? 'active' : '' }}">
+                <a href="{{ route('admin.locations.index') }}" class="nav-link">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Локации</span>
+                </a>
+            </li>
+            <li class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.index') }}" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    <span>Сотрудники</span>
+                </a>
+            </li>
+            <li class="nav-item {{ request()->routeIs('admin.structure*') ? 'active' : '' }}">
+                <a href="{{ route('admin.structure.index') }}" class="nav-link">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Структура</span>
+                </a>
+            </li>
+
             <li class="nav-item {{ request()->routeIs('admin.history*') ? 'active' : '' }}">
                 <a href="{{ route('admin.history') }}" class="nav-link">
                     <i class="bi bi-clock-history"></i>
                     <span>История операций</span>
                 </a>
             </li>
-            <li class="nav-item {{ request()->routeIs('admin.employees*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
-                    <i class="bi bi-people"></i>
-                    <span>Сотрудники</span>
-                </a>
-            </li>
+
             <li class="nav-item {{ request()->routeIs('admin.stock*') ? 'active' : '' }}">
                 <a href="" class="nav-link">
                     <i class="bi bi-building"></i>

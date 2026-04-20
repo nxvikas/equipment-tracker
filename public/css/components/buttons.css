@@ -20,6 +20,14 @@
     transform: translateY(-1px);
 }
 
+.btn-primary:focus,
+.btn-primary:active {
+    background: var(--accent) !important;
+    color: #02040a !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 .btn-outline {
     background: transparent;
     border: 1px solid var(--border);

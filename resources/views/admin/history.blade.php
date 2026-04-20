@@ -55,7 +55,7 @@
                                value="{{ request('action_type') }}">
                     </div>
 
-                    {{-- Кнопки --}}
+
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
                     </button>
@@ -66,7 +66,7 @@
             </form>
         </div>
 
-        {{-- Таблица --}}
+
         <div class="table-wrapper">
             <div class="table-responsive">
                 <table class="custom-table">
@@ -171,7 +171,7 @@
                 </table>
             </div>
 
-            {{-- Пагинация в правильной обёртке --}}
+
             @if($operations->hasPages())
                 <div class="pagination-wrapper">
                     {{ $operations->appends(request()->query())->links() }}

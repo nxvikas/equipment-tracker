@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Enums\TypeEquipmentHistory;
 use App\Models\Category;
+use App\Models\Department;
 use App\Models\Equipment;
 use App\Models\Equipment_history;
 use App\Models\Location;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -91,5 +93,23 @@ class AdminController extends Controller
         $actionTypes = TypeEquipmentHistory::ruValues();
 
         return view('admin.history', compact('operations', 'actionTypes'));
+    }
+    public function structure(Request $request)
+    {
+        $activeTab = $request->get('tab', 'departments');
+
+        // Отделы
+        $departmentsQuery = Department::withCount('users');
+        $direction = $request->get('direction', 'desc');
+        $departmentsQuery->orderBy('users_count', $direction)->orderBy('name', 'asc');
+        $departments = $departmentsQuery->paginate(15, ['*'], 'departments_page')->withQueryString();
+
+        // Должности
+        $positionsQuery = Position::withCount('users');
+        $posDirection = $request->get('pos_direction', 'desc');
+        $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
+        $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();
+
+        return view('admin.structure.index', compact('departments', 'positions', 'activeTab'));
     }
 }

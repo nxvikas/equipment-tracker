@@ -39,9 +39,17 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
     const { selectName = null, reloadOnSuccess = false, onSuccess = null } = options;
 
     try {
+        const formData = new FormData(form);
+
+
+        const methodInput = form.querySelector('input[name="_method"]');
+        if (methodInput) {
+            formData.append('_method', methodInput.value);
+        }
+
         const response = await fetch(form.action, {
-            method: form.method || 'POST',
-            body: new FormData(form),
+            method: 'POST',
+            body: formData,
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
@@ -93,13 +101,19 @@ window.initCustomSelects = () => {
         const btn = select.querySelector('.custom-select-btn');
         const items = select.querySelectorAll('.dropdown-item');
         const hiddenInput = select.querySelector('.custom-select-input');
+        const directionInput = select.querySelector('.custom-direction-input');
+        const posDirectionInput = select.querySelector('.custom-pos-direction-input');
         const selectedText = btn.querySelector('.selected-text');
 
         items.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 selectedText.textContent = item.textContent;
-                if (hiddenInput) hiddenInput.value = item.dataset.value;
+
+                if (hiddenInput) hiddenInput.value = item.dataset.value || '';
+                if (directionInput && item.dataset.direction) directionInput.value = item.dataset.direction;
+                if (posDirectionInput && item.dataset.posDirection) posDirectionInput.value = item.dataset.posDirection;
+
                 items.forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
             });

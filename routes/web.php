@@ -54,6 +54,41 @@ Route::middleware(['auth', 'check.role:admin'])->prefix('admin')->name('admin.')
     Route::post('/equipment/{equipment}/repair', [\App\Http\Controllers\EquipmentController::class, 'repair'])->name('equipment.repair');
     Route::post('/equipment/{equipment}/return-from-repair', [\App\Http\Controllers\EquipmentController::class, 'returnFromRepair'])->name('equipment.return-from-repair');
     Route::post('/equipment/{equipment}/write-off', [\App\Http\Controllers\EquipmentController::class, 'writeOff'])->name('equipment.write-off');
+
+
+    Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
+    Route::post('/locations', [\App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
+    Route::put('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'update'])->name('locations.update');
+    Route::delete('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'destroy'])->name('locations.destroy');
+
+    Route::get('/structure', [\App\Http\Controllers\AdminController::class, 'structure'])->name('structure.index');
+    Route::post('/departments', [\App\Http\Controllers\DepartmentController::class, 'store'])->name('departments.store');
+    Route::put('/departments/{department}', [\App\Http\Controllers\DepartmentController::class, 'update'])->name('departments.update');
+    Route::delete('/departments/{department}', [\App\Http\Controllers\DepartmentController::class, 'destroy'])->name('departments.destroy');
+
+    Route::post('/positions', [\App\Http\Controllers\PositionController::class, 'store'])->name('positions.store');
+    Route::put('/positions/{position}', [\App\Http\Controllers\PositionController::class, 'update'])->name('positions.update');
+    Route::delete('/positions/{position}', [\App\Http\Controllers\PositionController::class, 'destroy'])->name('positions.destroy');
+
+    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [\App\Http\Controllers\UserController::class, 'show'])->name('users.show');
+
+
+    Route::post('/users/{user}/approve', [\App\Http\Controllers\UserController::class, 'approve'])->name('users.approve');
+    Route::post('/users/{user}/reject', [\App\Http\Controllers\UserController::class, 'reject'])->name('users.reject');
+    Route::post('/users/{user}/block', [\App\Http\Controllers\UserController::class, 'block'])->name('users.block');
+    Route::post('/users/{user}/activate', [\App\Http\Controllers\UserController::class, 'activate'])->name('users.activate');
+    Route::put('/users/{user}/quick', [\App\Http\Controllers\UserController::class, 'updateQuick'])->name('users.update.quick');
+    Route::put('/users/{user}/full', [\App\Http\Controllers\UserController::class, 'updateFull'])->name('users.update.full');
+    Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+
 });
 
 

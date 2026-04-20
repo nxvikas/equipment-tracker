@@ -21,7 +21,7 @@ body {
     min-height: 100vh;
 }
 
-/* Общие классы */
+
 .text-secondary {
     color: var(--text-secondary);
 }

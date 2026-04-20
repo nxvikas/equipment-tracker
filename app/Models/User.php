@@ -19,7 +19,8 @@ class User extends Authenticatable
         'avatar',
         'position_id',
         'department_id',
-        'role_id'
+        'role_id',
+        'status',
     ];
     protected $casts = [
         'status' => UserStatus::class,

@@ -410,31 +410,51 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Местоположение <span
-                                            class="text-danger">*</span></label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
-                                        новую</a>
-                                </div>
-                                <select name="location_id" class="form-control-custom custom-dark-select">
-                                    <option value="">Выберите локацию</option>
-                                    @foreach($locations as $location)
-                                        <option
-                                            value="{{ $location->id }}" {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
-                                            {{ $location->name }}
+                                <label class="form-label">Тип локации <span class="text-danger">*</span></label>
+                                <select id="editLocationTypeSelect" class="form-control-custom custom-dark-select">
+                                    <option value="">Все типы</option>
+                                    @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
+                                        <option value="{{ $type->value }}">
+                                            {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="row justify-content-end">
                             <div class="col-md-6 mb-3 user-field" style="display: none;">
-                                <label class="form-label" id="editUserLabel">Сотрудник</label>
+                                <label class="form-label" id="editUserLabel">Сотрудник <span
+                                        class="text-danger">*</span></label>
                                 <select name="current_user_id" class="form-control-custom custom-dark-select">
                                     <option value="">Выберите сотрудника</option>
                                     @foreach($users as $user)
                                         <option
                                             value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
                                             {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <label class="form-label mb-0">Выбор локации <span
+                                            class="text-danger">*</span></label>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                        новую</a>
+                                </div>
+                                <select name="location_id" id="editLocationSelect"
+                                        class="form-control-custom custom-dark-select">
+                                    <option value="">Выберите локацию</option>
+                                    @foreach($locations as $location)
+                                        <option value="{{ $location->id }}"
+                                                data-type="{{ $location->type }}"
+                                            {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
+                                            {{ $location->name }}
+                                            ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
+                                            )
                                         </option>
                                     @endforeach
                                 </select>
@@ -755,314 +775,156 @@
 @push('scripts')
     <script>
 
-        document.addEventListener('DOMContentLoaded', function () {
+
+        const initEditUserFieldToggle = () => {
+            const statusSelect = document.querySelector('#editEquipmentModal select[name="status"]');
+            const userField = document.querySelector('#editEquipmentModal .user-field');
+
+            if (!statusSelect || !userField) return;
+
+            const toggle = () => {
+                const isInUse = statusSelect.value === 'in_use';
+                userField.style.display = isInUse ? 'block' : 'none';
+                if (!isInUse) {
+                    const select = userField.querySelector('select');
+                    if (select) select.value = '';
+                }
+
+                const label = userField.querySelector('.form-label');
+                if (label) {
+                    label.innerHTML = isInUse ? 'Сотрудник <span class="text-danger">*</span>' : 'Сотрудник';
+                }
+            };
+
+            statusSelect.addEventListener('change', toggle);
+            toggle();
+        };
+        const initEditLocationFilter = () => {
+            const typeSelect = document.getElementById('editLocationTypeSelect');
+            const locationSelect = document.getElementById('editLocationSelect');
+
+            if (!typeSelect || !locationSelect) return;
+
+            const allOptions = Array.from(locationSelect.options);
+
+            typeSelect.addEventListener('change', () => {
+                const selectedType = typeSelect.value;
+                locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+                allOptions.forEach(option => {
+                    if (option.value === '') return;
+                    const optionType = option.dataset.type;
+                    if (!selectedType || optionType === selectedType) {
+                        locationSelect.appendChild(option.cloneNode(true));
+                    }
+                });
+
+                const savedValue = locationSelect.dataset.savedValue;
+                if (savedValue) {
+                    const optionToSelect = locationSelect.querySelector(`option[value="${savedValue}"]`);
+                    if (optionToSelect) optionToSelect.selected = true;
+                }
+            });
+
+            locationSelect.addEventListener('change', () => {
+                locationSelect.dataset.savedValue = locationSelect.value;
+            });
+
+            const selectedOption = Array.from(allOptions).find(opt => opt.selected && opt.value !== '');
+            if (selectedOption) {
+                const optionType = selectedOption.dataset.type;
+                if (optionType) {
+                    typeSelect.value = optionType;
+                    typeSelect.dispatchEvent(new Event('change'));
+                }
+            }
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
             @if(session('edit_modal_open') || ($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal')))
             new bootstrap.Modal(document.getElementById('editEquipmentModal')).show();
             @endif
+
             @if(session('open_category_modal') || $errors->hasBag('categoryModal'))
             new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
             @endif
+
             @if(session('open_location_modal') || $errors->hasBag('locationModal'))
             new bootstrap.Modal(document.getElementById('addLocationModal')).show();
             @endif
-        });
+
+            initEditUserFieldToggle();
+            initEditLocationFilter();
 
 
-        async function submitCategoryForm(form) {
-            const formData = new FormData(form);
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}
+            const editForm = document.querySelector('#editEquipmentModal form');
+            if (editForm) {
+                editForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    submitAjaxForm(editForm, 'editEquipmentModal', {reloadOnSuccess: true});
                 });
-                const data = await response.json();
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
-
-
-                    const editSelect = document.querySelector('#editEquipmentModal select[name="category_id"]');
-                    if (editSelect) {
-                        editSelect.add(new Option(data.item.name, data.item.id));
-                    }
-
-                    showToast(data.message, 'success');
-                    form.reset();
-                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-                } else {
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                showToast('Произошла ошибка', 'danger');
             }
-        }
 
-
-        async function submitLocationForm(form) {
-            const formData = new FormData(form);
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}
-                });
-                const data = await response.json();
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('addLocationModal')).hide();
-
-
-                    const editSelect = document.querySelector('#editEquipmentModal select[name="location_id"]');
-                    if (editSelect) {
-                        editSelect.add(new Option(data.item.name, data.item.id));
-                    }
-
-
-                    const assignSelect = document.querySelector('#assignModal select[name="location_id"]');
-                    if (assignSelect) {
-                        assignSelect.add(new Option(data.item.name, data.item.id));
-                    }
-
-                    showToast(data.message, 'success');
-                    form.reset();
-                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-                } else {
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
-
-        async function submitReturnFromRepairForm(form) {
-            const formData = new FormData(form);
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-
-                    bootstrap.Modal.getInstance(document.getElementById('returnFromRepairModal')).hide();
-
-
-                    window.location.reload();
-                } else {
-
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
-
-        async function submitAssignForm(form) {
-            const formData = new FormData(form);
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
-                    window.location.reload();
-                } else {
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
-
-        async function submitRepairForm(form) {
-            const formData = new FormData(form);
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('repairModal')).hide();
-                    window.location.reload();
-                } else {
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
-
-        async function submitWriteOffForm(form) {
-            const formData = new FormData(form);
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('writeOffModal')).hide();
-                    window.location.reload();
-                } else {
-                    showFormErrors(form, data.errors);
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
-
-        function showFormErrors(form, errors) {
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-            for (let field in errors) {
-                const input = form.querySelector(`[name="${field}"]`);
-                if (input) {
-                    input.classList.add('is-invalid');
-                    const feedback = document.createElement('div');
-                    feedback.className = 'invalid-feedback';
-                    feedback.textContent = errors[field][0];
-                    input.closest('.mb-3')?.appendChild(feedback) || input.parentNode.appendChild(feedback);
-                }
-            }
-        }
-
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3`;
-            toast.style.zIndex = '9999';
-            toast.style.backgroundColor = type === 'success' ? 'rgba(190, 242, 100, 0.9)' : 'rgba(239, 68, 68, 0.9)';
-            toast.style.color = type === 'success' ? '#02040a' : '#fff';
-            toast.style.borderRadius = '12px';
-            toast.style.padding = '12px 20px';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-
-        document.addEventListener('DOMContentLoaded', function () {
 
             const categoryForm = document.querySelector('#addCategoryModal form');
             if (categoryForm) {
-                categoryForm.addEventListener('submit', function (e) {
+                categoryForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitCategoryForm(this);
+                    submitAjaxForm(categoryForm, 'addCategoryModal', {
+                        selectName: 'category_id',
+                        reloadOnSuccess: false
+                    });
                 });
             }
 
 
             const locationForm = document.querySelector('#addLocationModal form');
             if (locationForm) {
-                locationForm.addEventListener('submit', function (e) {
+                locationForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitLocationForm(this);
+                    submitAjaxForm(locationForm, 'addLocationModal', {
+                        selectName: 'location_id',
+                        reloadOnSuccess: false
+                    });
                 });
             }
 
-
-            const editStatusSelect = document.querySelector('#editEquipmentModal select[name="status"]');
-            const editUserField = document.querySelector('#editEquipmentModal .user-field');
-            if (editStatusSelect && editUserField) {
-                function toggleEditUserField() {
-                    const userLabel = editUserField.querySelector('.form-label');
-                    if (editStatusSelect.value === 'in_use') {
-                        editUserField.style.display = 'block';
-                        if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
-                    } else {
-                        editUserField.style.display = 'none';
-                        editUserField.querySelector('select').value = '';
-                        if (userLabel) userLabel.innerHTML = 'Сотрудник';
-                    }
-                }
-
-                editStatusSelect.addEventListener('change', toggleEditUserField);
-                toggleEditUserField();
-            }
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const addLocationModal = document.getElementById('addLocationModal');
-
-            if (addLocationModal) {
-                addLocationModal.addEventListener('shown.bs.modal', function () {
-
-                    const openModals = document.querySelectorAll('.modal.show');
-                    if (openModals.length > 1) {
-                        this.style.zIndex = 1060 + (openModals.length * 10);
-                    }
-                });
-
-                addLocationModal.addEventListener('hidden.bs.modal', function () {
-                    this.style.zIndex = '';
-                });
-            }
-            const returnFromRepairForm = document.querySelector('#returnFromRepairModal form');
-            if (returnFromRepairForm) {
-                returnFromRepairForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    submitReturnFromRepairForm(this);
-                });
-            }
 
             const assignForm = document.querySelector('#assignModal form');
             if (assignForm) {
-                assignForm.addEventListener('submit', function (e) {
+                assignForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitAssignForm(this);
+                    submitAjaxForm(assignForm, 'assignModal', {reloadOnSuccess: true});
                 });
             }
+
 
             const repairForm = document.querySelector('#repairModal form');
             if (repairForm) {
-                repairForm.addEventListener('submit', function (e) {
+                repairForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitRepairForm(this);
+                    submitAjaxForm(repairForm, 'repairModal', {reloadOnSuccess: true});
                 });
             }
+
 
             const writeOffForm = document.querySelector('#writeOffModal form');
             if (writeOffForm) {
-                writeOffForm.addEventListener('submit', function (e) {
+                writeOffForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitWriteOffForm(this);
+                    submitAjaxForm(writeOffForm, 'writeOffModal', {reloadOnSuccess: true});
                 });
             }
 
+
+            const returnFromRepairForm = document.querySelector('#returnFromRepairModal form');
+            if (returnFromRepairForm) {
+                returnFromRepairForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    submitAjaxForm(returnFromRepairForm, 'returnFromRepairModal', {reloadOnSuccess: true});
+                });
+            }
         });
     </script>
 @endpush

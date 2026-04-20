@@ -37,6 +37,9 @@
 @endguest
 
 @include('partials.footer')
+@auth()
+    <script src="{{ asset('js/pages/admin/common.js') }}"></script>
+@endauth
 @stack('scripts')
 <script src="{{ asset('js/pages/sidebar.js') }}"></script>
 </body>

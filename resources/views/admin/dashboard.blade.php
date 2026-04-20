@@ -77,7 +77,8 @@
             </div>
             <div class="categories-container">
                 @forelse($categories as $category)
-                    <div class="category-item" onclick="window.location.href='{{ route('admin.equipment', ['category_id' => $category->id]) }}'">
+                    <div class="category-item"
+                         onclick="window.location.href='{{ route('admin.equipment', ['category_id' => $category->id,'from'=>'dashboard']) }}'">
                         <div class="category-icon">
                             <i class="bi bi-{{
                                 str_contains(strtolower($category->name), 'ноут') ? 'laptop' :
@@ -110,10 +111,14 @@
                     <canvas id="statusChart"></canvas>
                 </div>
                 <div class="chart-legend">
-                    <div class="legend-dot green"></div><span>Выдано <strong>{{ $inUseEquipments }}</strong></span>
-                    <div class="legend-dot blue"></div><span>На складе <strong>{{ $inStockEquipments }}</strong></span>
-                    <div class="legend-dot orange"></div><span>В ремонте <strong>{{ $inRepairEquipments }}</strong></span>
-                    <div class="legend-dot red"></div><span>Списано <strong>{{ $writtenEquipments }}</strong></span>
+                    <div class="legend-dot green"></div>
+                    <span>Выдано <strong>{{ $inUseEquipments }}</strong></span>
+                    <div class="legend-dot blue"></div>
+                    <span>На складе <strong>{{ $inStockEquipments }}</strong></span>
+                    <div class="legend-dot orange"></div>
+                    <span>В ремонте <strong>{{ $inRepairEquipments }}</strong></span>
+                    <div class="legend-dot red"></div>
+                    <span>Списано <strong>{{ $writtenEquipments }}</strong></span>
                 </div>
             </div>
 
@@ -135,7 +140,7 @@
                     <h3><i class="bi bi-clock-history"></i> Последние операции</h3>
                     <p class="table-desc">Недавние действия с оборудованием</p>
                 </div>
-                <a href="{{ route('admin.history') }}" class="link-btn">
+                <a href="{{ route('admin.history',['from'=>'dashboard']) }}" class="link-btn">
                     Все операции <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
@@ -201,7 +206,7 @@
 @push('scripts')
     <script src="{{asset('https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js')}}"></script>
     <script>
-        (function() {
+        (function () {
 
             const statusData = {
                 in_use: {{ $inUseEquipments }},

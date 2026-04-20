@@ -32,7 +32,7 @@ class LocationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'in:office,warehouse,service,remote'],
+            'type' => ['required', 'string', 'in:' . implode(',', \App\Http\Enums\TypeLocation::values())],
             'address' => ['nullable', 'string', 'max:500']
         ], [
             'name.required' => 'Название локации обязательно для заполнения',

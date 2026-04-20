@@ -33,7 +33,8 @@
                             <input type="text"
                                    name="surname"
                                    id="surname"
-                                   class="form-control @error('surname') is-invalid @enderror">
+                                   class="form-control @error('surname') is-invalid @enderror"
+                                   value="{{old('surname')}}">
                         </div>
                         @error('surname')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -48,10 +49,10 @@
                             <input type="text"
                                    name="name"
                                    id="name"
-                                   class="form-control @error('name') is-invalid @enderror">
+                                   class="form-control @error('name') is-invalid @enderror" value="{{old('name')}}">
                         </div>
                         @error('name')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class=" invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -66,7 +67,7 @@
                         <input type="text"
                                name="patronymic"
                                id="patronymic"
-                               class="form-control @error('patronymic') is-invalid @enderror">
+                               class="form-control @error('patronymic') is-invalid @enderror" value="{{old('patronymic')}}">
                     </div>
                     @error('patronymic')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -83,7 +84,7 @@
                         <input type="email"
                                name="email"
                                id="email"
-                               class="form-control @error('email') is-invalid @enderror">
+                               class="form-control @error('email') is-invalid @enderror" value="{{old('email')}}">
                     </div>
                     @error('email')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -100,7 +101,7 @@
                         <input type="tel"
                                name="phone"
                                id="phone"
-                               class="form-control @error('phone') is-invalid @enderror">
+                               class="form-control @error('phone') is-invalid @enderror" value="{{old('phone')}}">
                     </div>
                     <small class="form-hint">Формат: +7XXXXXXXXXX или 8XXXXXXXXXX (10 цифр после кода)</small>
                     @error('phone')

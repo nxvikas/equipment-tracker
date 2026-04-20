@@ -11,19 +11,22 @@
     <div class="equipment-page">
         <div class="page-header">
             <div>
-                <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
-                    <i class="bi bi-arrow-left"></i> Назад на главную
-                </a>
+                @if(request('from')==='dashboard')
+                    <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад на главную
+                    </a>
+                @endif
+
                 <h1 class="page-title mt-2">История операций</h1>
                 <p class="page-subtitle">Полная хронология всех действий с оборудованием</p>
             </div>
         </div>
 
-        {{-- Фильтры --}}
+
         <div class="filters-bar">
             <form method="GET" action="{{ route('admin.history') }}" class="d-flex w-100 gap-3 justify-content-between">
                 <div class="filters-group">
-                    {{-- Кастомный селект вместо нативного --}}
+
                     <div class="dropdown custom-select">
                         <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="selected-text">

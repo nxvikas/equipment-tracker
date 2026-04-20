@@ -52,12 +52,18 @@ class EquipmentController extends Controller
 
 
         if ($validated['status'] === 'in_use' && empty($validated['current_user_id'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
+                ], 422);
+            }
+
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
                 ->with('reopen_equipment_modal', true)
                 ->withInput();
         }
-
 
         if ($validated['status'] !== 'in_use') {
             $validated['current_user_id'] = null;
@@ -84,6 +90,15 @@ class EquipmentController extends Controller
             'comment' => 'Оборудование добавлено в систему'
         ]);
 
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Оборудование "' . $equipment->name . '" успешно добавлено',
+                'item' => $equipment
+            ]);
+        }
+
         return redirect()->route('admin.equipment')
             ->with('success', 'Оборудование успешно добавлено в базу');
     }
@@ -104,14 +119,19 @@ class EquipmentController extends Controller
     {
         $validated = $request->validated();
 
-
         if ($validated['status'] === 'in_use' && empty($validated['current_user_id'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
+                ], 422);
+            }
+
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
                 ->with('edit_modal_open', true)
                 ->withInput();
         }
-
 
         if ($validated['status'] !== 'in_use') {
             $validated['current_user_id'] = null;
@@ -126,6 +146,14 @@ class EquipmentController extends Controller
             'new_status' => $equipment->status,
             'comment' => 'Оборудование отредактировано'
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Оборудование обновлено',
+                'item' => $equipment
+            ]);
+        }
 
         return redirect()->route('admin.equipment.show', $equipment->id)
             ->with('success', 'Оборудование обновлено');

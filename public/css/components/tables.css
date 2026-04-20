@@ -109,30 +109,77 @@
     gap: 8px;
 }
 
+/* Сброс стандартных стилей пагинации */
 .pagination-wrapper .pagination {
-    margin: 0;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    list-style: none !important;
+}
+
+.pagination-wrapper .page-item {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .pagination-wrapper .page-item .page-link {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 14px;
-    color: var(--text-primary);
-    font-size: 13px;
-    transition: all 0.2s;
+    display: block !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: 8px 14px !important;
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+    transition: all 0.2s !important;
+    text-decoration: none !important;
+    line-height: 1.5 !important;
 }
 
 .pagination-wrapper .page-item.active .page-link {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #02040a;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #02040a !important;
+    font-weight: 500 !important;
 }
 
 .pagination-wrapper .page-item .page-link:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    background: var(--bg-surface) !important;
+}
+
+.pagination-wrapper .page-item.active .page-link:hover {
+    color: #02040a !important;
+}
+
+.pagination-wrapper .page-item.disabled .page-link {
+    opacity: 0.4 !important;
+    pointer-events: none !important;
+}
+
+/* SVG иконки в пагинации */
+.pagination-wrapper .page-link svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: currentColor !important;
+}
+
+/* Скрываем текст "Showing X to Y of Z results" */
+.pagination-wrapper .text-sm,
+.pagination-wrapper p.text-sm {
+    display: none !important;
+}
+/* АДАПТИВ ДЛЯ ПАГИНАЦИИ */
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        justify-content: center;
+    }
+
+    .pagination-wrapper .page-item .page-link {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
 }

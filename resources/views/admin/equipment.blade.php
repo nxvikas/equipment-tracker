@@ -20,6 +20,11 @@
             <div>
                 <h1 class="page-title">Оборудование</h1>
                 <p class="page-subtitle">Управление всем оборудованием компании</p>
+                @if(request('from')==='dashboard')
+                    <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад на главную
+                    </a>
+                @endif
             </div>
             <div class="page-actions">
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
@@ -29,7 +34,8 @@
         </div>
 
         <div class="filters-bar">
-            <form method="GET" action="{{ route('admin.equipment') }}" id="filterForm" class="d-flex w-100 gap-3 justify-content-between">
+            <form method="GET" action="{{ route('admin.equipment') }}" id="filterForm"
+                  class="d-flex w-100 gap-3 justify-content-between">
 
                 <div class="search-input-wrapper">
                     <i class="bi bi-search"></i>
@@ -328,39 +334,71 @@
                             </div>
                         </div>
 
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
                                 <select name="status"
                                         class="form-control-custom custom-dark-select @error('status') is-invalid @enderror">
                                     <option value="">Выберите статус</option>
-                                    <option value="in_stock" {{ old('status') == 'in_stock' ? 'selected' : '' }}>На
-                                        складе
-                                    </option>
-                                    <option value="in_use" {{ old('status') == 'in_use' ? 'selected' : '' }}>В работе
-                                    </option>
-                                    <option value="repair" {{ old('status') == 'repair' ? 'selected' : '' }}>В ремонте
-                                    </option>
+                                    @foreach(\App\Http\Enums\StatusEquipment::cases() as $status)
+                                        @if($status->value !== 'written')
+                                            <option value="{{ $status->value }}" {{ old('status') == $status->value ? 'selected' : '' }}>
+                                                {{ \App\Http\Enums\StatusEquipment::ruValues()[$status->value] }}
+                                            </option>
+                                        @endif
+                                    @endforeach
                                 </select>
                                 @error('status')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Тип локации <span class="text-danger">*</span></label>
+                                <select id="locationTypeSelect" class="form-control-custom custom-dark-select">
+                                    <option value="">Все типы</option>
+                                    @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
+                                        <option value="{{ $type->value }}">
+                                            {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="row justify-content-end">
+                            <div class="col-md-6 mb-3 user-field" style="display: none;">
+                                <label class="form-label">Сотрудник <span class="text-danger">*</span></label>
+                                <select name="current_user_id"
+                                        class="form-control-custom custom-dark-select @error('current_user_id') is-invalid @enderror">
+                                    <option value="">Выберите сотрудника</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" {{ old('current_user_id') == $user->id ? 'selected' : '' }}>
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('current_user_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Местоположение <span
-                                            class="text-danger">*</span></label>
+                                    <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
-                                        новую</a>
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
                                 </div>
-                                <select name="location_id"
+                                <select name="location_id" id="locationSelect"
                                         class="form-control-custom custom-dark-select @error('location_id') is-invalid @enderror">
                                     <option value="">Выберите локацию</option>
                                     @foreach($locations as $location)
-                                        <option
-                                            value="{{ $location->id }}" {{ (old('location_id') == $location->id || session('new_location_id') == $location->id) ? 'selected' : '' }}>
-                                            {{ $location->name }}
+                                        <option value="{{ $location->id }}"
+                                                data-type="{{ $location->type }}"
+                                            {{ (old('location_id') == $location->id || session('new_location_id') == $location->id) ? 'selected' : '' }}>
+                                            {{ $location->name }} ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -368,22 +406,10 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 mb-3 user-field" style="display: none;">
-                                <label class="form-label">Сотрудник</label>
-                                <select name="current_user_id"
-                                        class="form-control-custom custom-dark-select @error('current_user_id') is-invalid @enderror">
-                                    <option value="">Выберите сотрудника</option>
-                                    @foreach($users as $user)
-                                        <option
-                                            value="{{ $user->id }}" {{ old('current_user_id') == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }} ({{ $user->email }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('current_user_id')
-                                <div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
                         </div>
+
+
+
 
                         <div class="mb-3">
                             <label class="form-label">Примечание</label>
@@ -476,13 +502,13 @@
                             <label class="form-label">Тип <span class="text-danger">*</span></label>
                             <select name="type"
                                     class="form-control-custom custom-dark-select @error('type', 'locationModal') is-invalid @enderror">
-                                <option value="office" {{ old('type') == 'office' ? 'selected' : '' }}>Офис</option>
-                                <option value="warehouse" {{ old('type') == 'warehouse' ? 'selected' : '' }}>Склад
-                                </option>
-                                <option value="service" {{ old('type') == 'service' ? 'selected' : '' }}>Сервис
-                                    (Ремонт)
-                                </option>
-                                <option value="remote" {{ old('type') == 'remote' ? 'selected' : '' }}>Удаленно</option>
+                                <option value="">Выберите тип</option>
+                                @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
+                                    <option
+                                        value="{{ $type->value }}" {{ old('type') == $type->value ? 'selected' : '' }}>
+                                        {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('type', 'locationModal')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -513,180 +539,122 @@
 
 @push('scripts')
     <script>
-        function viewEquipment(id) {
-            window.location.href = '/admin/equipment/' + id;
-        }
+        const initUserFieldToggle = () => {
+            const statusSelect = document.querySelector('#addEquipmentModal select[name="status"]');
+            const userField = document.querySelector('#addEquipmentModal .user-field');
 
-        function editEquipment(id) {
-            window.location.href = '/admin/equipment/' + id + '/edit';
-        }
+            if (!statusSelect || !userField) return;
 
-        function assignEquipment(id) {
-            window.location.href = '/admin/equipment/' + id + '/assign';
-        }
+            const toggle = () => {
+                const isInUse = statusSelect.value === 'in_use';
+                userField.style.display = isInUse ? 'block' : 'none';
+                if (!isInUse) {
+                    const select = userField.querySelector('select');
+                    if (select) select.value = '';
+                }
+                const label = userField.querySelector('.form-label');
+                if (label) {
+                    label.innerHTML = isInUse ? 'Сотрудник <span class="text-danger">*</span>' : 'Сотрудник';
+                }
+            };
 
+            statusSelect.addEventListener('change', toggle);
+            toggle();
+        };
 
-        async function submitModalForm(form, modalId, selectName) {
-            const formData = new FormData(form);
+        const initLiveSearch = () => {
+            const searchInput = document.getElementById('searchEquipment');
+            if (!searchInput) return;
 
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.custom-table tbody tr').forEach(row => {
+                    const text = [
+                        row.querySelector('.inv-number')?.textContent || '',
+                        row.querySelector('.equipment-name')?.textContent || '',
+                        row.querySelector('.serial-number')?.textContent || ''
+                    ].join(' ').toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
+        };
+
+        const initLocationFilter = () => {
+            const typeSelect = document.getElementById('locationTypeSelect');
+            const locationSelect = document.getElementById('locationSelect');
+
+            if (!typeSelect || !locationSelect) return;
+
+            const allOptions = Array.from(locationSelect.options);
+
+            typeSelect.addEventListener('change', () => {
+                const selectedType = typeSelect.value;
+                locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+                allOptions.forEach(option => {
+                    if (option.value === '') return;
+                    const optionType = option.dataset.type;
+                    if (!selectedType || optionType === selectedType) {
+                        locationSelect.appendChild(option.cloneNode(true));
                     }
                 });
 
-                const data = await response.json();
-
-                if (data.success) {
-
-                    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-                    modal.hide();
-
-
-                    const select = document.querySelector(`select[name="${selectName}"]`);
-                    const newOption = new Option(data.item.name, data.item.id, true, true);
-                    select.add(newOption);
-
-
-                    showToast(data.message, 'success');
-
-
-                    form.reset();
-
-
-                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-                } else {
-
-                    showFormErrors(form, data.errors);
+                const savedValue = locationSelect.dataset.savedValue;
+                if (savedValue) {
+                    const optionToSelect = locationSelect.querySelector(`option[value="${savedValue}"]`);
+                    if (optionToSelect) optionToSelect.selected = true;
                 }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                showToast('Произошла ошибка', 'danger');
-            }
-        }
+            });
 
-        function showFormErrors(form, errors) {
+            locationSelect.addEventListener('change', () => {
+                locationSelect.dataset.savedValue = locationSelect.value;
+            });
 
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-
-            for (let field in errors) {
-                const input = form.querySelector(`[name="${field}"]`);
-                if (input) {
-                    input.classList.add('is-invalid');
-                    const feedback = document.createElement('div');
-                    feedback.className = 'invalid-feedback';
-                    feedback.textContent = errors[field][0];
-                    input.closest('.mb-3')?.appendChild(feedback) || input.parentNode.appendChild(feedback);
+            const selectedOption = Array.from(allOptions).find(opt => opt.selected && opt.value !== '');
+            if (selectedOption) {
+                const optionType = selectedOption.dataset.type;
+                if (optionType) {
+                    typeSelect.value = optionType;
+                    typeSelect.dispatchEvent(new Event('change'));
                 }
             }
-        }
+        };
 
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `alert alert-${type} position-fixed bottom-0 end-0 m-3`;
-            toast.style.zIndex = '9999';
-            toast.style.backgroundColor = type === 'success' ? 'rgba(190, 242, 100, 0.9)' : 'rgba(239, 68, 68, 0.9)';
-            toast.style.color = type === 'success' ? '#02040a' : '#fff';
-            toast.style.borderRadius = '12px';
-            toast.style.padding = '12px 20px';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-
+        document.addEventListener('DOMContentLoaded', () => {
             @if($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal'))
             new bootstrap.Modal(document.getElementById('addEquipmentModal')).show();
             @endif
-
 
             @if(session('reopen_equipment_modal'))
             new bootstrap.Modal(document.getElementById('addEquipmentModal')).show();
             @endif
 
-            const categoryForm = document.querySelector('#addCategoryModal form');
-            if (categoryForm) {
-                categoryForm.addEventListener('submit', function (e) {
+            initCustomSelects();
+            initUserFieldToggle();
+            initLiveSearch();
+            initLocationFilter();
+
+            const equipmentForm = document.querySelector('#addEquipmentModal form');
+            if (equipmentForm) {
+                equipmentForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitModalForm(this, 'addCategoryModal', 'category_id');
+                    submitAjaxForm(equipmentForm, 'addEquipmentModal', {reloadOnSuccess: true});
                 });
             }
 
+            const categoryForm = document.querySelector('#addCategoryModal form');
+            if (categoryForm) {
+                categoryForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    submitAjaxForm(categoryForm, 'addCategoryModal', {selectName: 'category_id'});
+                });
+            }
 
             const locationForm = document.querySelector('#addLocationModal form');
             if (locationForm) {
-                locationForm.addEventListener('submit', function (e) {
+                locationForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitModalForm(this, 'addLocationModal', 'location_id');
-                });
-            }
-
-            const customSelects = document.querySelectorAll('.custom-select');
-            customSelects.forEach(select => {
-                const btn = select.querySelector('.custom-select-btn');
-                const items = select.querySelectorAll('.dropdown-item');
-                const hiddenInput = select.querySelector('.custom-select-input');
-                const selectedText = btn.querySelector('.selected-text');
-
-                items.forEach(item => {
-                    item.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        const value = this.dataset.value;
-                        const text = this.textContent;
-                        selectedText.textContent = text;
-                        if (hiddenInput) hiddenInput.value = value;
-                        items.forEach(i => i.classList.remove('active'));
-                        this.classList.add('active');
-                    });
-                });
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusSelect = document.querySelector('#addEquipmentModal select[name="status"]');
-            const userField = document.querySelector('#addEquipmentModal .user-field');
-
-            if (statusSelect && userField) {
-                function toggleUserField() {
-                    const userLabel = userField.querySelector('.form-label');
-                    if (statusSelect.value === 'in_use') {
-                        userField.style.display = 'block';
-                        if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
-                    } else {
-                        userField.style.display = 'none';
-                        userField.querySelector('select').value = '';
-                        if (userLabel) userLabel.innerHTML = 'Сотрудник';
-                    }
-                }
-
-                statusSelect.addEventListener('change', toggleUserField);
-                toggleUserField();
-            }
-
-            const searchInput = document.getElementById('searchEquipment');
-            if (searchInput) {
-                searchInput.addEventListener('input', function () {
-                    const searchTerm = this.value.toLowerCase();
-                    const rows = document.querySelectorAll('.custom-table tbody tr');
-
-                    rows.forEach(row => {
-                        const invNumber = row.querySelector('.inv-number')?.textContent.toLowerCase() || '';
-                        const name = row.querySelector('.equipment-name')?.textContent.toLowerCase() || '';
-                        const serial = row.querySelector('.serial-number')?.textContent.toLowerCase() || '';
-
-                        if (invNumber.includes(searchTerm) || name.includes(searchTerm) || serial.includes(searchTerm)) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
+                    submitAjaxForm(locationForm, 'addLocationModal', {selectName: 'location_id'});
                 });
             }
         });

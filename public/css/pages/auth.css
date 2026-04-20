@@ -82,3 +82,23 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.08);
 }
+
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-caps-lock-indicator,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-strong-password-auto-fill-button {
+    display: none !important;
+    visibility: hidden;
+}
+
+
+input[type="password"]::-webkit-password-eye {
+    display: none;
+}

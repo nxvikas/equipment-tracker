@@ -38,6 +38,39 @@ class UserController extends Controller
 
         return view('admin.users.index', compact('users', 'departments', 'positions', 'statuses'));
     }
+    public function makeAdmin(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Нельзя изменить свою роль');
+        }
+
+
+        $statusValue = $user->status->value ?? $user->status;
+        if ($statusValue === 'pending') {
+            return redirect()->back()->with('error', 'Сначала активируйте пользователя');
+        }
+
+        $user->update(['role_id' => 1]);
+
+        return redirect()->back()->with('success', 'Пользователь назначен администратором');
+    }
+
+    public function removeAdmin(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Нельзя изменить свою роль');
+        }
+
+
+        $statusValue = $user->status->value ?? $user->status;
+        if ($statusValue === 'pending') {
+            return redirect()->back()->with('error', 'Сначала активируйте пользователя');
+        }
+
+        $user->update(['role_id' => 2]);
+
+        return redirect()->back()->with('success', 'Права администратора сняты');
+    }
 
     public function show(User $user)
     {

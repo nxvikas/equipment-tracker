@@ -20,6 +20,9 @@
                 <h1 class="page-title mt-2">История операций</h1>
                 <p class="page-subtitle">Полная хронология всех действий с оборудованием</p>
             </div>
+            <a href="{{ route('admin.export.history') }}" class="btn-outline" title="Экспорт в Excel">
+                <i class="bi bi-download"></i> Экспорт
+            </a>
         </div>
 
 

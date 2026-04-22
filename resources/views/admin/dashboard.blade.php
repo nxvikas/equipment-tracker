@@ -14,7 +14,7 @@
                 <p class="dashboard-subtitle">Добро пожаловать! Вот сводка по оборудованию и активам</p>
             </div>
             <div class="dashboard-actions">
-                <a href="#" class="btn-icon" id="exportReportBtn" title="Экспорт отчета">
+                <a href="{{ route('admin.export.dashboard') }}" class="btn-icon" title="Экспорт отчета">
                     <i class="bi bi-download"></i>
                 </a>
                 <a href="{{ url()->current() }}" class="btn-icon" title="Обновить">

@@ -167,6 +167,18 @@
                     </form>
                 @endif
 
+                @if($user->status->value !== 'pending' && $user->role->name !== 'admin')
+                    <button type="button" class="action-button" data-bs-toggle="modal" data-bs-target="#makeAdminModal">
+                        <i class="bi bi-shield-plus"></i> Назначить администратором
+                    </button>
+                @elseif($user->status->value !== 'pending' && $user->role->name === 'admin')
+                    @if($user->id !== auth()->id())
+                        <button type="button" class="action-button action-danger" data-bs-toggle="modal" data-bs-target="#removeAdminModal">
+                            <i class="bi bi-shield-slash"></i> Снять права администратора
+                        </button>
+                    @endif
+                @endif
+
                 @if($user->id !== auth()->id())
                     <button type="button" class="action-button action-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
                         <i class="bi bi-trash"></i> Удалить
@@ -460,6 +472,76 @@
             </div>
         </div>
     </div>
+
+    @if($user->role->name !== 'admin')
+        <div class="modal fade" id="makeAdminModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-warning">
+                            <i class="bi bi-shield-plus me-2"></i>Назначение администратором
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <i class="bi bi-shield-shaded" style="font-size: 48px; color: var(--warning);"></i>
+                        <p class="mt-3 mb-0">Вы уверены, что хотите назначить администратором?</p>
+                        <p class="text-secondary mt-2">
+                            <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                            {{ $user->email }}
+                        </p>
+                        <p class="text-warning small mt-3">
+                            <i class="bi bi-exclamation-circle"></i> Администратор имеет полный доступ к системе.
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{{ route('admin.users.make-admin', $user) }}" method="POST" class="make-admin-form">
+                            @csrf
+                            <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                                <i class="bi bi-shield-plus"></i> Назначить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @else
+        @if($user->id !== auth()->id())
+            <div class="modal fade" id="removeAdminModal" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="bi bi-shield-slash me-2"></i>Снятие прав администратора
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="bi bi-shield-exclamation" style="font-size: 48px; color: var(--danger);"></i>
+                            <p class="mt-3 mb-0">Вы уверены, что хотите снять права администратора?</p>
+                            <p class="text-secondary mt-2">
+                                <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                                {{ $user->email }}
+                            </p>
+                            <p class="text-danger small mt-3">
+                                <i class="bi bi-exclamation-circle"></i> Пользователь потеряет доступ к админ-панели.
+                            </p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                            <form action="{{ route('admin.users.remove-admin', $user) }}" method="POST" class="remove-admin-form">
+                                @csrf
+                                <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
+                                    <i class="bi bi-shield-slash"></i> Снять права
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
 @endsection
 
 @push('scripts')

@@ -37,7 +37,7 @@
             <li class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.index') }}" class="nav-link">
                     <i class="bi bi-people"></i>
-                    <span>Сотрудники</span>
+                    <span>Пользователи</span>
                 </a>
             </li>
             <li class="nav-item {{ request()->routeIs('admin.structure*') ? 'active' : '' }}">

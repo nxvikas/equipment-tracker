@@ -30,6 +30,11 @@
                 <h1 class="page-title">Структура компании</h1>
                 <p class="page-subtitle">Управление отделами и должностями</p>
             </div>
+            <div class="page-actions">
+                <a href="{{ route('admin.export.structure') }}" class="btn-outline" title="Экспорт в Excel">
+                    <i class="bi bi-download"></i> Экспорт
+                </a>
+            </div>
         </div>
 
 

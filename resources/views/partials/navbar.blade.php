@@ -6,8 +6,38 @@
     <div class="search-wrapper">
         <i class="bi bi-search"></i>
         <input type="text" id="globalSearch" class="search-input"
-               placeholder="Поиск по инвентарному номеру, названию...">
+               placeholder="@if(auth()->user()->isAdmin())Название, инв.№, SN, ФИО...@else Название, инв.№...@endif">
+
+
+        <button type="button" class="search-hint-btn"
+                data-bs-toggle="popover"
+                data-bs-html="true"
+                data-bs-placement="right"
+                data-bs-container="body"
+                data-bs-title="<i class='bi bi-search' style='color: var(--accent);'></i> <span style='color: var(--text-primary);'>Что можно искать?</span>"
+                data-bs-content="@if(auth()->user()->isAdmin())
+                <div class='popover-content-wrapper'>
+                    <div class='popover-items'>
+                        <div class='popover-item'><i class='bi bi-laptop'></i> <strong>Оборудование</strong> — название, инв.№, SN</div>
+                        <div class='popover-item'><i class='bi bi-person'></i> <strong>Сотрудники</strong> — ФИО, email</div>
+                        <div class='popover-item'><i class='bi bi-tags'></i> <strong>Категории</strong> — название</div>
+                        <div class='popover-item'><i class='bi bi-geo-alt'></i> <strong>Локации</strong> — название</div>
+                    </div>
+
+                </div>
+            @else
+                <div class='popover-content-wrapper'>
+                    <div class='popover-section-title'>Что можно искать:</div>
+                    <div class='popover-items'>
+                        <div class='popover-item'><i class='bi bi-laptop'></i> <strong>Моё оборудование</strong> — название, инв.№</div>
+                    </div>
+                </div>
+            @endif">
+            <i class="bi bi-info-circle-fill"></i>
+        </button>
     </div>
+
+
     <div class="user-area">
 
         <div class="dropdown">
@@ -69,3 +99,66 @@
         </div>
     </div>
 </header>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('globalSearch');
+            if (!searchInput) return;
+
+            let searchTimeout;
+            let searchResults = document.createElement('div');
+            searchResults.className = 'global-search-results';
+            searchInput.parentNode.appendChild(searchResults);
+
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.classList.remove('show');
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`/admin/search?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length === 0) {
+                                searchResults.innerHTML = '<div class="search-result-item">Ничего не найдено</div>';
+                                searchResults.classList.add('show');
+                                return;
+                            }
+
+                            let html = '';
+                            data.forEach(item => {
+
+                                html += `
+                            <a href="${item.url}" class="search-result-item">
+                                <div class="search-result-info">
+                                    <div class="search-result-title">${item.title}</div>
+                                    <div class="search-result-subtitle">${item.subtitle}</div>
+                                </div>
+                            </a>
+                        `;
+                            });
+                            searchResults.innerHTML = html;
+                            searchResults.classList.add('show');
+                        })
+                        .catch(error => {
+                            console.error('Search error:', error);
+                        });
+                }, 300);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.remove('show');
+                }
+            });
+        });
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+    </script>
+@endpush

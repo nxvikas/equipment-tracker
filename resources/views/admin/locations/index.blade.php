@@ -22,17 +22,22 @@
             </div>
         @endif
 
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Локации</h1>
-                <p class="page-subtitle">Управление местоположениями оборудования</p>
+            <div class="page-header">
+                <div>
+                    @if(request('from_dashboard'))
+                        <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Назад на главную
+                        </a>
+                    @endif
+                    <h1 class="page-title mt-2">Локации</h1>
+                    <p class="page-subtitle">Управление местоположениями оборудования</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                        <i class="bi bi-plus-lg"></i> Добавить локацию
+                    </button>
+                </div>
             </div>
-            <div class="page-actions">
-                <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
-                    <i class="bi bi-plus-lg"></i> Добавить локацию
-                </button>
-            </div>
-        </div>
 
 
         <div class="filters-bar">

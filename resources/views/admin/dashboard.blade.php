@@ -71,7 +71,7 @@
         <div class="section-wrapper">
             <div class="section-head">
                 <div>
-                    <h2 class="section-title">Категории оборудования</h2>
+                    <h2 class="section-title">Популярные категории оборудования</h2>
                     <p class="section-desc">Распределение активов по типам</p>
                 </div>
             </div>
@@ -129,6 +129,105 @@
                 </div>
                 <div class="chart-body">
                     <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid-2cols">
+
+            <div class="top-users-card">
+                <div class="top-users-header">
+                    <h3>
+                        <i class="bi bi-trophy-fill"></i>
+                        Топ сотрудников по технике
+                    </h3>
+                    <a href="{{ route('admin.users.index', ['from_dashboard' => 1]) }}" class="link-btn">
+                        Управление сотрудниками <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="top-users-list">
+                    @forelse($topUsers as $index => $user)
+                        <a href="{{ route('admin.users.show', ['user' => $user, 'from_dashboard' => 1]) }}" class="user-rank-item">
+                            <div class="user-rank-info">
+                                <div class="user-rank-number">#{{ $index + 1 }}</div>
+                                <div class="user-rank-avatar">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->surname, 0, 1)) }}
+                                </div>
+                                <div class="user-rank-details">
+                                    <div class="user-rank-name">{{ $user->surname }} {{ $user->name }}</div>
+                                    <div class="user-rank-dept">{{ $user->department->name ?? 'Без отдела' }}</div>
+                                </div>
+                            </div>
+                            <div class="user-rank-count">
+                                {{ $user->equipment_count }} ед.
+                            </div>
+                        </a>
+                    @empty
+                        <div class="text-center text-secondary py-4">
+                            <i class="bi bi-inbox"></i> Нет данных
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+
+            <div class="locations-card">
+                <div class="locations-header">
+                    <div>
+                        <h3>
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Распределение по локациям
+                        </h3>
+                        <p>Где находится оборудование</p>
+                    </div>
+                    <a href="{{ route('admin.locations.index', ['from_dashboard' => 1]) }}" class="link-btn">
+                        Управление локациями <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="location-progress-list">
+                    @forelse($locationStats as $location)
+                        @php
+                            $percentage = $totalInLocations > 0 ? round(($location->equipment_count / $totalInLocations) * 100) : 0;
+
+                            $typeIcon = match($location->type) {
+                                'office' => 'bi-building',
+                                'warehouse' => 'bi-box-seam',
+                                'service' => 'bi-tools',
+                                'remote' => 'bi-wifi',
+                                default => 'bi-geo-alt'
+                            };
+
+                            $typeColor = match($location->type) {
+                                'office' => '#3b82f6',
+                                'warehouse' => '#f59e0b',
+                                'service' => '#ef4444',
+                                'remote' => '#10b981',
+                                default => '#94a3b8'
+                            };
+
+                            // Используем существующий enum для русских названий
+                            $typeLabel = \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type;
+                        @endphp
+                        <div class="location-progress-item">
+                            <div class="location-progress-info">
+                                <div class="location-name">
+                                    <i class="bi {{ $typeIcon }}" style="color: {{ $typeColor }};"></i>
+                                    {{ $location->name }}
+                                    <small style="color: {{ $typeColor }};">({{ $typeLabel }})</small>
+                                </div>
+                                <div class="location-count">
+                                    {{ $location->equipment_count }} ед. ({{ $percentage }}%)
+                                </div>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center text-secondary py-4">
+                            <i class="bi bi-inbox"></i> Нет локаций
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

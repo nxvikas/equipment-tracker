@@ -22,12 +22,17 @@
             </div>
         @endif
 
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Сотрудники</h1>
-                <p class="page-subtitle">Управление пользователями системы</p>
+            <div class="page-header">
+                <div>
+                    @if(request('from_dashboard'))
+                        <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Назад на главную
+                        </a>
+                    @endif
+                    <h1 class="page-title mt-2">Сотрудники</h1>
+                    <p class="page-subtitle">Управление пользователями системы</p>
+                </div>
             </div>
-        </div>
 
 
         <div class="filters-bar">

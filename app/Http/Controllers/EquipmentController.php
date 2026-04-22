@@ -20,6 +20,7 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Config;
 
 class EquipmentController extends Controller
 {
@@ -30,13 +31,16 @@ class EquipmentController extends Controller
             abort(404, 'QR-код не найден');
         }
 
+        $size = Config::get('app.qr_code.size', 300);
+        $margin = Config::get('app.qr_code.margin', 10);
+
         $result = new Builder(
             writer: new PngWriter(),
             data: $equipment->qr_code,
             encoding: new Encoding('UTF-8'),
             errorCorrectionLevel: ErrorCorrectionLevel::High,
-            size: 300,
-            margin: 10,
+            size: $size,
+            margin: $margin,
             roundBlockSizeMode: RoundBlockSizeMode::Margin
         );
 
@@ -308,6 +312,7 @@ class EquipmentController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     public function returnFromRepair(Request $request, Equipment $equipment)
     {
         if ($equipment->status !== StatusEquipment::REPAIR->value) {
@@ -360,14 +365,12 @@ class EquipmentController extends Controller
             'comment' => $request->comment ?? 'Возвращено из ремонта',
         ]);
 
-        // Сохраняем сообщение в сессию для отображения после перезагрузки
         session()->flash('success', 'Оборудование возвращено из ремонта');
 
         return response()->json([
             'success' => true
         ]);
     }
-
 
 
     public function writeOff(Request $request, Equipment $equipment)

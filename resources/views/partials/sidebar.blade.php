@@ -54,18 +54,6 @@
                 </a>
             </li>
 
-            <li class="nav-item {{ request()->routeIs('admin.stock*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
-                    <i class="bi bi-building"></i>
-                    <span>Склад</span>
-                </a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.reports*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
-                    <i class="bi bi-bar-chart-steps"></i>
-                    <span>Аналитика</span>
-                </a>
-            </li>
         @elseif(auth()->user()->isEmployee())
             <li class="nav-item {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}">
                 <a href="{{ route('employee.dashboard') }}" class="nav-link">

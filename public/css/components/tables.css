@@ -222,3 +222,11 @@ a.equipment-name:hover {
 .info-value a:hover {
     color: var(--accent-hover);
 }
+
+
+
+
+body.light .custom-table tbody tr:hover {
+    background: rgba(132, 204, 22, 0.08);
+}
+

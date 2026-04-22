@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\admin\CategoryExport;
+use App\Exports\admin\DashboardExport;
+use App\Exports\admin\EquipmentExport;
+use App\Exports\admin\HistoryExport;
+use App\Exports\admin\LocationExport;
+use App\Exports\admin\StructureExport;
+use App\Exports\admin\UserExport;
 use App\Http\Enums\TypeEquipmentHistory;
 use App\Models\Category;
 use App\Models\Department;
@@ -11,9 +18,43 @@ use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
+    public function exportDashboard()
+    {
+        return Excel::download(new DashboardExport(), 'dashboard-report-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+    public function exportEquipment()
+    {
+        return Excel::download(new EquipmentExport(), 'equipment-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function exportCategories()
+    {
+        return Excel::download(new CategoryExport(), 'categories-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function exportLocations()
+    {
+        return Excel::download(new LocationExport(), 'locations-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function exportUsers()
+    {
+        return Excel::download(new UserExport(), 'users-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function exportStructure()
+    {
+        return Excel::download(new StructureExport(), 'structure-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function exportHistory()
+    {
+        return Excel::download(new HistoryExport(), 'history-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
     public function dashboard()
     {
 
@@ -125,5 +166,87 @@ class AdminController extends Controller
         $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();
 
         return view('admin.structure.index', compact('departments', 'positions', 'activeTab'));
+    }
+
+    public function globalSearch(Request $request)
+    {
+        $query = $request->get('q');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+
+        $equipment = Equipment::where('name', 'like', "%{$query}%")
+            ->orWhere('inventory_number', 'like', "%{$query}%")
+            ->orWhere('serial_number', 'like', "%{$query}%")
+            ->limit(5)
+            ->get(['id', 'name', 'inventory_number', 'serial_number'])
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'type' => 'equipment',
+                    'title' => $item->name,
+                    'subtitle' => $item->inventory_number,
+                    'url' => route('admin.equipment.show', $item->id)
+                ];
+            });
+
+
+        $users = collect();
+        if (auth()->user()->isAdmin()) {
+            $users = User::where('surname', 'like', "%{$query}%")
+                ->orWhere('name', 'like', "%{$query}%")
+                ->orWhere('email', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['id', 'surname', 'name', 'email'])
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'type' => 'user',
+                        'title' => $item->surname . ' ' . $item->name,
+                        'subtitle' => $item->email,
+                        'url' => route('admin.users.show', $item->id)
+                    ];
+                });
+        }
+
+
+        $categories = collect();
+        if (auth()->user()->isAdmin()) {
+            $categories = Category::where('name', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['id', 'name'])
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'type' => 'category',
+                        'title' => $item->name,
+                        'subtitle' => 'Категория оборудования',
+                        'url' => route('admin.categories.index') . '?search=' . $item->name
+                    ];
+                });
+        }
+
+
+        $locations = collect();
+        if (auth()->user()->isAdmin()) {
+            $locations = Location::where('name', 'like', "%{$query}%")
+                ->limit(5)
+                ->get(['id', 'name'])
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'type' => 'location',
+                        'title' => $item->name,
+                        'subtitle' => 'Локация',
+                        'url' => route('admin.locations.index') . '?search=' . $item->name
+                    ];
+                });
+        }
+
+        $results = $equipment->concat($users)->concat($categories)->concat($locations);
+
+        return response()->json($results);
     }
 }

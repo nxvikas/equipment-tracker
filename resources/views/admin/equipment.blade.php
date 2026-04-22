@@ -27,6 +27,9 @@
                 @endif
             </div>
             <div class="page-actions">
+                <a href="{{ route('admin.export.equipment') }}" class="btn-outline" title="Экспорт в Excel" style="margin-right: 10px">
+                    <i class="bi bi-download"></i> Экспорт
+                </a>
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
                     <i class="bi bi-plus-lg"></i> Добавить оборудование
                 </button>
@@ -42,7 +45,7 @@
                     <input type="text"
                            id="searchEquipment"
                            class="search-input"
-                           placeholder="Поиск по названию, инв. номеру...">
+                           placeholder="Поиск по названию, инв. и сер. номеру...">
                 </div>
 
                 <div class="filters-group">

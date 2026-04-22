@@ -15,6 +15,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/auth', [\App\Http\Controllers\AuthController::class, 'auth'])->name('auth');
 
 });
+Route::middleware('auth')->group(function () {
+    Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+});
 
 Route::get('/waiting', [\App\Http\Controllers\AuthController::class, 'showWaitingPage'])->name('auth.waiting');
 Route::get('/check-status', [\App\Http\Controllers\AuthController::class, 'checkStatus'])->name('check.status');
@@ -89,14 +92,27 @@ Route::middleware(['auth', 'check.role:admin'])->prefix('admin')->name('admin.')
 
     Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
 
+    Route::post('/users/{user}/make-admin', [\App\Http\Controllers\UserController::class, 'makeAdmin'])->name('users.make-admin');
+    Route::post('/users/{user}/remove-admin', [\App\Http\Controllers\UserController::class, 'removeAdmin'])->name('users.remove-admin');
+
+
+    Route::get('/export/dashboard', [\App\Http\Controllers\AdminController::class, 'exportDashboard'])->name('export.dashboard');
+    Route::get('/export/equipment', [\App\Http\Controllers\AdminController::class, 'exportEquipment'])->name('export.equipment');
+    Route::get('/export/categories', [\App\Http\Controllers\AdminController::class, 'exportCategories'])->name('export.categories');
+    Route::get('/export/locations', [\App\Http\Controllers\AdminController::class, 'exportLocations'])->name('export.locations');
+    Route::get('/export/users', [\App\Http\Controllers\AdminController::class, 'exportUsers'])->name('export.users');
+    Route::get('/export/structure', [\App\Http\Controllers\AdminController::class, 'exportStructure'])->name('export.structure');
+    Route::get('/export/history', [\App\Http\Controllers\AdminController::class, 'exportHistory'])->name('export.history');
+
+
+    Route::get('/search', [\App\Http\Controllers\AdminController::class, 'globalSearch'])->name('global.search');
+
 });
 
 
-Route::middleware('auth')->group(function () {
-
-
-    Route::get('/employee/dashboard', [\App\Http\Controllers\PageController::class, 'employeeDashboard'])
-        ->name('employee.dashboard')->middleware('check.role:employee');
-
-    Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+Route::middleware(['auth', 'check.role:employee'])->prefix('employee')->name('employee.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\EmployeeController::class, 'dashboard'])->name('dashboard');
 });
+
+
+

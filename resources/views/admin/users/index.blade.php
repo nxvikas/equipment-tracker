@@ -22,17 +22,21 @@
             </div>
         @endif
 
-            <div class="page-header">
-                <div>
-                    @if(request('from_dashboard'))
-                        <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
-                            <i class="bi bi-arrow-left"></i> Назад на главную
-                        </a>
-                    @endif
-                    <h1 class="page-title mt-2">Сотрудники</h1>
-                    <p class="page-subtitle">Управление пользователями системы</p>
-                </div>
+        <div class="page-header">
+            <div>
+                @if(request('from_dashboard'))
+                    <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад на главную
+                    </a>
+                @endif
+
+                <h1 class="page-title mt-2">Пользователи системы</h1>
+                <p class="page-subtitle">Управление пользователями и правами доступа</p>
             </div>
+            <a href="{{ route('admin.export.users') }}" class="btn-outline" title="Экспорт в Excel">
+                <i class="bi bi-download"></i> Экспорт
+            </a>
+        </div>
 
 
         <div class="filters-bar">
@@ -149,6 +153,9 @@
                                 <a href="{{ route('admin.users.show', $user) }}" class="equipment-name">
                                     {{ $user->surname }} {{ $user->name }} {{ $user->patronymic }}
                                 </a>
+                                @if($user->role->name === 'admin')
+                                    <span class="role-indicator">(Админ)</span>
+                                @endif
                             </td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->phone }}</td>
@@ -177,6 +184,24 @@
                                         title="Редактировать">
                                     <i class="bi bi-pencil"></i>
                                 </button>
+
+                                @if($user->status->value !== 'pending' && $user->role->name !== 'admin')
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#makeAdminModal{{ $user->id }}"
+                                            title="Сделать администратором">
+                                        <i class="bi bi-shield-plus"></i>
+                                    </button>
+                                @elseif($user->status->value !== 'pending' && $user->role->name === 'admin')
+                                    @if($user->id !== auth()->id())
+                                        <button class="action-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#removeAdminModal{{ $user->id }}"
+                                                title="Снять права администратора">
+                                            <i class="bi bi-shield-slash"></i>
+                                        </button>
+                                    @endif
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -346,6 +371,85 @@
             </div>
         </div>
     </div>
+
+    @foreach($users as $user)
+        @if($user->role->name !== 'admin')
+            <div class="modal fade" id="makeAdminModal{{ $user->id }}" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-warning">
+                                <i class="bi bi-shield-plus me-2"></i>Назначение администратором
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="bi bi-shield-shaded" style="font-size: 48px; color: var(--warning);"></i>
+                            <p class="mt-3 mb-0">Вы уверены, что хотите назначить администратором?</p>
+                            <p class="text-secondary mt-2">
+                                <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                                {{ $user->email }}
+                            </p>
+                            <p class="text-warning small mt-3">
+                                <i class="bi bi-exclamation-circle"></i> Администратор имеет полный доступ к системе.
+                            </p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                            <form action="{{ route('admin.users.make-admin', $user) }}" method="POST"
+                                  class="make-admin-form">
+                                @csrf
+                                <button type="submit" class="btn-primary"
+                                        style="background: var(--warning); color: #02040a;">
+                                    <i class="bi bi-shield-plus"></i> Назначить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            @if($user->id !== auth()->id())
+                <div class="modal fade" id="removeAdminModal{{ $user->id }}" tabindex="-1" data-bs-backdrop="static">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title text-danger">
+                                    <i class="bi bi-shield-slash me-2"></i>Снятие прав администратора
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body text-center py-4">
+                                <i class="bi bi-shield-exclamation" style="font-size: 48px; color: var(--danger);"></i>
+                                <p class="mt-3 mb-0">Вы уверены, что хотите снять права администратора?</p>
+                                <p class="text-secondary mt-2">
+                                    <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                                    {{ $user->email }}
+                                </p>
+                                <p class="text-danger small mt-3">
+                                    <i class="bi bi-exclamation-circle"></i> Пользователь потеряет доступ к
+                                    админ-панели.
+                                </p>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                                <form action="{{ route('admin.users.remove-admin', $user) }}" method="POST"
+                                      class="remove-admin-form">
+                                    @csrf
+                                    <button type="submit" class="btn-primary"
+                                            style="background: var(--danger); color: white;">
+                                        <i class="bi bi-shield-slash"></i> Снять права
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
+    @endforeach
 @endsection
 
 @push('scripts')
@@ -388,5 +492,7 @@
                 reloadOnSuccess: false
             });
         });
+
+
     </script>
 @endpush

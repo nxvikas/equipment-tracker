@@ -28,6 +28,9 @@
                 <p class="page-subtitle">Управление категориями для классификации техники</p>
             </div>
             <div class="page-actions">
+                <a href="{{ route('admin.export.categories') }}" class="btn-outline" title="Экспорт в Excel" style="margin-right: 10px">
+                    <i class="bi bi-download"></i> Экспорт
+                </a>
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
                     <i class="bi bi-plus-lg"></i> Добавить категорию
                 </button>

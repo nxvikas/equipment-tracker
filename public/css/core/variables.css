@@ -1,8 +1,13 @@
 /* CSS VARIABLES - ТЕМЫ */
-
 :root {
     --sidebar-width: 280px;
     --sidebar-collapsed: 80px;
+}
+
+/* ТЕМНАЯ ТЕМА (по умолчанию) */
+:root,
+html.dark,
+body.dark {
     --bg-dark: #03050b;
     --bg-surface: #0c0f17;
     --bg-card: #11141f;
@@ -17,6 +22,8 @@
     --warning: #f59e0b;
 }
 
+/* СВЕТЛАЯ ТЕМА */
+html.light,
 body.light {
     --bg-dark: #f5f7fb;
     --bg-surface: #ffffff;

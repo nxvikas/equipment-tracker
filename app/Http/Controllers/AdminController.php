@@ -24,7 +24,10 @@ class AdminController extends Controller
         $writtenEquipments = Equipment::where('status', 'written')->count();
 
 
-        $categories = Category::withCount('equipment')->orderBy('equipment_count', 'desc')->take(6)->get();
+        $categories = Category::withCount('equipment')
+            ->orderBy('equipment_count', 'desc')
+            ->take(6)
+            ->get();
 
 
         $recentOperations = Equipment_history::with(['equipment', 'user', 'toUser'])
@@ -32,20 +35,27 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
-
-        $statusData = [
-            'in_stock' => $inStockEquipments,
-            'in_use' => $inUseEquipments,
-            'repair' => $inRepairEquipments,
-        ];
-
-
         $monthlyAssigns = Equipment_history::where('action_type', 'assigned')
             ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
             ->where('created_at', '>=', now()->subMonths(6))
             ->groupBy('month')
             ->orderBy('month')
             ->get();
+
+        $topUsers = User::where('status', 'active')
+            ->withCount(['equipment as equipment_count' => function ($query) {
+                $query->where('status', 'in_use');
+            }])
+            ->having('equipment_count', '>', 0)
+            ->orderBy('equipment_count', 'desc')
+            ->take(5)
+            ->get();
+
+        $locationStats = Location::withCount('equipment')
+            ->orderBy('equipment_count', 'desc')
+            ->get();
+        $totalInLocations = $locationStats->sum('equipment_count');
+
 
         return view('admin.dashboard', compact(
             'totalEquipments',
@@ -55,8 +65,10 @@ class AdminController extends Controller
             'writtenEquipments',
             'categories',
             'recentOperations',
-            'statusData',
-            'monthlyAssigns'
+            'monthlyAssigns',
+            'topUsers',
+            'locationStats',
+            'totalInLocations',
         ));
     }
 
@@ -79,6 +91,7 @@ class AdminController extends Controller
 
         return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users'));
     }
+
     public function history(Request $request)
     {
         $query = Equipment_history::with(['equipment', 'user', 'toUser', 'fromUser', 'toLocation', 'fromLocation'])
@@ -94,6 +107,7 @@ class AdminController extends Controller
 
         return view('admin.history', compact('operations', 'actionTypes'));
     }
+
     public function structure(Request $request)
     {
         $activeTab = $request->get('tab', 'departments');

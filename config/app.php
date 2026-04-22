@@ -135,11 +135,16 @@ return [
     */
     'company' => [
         'name' => env('COMPANY_NAME'),
-        'short_name'=>env('COMPANY_SHORT_NAME'),
+        'short_name' => env('COMPANY_SHORT_NAME'),
         'description' => env('COMPANY_DESCRIPTION'),
         'email' => env('COMPANY_EMAIL'),
         'phone' => env('COMPANY_PHONE'),
         'logo' => env('COMPANY_LOGO'),
-    ]
+    ],
+
+    'qr_code' => [
+        'size' => env('QR_CODE_SIZE', 300),
+        'margin' => env('QR_CODE_MARGIN', 10),
+    ],
 
 ];

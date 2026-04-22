@@ -32,3 +32,88 @@
 .notification-text {
     color: var(--text-secondary);
 }
+
+
+/*СВЕТЛАЯ ТЕМА*/
+body.light .waiting-wrapper {
+    background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf2 100%);
+}
+body.light .waiting-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+body.light .status-card {
+    background: #f8fafc;
+}
+body.light .btn-outline-custom {
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+body.light .btn-outline-custom:hover {
+    background: rgba(132, 204, 22, 0.08);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+body.light .btn-primary-custom {
+    background: var(--accent);
+    color: #1a2e05;
+}
+
+body.light .btn-primary-custom:hover {
+    background: var(--accent-hover);
+}
+
+body.light .status-badge {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+body.light .status-badge i {
+    color: #475569;
+}
+
+
+
+.theme-toggle-auth {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.theme-toggle-auth .theme-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 20px;
+}
+
+.theme-toggle-auth .theme-toggle-btn:hover {
+    background: var(--accent);
+    color: #02040a;
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .theme-toggle-auth {
+        top: 16px;
+        right: 16px;
+    }
+
+    .theme-toggle-auth .theme-toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}

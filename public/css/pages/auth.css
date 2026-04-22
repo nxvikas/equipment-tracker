@@ -8,6 +8,8 @@
     linear-gradient(180deg, var(--bg-dark), #02040a);
 }
 
+
+
 .logo-text {
     font-size: 30px;
     font-weight: bold;
@@ -101,4 +103,110 @@ input[type="password"]::-webkit-strong-password-auto-fill-button {
 
 input[type="password"]::-webkit-password-eye {
     display: none;
+}
+
+
+/*СВЕТЛАЯ ТЕМА*/
+body.light .register-wrapper {
+    background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf2 100%);
+}
+body.light .register-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+body.light .input-group .form-control,
+body.light .input-group .input-group-text {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0;
+    color: #1e293b;
+}
+
+body.light .input-group .form-control:focus,
+body.light .input-group .input-group-text:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
+}
+
+body.light .input-group .form-control::placeholder {
+    color: #94a3b8;
+}
+
+body.light .btn-outline-secondary {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0;
+    color: #64748b;
+}
+
+body.light .btn-outline-secondary:hover {
+    background-color: #f1f5f9 !important;
+    border-color: var(--accent);
+    color: var(--accent);
+}
+body.light .remember-check {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+body.light .remember-wrapper:hover .remember-check {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
+}
+body.light .btn-primary-custom {
+    background: var(--accent);
+    color: #1a2e05;
+}
+
+body.light .btn-primary-custom:hover {
+    background: var(--accent-hover);
+}
+
+body.light .invalid-feedback {
+    color: #dc2626;
+}
+
+body.light .form-hint {
+    color: #64748b;
+}
+
+
+.theme-toggle-auth {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.theme-toggle-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 20px;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--accent);
+    color: #02040a;
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .theme-toggle-auth {
+        top: 16px;
+        right: 16px;
+    }
+
+    .theme-toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
 }

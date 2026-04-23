@@ -445,112 +445,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title">Новая категория</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ route('admin.category.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="return_to" value="equipment">
 
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Название категории <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   name="name"
-                                   class="form-control-custom @error('name', 'categoryModal') is-invalid @enderror"
-                                   placeholder="Например: Мониторы"
-                                   value="{{ old('name') }}">
-                            @error('name', 'categoryModal')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Описание</label>
-                            <textarea name="description"
-                                      class="form-control-custom @error('description', 'categoryModal') is-invalid @enderror"
-                                      placeholder="Дополнительная информация о категории"
-                                      rows="2">{{ old('description') }}</textarea>
-                            @error('description', 'categoryModal')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
-                        <button type="submit" class="btn-primary">Сохранить</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="addLocationModal" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title">Новая локация</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form action="{{ route('admin.location.store') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="return_to" value="equipment">
-
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Название локации <span class="text-danger">*</span></label>
-                            <input type="text"
-                                   name="name"
-                                   class="form-control-custom @error('name', 'locationModal') is-invalid @enderror"
-                                   placeholder="Например: Склад №5"
-                                   value="{{ old('name') }}">
-                            @error('name', 'locationModal')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Тип <span class="text-danger">*</span></label>
-                            <select name="type"
-                                    class="form-control-custom custom-dark-select @error('type', 'locationModal') is-invalid @enderror">
-                                <option value="">Выберите тип</option>
-                                @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
-                                    <option
-                                        value="{{ $type->value }}" {{ old('type') == $type->value ? 'selected' : '' }}>
-                                        {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('type', 'locationModal')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Адрес</label>
-                            <textarea name="address"
-                                      class="form-control-custom @error('address', 'locationModal') is-invalid @enderror"
-                                      placeholder="Физический адрес (необязательно)"
-                                      rows="2">{{ old('address') }}</textarea>
-                            @error('address', 'locationModal')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
-                        <button type="submit" class="btn-primary">Сохранить</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     @foreach($equipments as $equipment)
         <div class="modal fade" id="editEquipmentModal{{ $equipment->id }}" tabindex="-1" data-bs-backdrop="static">
@@ -767,6 +662,112 @@
             </div>
         @endif
     @endforeach
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">Новая категория</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.category.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="return_to" value="equipment">
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Название категории <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name', 'categoryModal') is-invalid @enderror"
+                                   placeholder="Например: Мониторы"
+                                   value="{{ old('name') }}">
+                            @error('name', 'categoryModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Описание</label>
+                            <textarea name="description"
+                                      class="form-control-custom @error('description', 'categoryModal') is-invalid @enderror"
+                                      placeholder="Дополнительная информация о категории"
+                                      rows="2">{{ old('description') }}</textarea>
+                            @error('description', 'categoryModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
+                        <button type="submit" class="btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addLocationModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">Новая локация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.location.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="return_to" value="equipment">
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Название локации <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name', 'locationModal') is-invalid @enderror"
+                                   placeholder="Например: Склад №5"
+                                   value="{{ old('name') }}">
+                            @error('name', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Тип <span class="text-danger">*</span></label>
+                            <select name="type"
+                                    class="form-control-custom custom-dark-select @error('type', 'locationModal') is-invalid @enderror">
+                                <option value="">Выберите тип</option>
+                                @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
+                                    <option
+                                        value="{{ $type->value }}" {{ old('type') == $type->value ? 'selected' : '' }}>
+                                        {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('type', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Адрес</label>
+                            <textarea name="address"
+                                      class="form-control-custom @error('address', 'locationModal') is-invalid @enderror"
+                                      placeholder="Физический адрес (необязательно)"
+                                      rows="2">{{ old('address') }}</textarea>
+                            @error('address', 'locationModal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Назад</button>
+                        <button type="submit" class="btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -903,5 +904,7 @@
                 submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
             });
         });
+
+
     </script>
 @endpush

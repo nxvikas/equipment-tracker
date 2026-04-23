@@ -1,0 +1,77 @@
+/* СТИЛИ СТРАНИЦЫ ПРОФИЛЯ */
+
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    background: var(--bg-surface);
+    transition: all 0.2s ease;
+}
+
+.avatar-placeholder.profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-surface);
+}
+
+.avatar-placeholder.profile-avatar i {
+    font-size: 64px;
+    color: var(--text-secondary);
+}
+
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    padding: 8px 20px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(190, 242, 100, 0.05);
+}
+
+
+.form-control-custom:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+body.light .form-control-custom:disabled {
+    background: #f1f5f9;
+}
+
+.border-top {
+    border-top: 1px solid var(--border);
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+    }
+
+    .avatar-placeholder.profile-avatar i {
+        font-size: 50px;
+    }
+}

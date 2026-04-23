@@ -7,7 +7,12 @@
             <small>{{ config('app.company.description') }}</small>
         </div>
     </div>
-
+    <div class="sidebar-qr-btn">
+        <button type="button" class="qr-scan-btn" data-bs-toggle="modal" data-bs-target="#qrScannerModal">
+            <i class="bi bi-qr-code-scan"></i>
+            <span>Сканировать QR-код</span>
+        </button>
+    </div>
     <ul class="nav flex-column">
         @if(auth()->user()->isAdmin())
             <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -62,7 +67,7 @@
                 </a>
             </li>
             <li class="nav-item {{ request()->routeIs('employee.equipment*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
+                <a href="{{ route('employee.equipment') }}" class="nav-link">
                     <i class="bi bi-laptop"></i>
                     <span>Моё оборудование</span>
                 </a>

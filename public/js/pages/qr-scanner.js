@@ -12,10 +12,14 @@
 
 
     function getEquipmentIdFromUrl(url) {
-        let match = url.match(/\/admin\/equipment\/(\d+)/);
+
+        let match = url.match(/\/equipment\/(\d+)/);
         if (match) return match[1];
-        match = url.match(/\/equipment\/(\d+)/);
+
+
+        match = url.match(/\/admin\/equipment\/(\d+)/);
         if (match) return match[1];
+
         return null;
     }
 
@@ -60,7 +64,8 @@
                     stopScanner();
                     const bsModal = bootstrap.Modal.getInstance(modal);
                     if (bsModal) bsModal.hide();
-                    window.location.href = '/admin/equipment/' + equipmentId;
+
+                    window.location.href = '/equipment/' + equipmentId;
                 } else {
                     alert('Неверный QR-код');
                 }

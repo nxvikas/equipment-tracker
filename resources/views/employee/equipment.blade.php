@@ -138,7 +138,7 @@
                             <td style="text-align: center;">
                                 @if($item->qr_code)
                                     <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('admin.equipment.qrcode', $item->id) }}" alt="QR" style="width: 40px; height: 40px;">
+                                        <img src="{{ route('equipment.qrcode', $item->id) }}" alt="QR" style="width: 40px; height: 40px;">
                                     </div>
                                 @else
                                     <span class="text-secondary">—</span>

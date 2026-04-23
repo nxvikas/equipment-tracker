@@ -20,6 +20,9 @@ Route::middleware('web')->group(function () {
 
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+        Route::get('/equipment/{id}', [\App\Http\Controllers\EquipmentController::class, 'publicShow'])->name('public.equipment');
+        Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');
     });
     Route::get('/waiting', [\App\Http\Controllers\AuthController::class, 'showWaitingPage'])->name('auth.waiting');
     Route::get('/check-status', [\App\Http\Controllers\AuthController::class, 'checkStatus'])->name('check.status');
@@ -49,7 +52,8 @@ Route::middleware('web')->group(function () {
         Route::post('/equipment/location', [\App\Http\Controllers\LocationController::class, 'store'])->name('location.store');
 
         Route::get('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'show'])->name('equipment.show');
-        Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');
+
+
 
 
         Route::post('/equipment/{equipment}/assign', [\App\Http\Controllers\EquipmentController::class, 'assign'])->name('equipment.assign');

@@ -47,10 +47,10 @@
                 <div class="equipment-card">
                     <div class="equipment-card-body text-center">
                         @if($equipment->qr_code)
-                            <img src="{{ route('admin.equipment.qrcode', $equipment->id) }}" alt="QR-код"
+                            <img src="{{ route('equipment.qrcode', $equipment->id) }}" alt="QR-код"
                                  class="qr-code-image">
                             <div class="mt-3">
-                                <a href="{{ route('admin.equipment.qrcode', $equipment->id) }}"
+                                <a href="{{ route('equipment.qrcode', $equipment->id) }}"
                                    download="qr-{{ $equipment->inventory_number }}.png"
                                    class="btn-outline w-100">
                                     <i class="bi bi-download"></i> Скачать QR-код

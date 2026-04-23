@@ -82,7 +82,7 @@ class EquipmentController extends Controller
         $equipment = Equipment::create($validated);
 
         $equipment->update([
-            'qr_code' => route('admin.equipment.qrcode', $equipment->id)
+            'qr_code' => route('public.equipment', $equipment->id)
         ]);
 
         Equipment_history::create([
@@ -417,5 +417,18 @@ class EquipmentController extends Controller
         session()->flash('success', 'Оборудование списано');
 
         return response()->json(['success' => true]);
+    }
+
+    public function publicShow($id)
+    {
+        $equipment = Equipment::with(['category', 'location', 'currentUser'])
+            ->findOrFail($id);
+
+
+        if (auth()->user()->isAdmin()) {
+            $equipment->load(['history.user', 'history.toUser', 'history.toLocation']);
+        }
+
+        return view('public.equipment', compact('equipment'));
     }
 }

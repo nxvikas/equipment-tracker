@@ -27,7 +27,8 @@
                 @endif
             </div>
             <div class="page-actions">
-                <a href="{{ route('admin.export.equipment') }}" class="btn-outline" title="Экспорт в Excel" style="margin-right: 10px">
+                <a href="{{ route('admin.export.equipment') }}" class="btn-outline" title="Экспорт в Excel"
+                   style="margin-right: 10px">
                     <i class="bi bi-download"></i> Экспорт
                 </a>
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
@@ -137,7 +138,7 @@
                             <td style="text-align: center;">
                                 @if($equipment->qr_code)
                                     <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('admin.equipment.qrcode', $equipment->id) }}" alt="QR"
+                                        <img src="{{ route('equipment.qrcode', $equipment->id) }}" alt="QR"
                                              style="width: 40px; height: 40px;">
                                     </div>
                                 @else
@@ -714,7 +715,7 @@
                     <h5 class="modal-title">Новая локация</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.location.store') }}" method="POST">
+                <form action="{{ route('admin.locations.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="return_to" value="equipment">
 

@@ -83,7 +83,7 @@
                 </div>
             </button>
             <ul class="dropdown-menu dropdown-menu-end profile-menu">
-                <li><a class="dropdown-item" href="#">
+                <li><a class="dropdown-item" href="{{route('profile.show')}}">
                         <i class="bi bi-person me-2"></i> Мой профиль
                     </a></li>
                 <li>

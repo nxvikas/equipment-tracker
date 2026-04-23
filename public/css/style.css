@@ -33,3 +33,43 @@
 @import 'pages/equipment/admin.css';
 @import 'pages/equipment/employee.css';
 @import 'pages/equipment/show.css';
+
+
+/* pages — профиль */
+@import 'pages/profile.css';
+
+#qr-reader {
+    width: 100%;
+    border: none !important;
+    border-radius: 16px;
+    overflow: hidden;
+}
+#qr-reader video {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+}
+#qr-reader__scan_region {
+    background: #000;
+    border-radius: 16px;
+}
+.qr-scanner-container {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+}
+.qr-scanner-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+.qr-scanner-status {
+    text-align: center;
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+}

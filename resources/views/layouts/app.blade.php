@@ -5,6 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
         (function () {
             try {
@@ -58,11 +59,37 @@
 @endguest
 
 @include('partials.footer')
+<div class="modal fade" id="qrScannerModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-qr-code-scan me-2" style="color: var(--accent);"></i>
+                    Сканирование QR-кода
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div id="qr-reader" style="width: 100%;"></div>
+                <p class="text-center text-secondary mt-3">
+                    <i class="bi bi-info-circle"></i> Наведите камеру на QR-код
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn-outline" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
 @auth()
     <script src="{{ asset('js/pages/admin/common.js') }}"></script>
 @endauth
 @stack('scripts')
 <script src="{{ asset('js/pages/sidebar.js') }}"></script>
 <script src="{{asset('js/toggleTheme.js')}}"></script>
+@auth()
+    <script src="{{ asset('js/pages/qr-scanner.js') }}"></script>
+@endauth
+
 </body>
 </html>

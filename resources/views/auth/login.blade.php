@@ -76,7 +76,7 @@
                 <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
                     <div class="form-check" style="padding-left: 0 !important;">
                         <label class="remember-wrapper">
-                            <input type="checkbox" name="remember">
+                            <input type="checkbox" name="remember" value="1">
                             <span class="remember-check"></span>
                             <span class="small text-secondary">Запомнить меня</span>
                         </label>
@@ -105,7 +105,7 @@
 @push('scripts')
     <script src="{{ asset('js/pages/auth/eyePassword.js') }}"></script>
     <script>
-        (function() {
+        (function () {
             const themeToggle = document.getElementById('themeToggleAuth');
             if (!themeToggle) return;
 
@@ -127,7 +127,7 @@
                 themeToggle.innerHTML = '<i class="bi bi-moon"></i>';
             }
 
-            themeToggle.addEventListener('click', function() {
+            themeToggle.addEventListener('click', function () {
                 const isLight = document.documentElement.classList.contains('light');
                 if (isLight) {
                     applyTheme('dark');

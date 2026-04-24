@@ -130,7 +130,6 @@ class EquipmentController extends Controller
                     'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
                 ], 422);
             }
-
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
                 ->with('edit_modal_open', true)
@@ -141,15 +140,79 @@ class EquipmentController extends Controller
             $validated['current_user_id'] = null;
         }
 
+        // Сохраняем старые значения для сравнения
+        $oldStatus = $equipment->status;
+        $oldUserId = $equipment->current_user_id;
+        $oldLocationId = $equipment->location_id;
+        $oldCategoryId = $equipment->category_id;
+
         $equipment->update($validated);
 
-        Equipment_history::create([
-            'equipment_id' => $equipment->id,
-            'action_type' => TypeEquipmentHistory::MOVED->value,
-            'user_id' => Auth::id(),
-            'new_status' => $equipment->status,
-            'comment' => 'Оборудование отредактировано'
-        ]);
+        // ========== ЗАПИСЫВАЕМ В ИСТОРИЮ ==========
+
+        // 1. Если изменился сотрудник (выдали новому сотруднику)
+        if ($oldUserId != $equipment->current_user_id && $equipment->current_user_id !== null) {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => 'assigned',
+                'user_id' => Auth::id(),
+                'to_user_id' => $equipment->current_user_id,
+                'from_user_id' => $oldUserId,
+                'to_location_id' => $equipment->location_id,
+                'new_status' => $equipment->status,
+                'comment' => 'Изменён ответственный сотрудник при редактировании'
+            ]);
+        }
+
+        // 2. Если оборудование вернули на склад (было у сотрудника, стало на складе)
+        if ($oldUserId !== null && $equipment->current_user_id === null && $equipment->status === 'in_stock') {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => 'returned',
+                'user_id' => Auth::id(),
+                'from_user_id' => $oldUserId,
+                'new_status' => 'in_stock',
+                'comment' => 'Возвращено на склад при редактировании'
+            ]);
+        }
+
+        // 3. Если изменился статус (кроме случаев, уже обработанных выше)
+        if ($oldStatus !== $equipment->status && $equipment->status !== 'in_stock') {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => 'moved',
+                'user_id' => Auth::id(),
+                'old_status' => $oldStatus,
+                'new_status' => $equipment->status,
+                'comment' => 'Изменён статус оборудования'
+            ]);
+        }
+
+        // 4. Если изменилась локация
+        if ($oldLocationId != $equipment->location_id) {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => 'moved',
+                'user_id' => Auth::id(),
+                'from_location_id' => $oldLocationId,
+                'to_location_id' => $equipment->location_id,
+                'new_status' => $equipment->status,
+                'comment' => 'Изменена локация оборудования'
+            ]);
+        }
+
+        // 5. Если изменилась категория (тоже полезно отслеживать)
+        if ($oldCategoryId != $equipment->category_id) {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => 'moved',
+                'user_id' => Auth::id(),
+                'new_status' => $equipment->status,
+                'comment' => 'Изменена категория оборудования'
+            ]);
+        }
+
+        session()->flash('success', 'Оборудование обновлено');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

@@ -111,6 +111,9 @@
             searchResults.className = 'global-search-results';
             searchInput.parentNode.appendChild(searchResults);
 
+
+            const searchUrl = @json(auth()->user()->isAdmin() ? route('admin.global.search') : route('employee.global.search'));
+
             searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
                 const query = this.value.trim();
@@ -122,7 +125,7 @@
                 }
 
                 searchTimeout = setTimeout(() => {
-                    fetch(`/admin/search?q=${encodeURIComponent(query)}`)
+                    fetch(`${searchUrl}?q=${encodeURIComponent(query)}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.length === 0) {
@@ -133,15 +136,14 @@
 
                             let html = '';
                             data.forEach(item => {
-
                                 html += `
-                            <a href="${item.url}" class="search-result-item">
-                                <div class="search-result-info">
-                                    <div class="search-result-title">${item.title}</div>
-                                    <div class="search-result-subtitle">${item.subtitle}</div>
-                                </div>
-                            </a>
-                        `;
+                                    <a href="${item.url}" class="search-result-item">
+                                        <div class="search-result-info">
+                                            <div class="search-result-title">${item.title}</div>
+                                            <div class="search-result-subtitle">${item.subtitle}</div>
+                                        </div>
+                                    </a>
+                                `;
                             });
                             searchResults.innerHTML = html;
                             searchResults.classList.add('show');
@@ -158,7 +160,8 @@
                 }
             });
         });
-        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 @endpush

@@ -4,52 +4,73 @@ namespace App\Http\Controllers;
 
 use App\Exports\employee\EmployeeEquipmentExport;
 use App\Models\Category;
+use App\Models\Location;
 use App\Models\Equipment;
 use App\Models\Equipment_history;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Carbon\Carbon;
 class EmployeeController extends Controller
 {
     public function dashboard()
     {
         $user = Auth::user();
 
-
-        $myEquipment = Equipment::where('current_user_id', $user->id)
+        $totalMyEquipment = Equipment::where('current_user_id', $user->id)
             ->where('status', 'in_use')
-            ->with('category')
-            ->get();
+            ->count();
 
-
-        $totalMyEquipment = $myEquipment->count();
-
-
-        $repairEquipment = Equipment::where('current_user_id', $user->id)
+        $totalRepairEquipment = Equipment::where('current_user_id', $user->id)
             ->where('status', 'repair')
-            ->with('category')
-            ->get();
+            ->count();
 
-        $totalRepairEquipment = $repairEquipment->count();
-
-
-        $recentHistory = Equipment_history::where(function ($query) use ($user) {
-            $query->where('to_user_id', $user->id)
-                ->orWhere('from_user_id', $user->id);
-        })
-            ->with(['equipment', 'user'])
+        $recentAssigns = Equipment_history::where('to_user_id', $user->id)
+            ->where('action_type', 'assigned')
+            ->with(['equipment'])
             ->orderBy('created_at', 'desc')
-            ->take(10)
+            ->take(5)
             ->get();
+
+        $monthlyStats = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $monthName = $month->translatedFormat('F');
+
+            $assigned = Equipment_history::where('to_user_id', $user->id)
+                ->where('action_type', 'assigned')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+
+            $returned = Equipment_history::where('from_user_id', $user->id)
+                ->where('action_type', 'returned')
+                ->whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->count();
+
+            $monthlyStats[] = [
+                'month' => $monthName,
+                'assigned' => $assigned,
+                'returned' => $returned,
+            ];
+        }
+
+        $chartMonths = array_column($monthlyStats, 'month');
+        $chartAssigned = array_column($monthlyStats, 'assigned');
+        $chartReturned = array_column($monthlyStats, 'returned');
+
 
         return view('employee.dashboard', compact(
             'user',
-            'myEquipment',
             'totalMyEquipment',
-            'repairEquipment',
             'totalRepairEquipment',
-            'recentHistory'
+            'recentAssigns',
+            'monthlyStats',
+            'chartMonths',
+            'chartAssigned',
+            'chartReturned',
+
         ));
     }
     public function myEquipment(Request $request)
@@ -102,5 +123,68 @@ class EmployeeController extends Controller
         $fileName = 'report_' . $user->surname . '_' . $user->name . '_' . now()->format('Y-m-d') . '.xlsx';
 
         return Excel::download(new EmployeeEquipmentExport($equipments, $user), $fileName);
+    }
+    public function globalSearch(Request $request)
+    {
+        $query = $request->get('q');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $user = Auth::user();
+
+
+        $equipment = Equipment::where('current_user_id', $user->id)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('inventory_number', 'like', "%{$query}%")
+                    ->orWhere('serial_number', 'like', "%{$query}%");
+            })
+            ->get(['id', 'name', 'inventory_number', 'serial_number'])
+            ->map(function ($item) {
+                $subtitle = $item->inventory_number;
+                if ($item->serial_number) {
+                    $subtitle .= ' | SN: ' . $item->serial_number;
+                }
+                return [
+                    'id' => $item->id,
+                    'type' => 'equipment',
+                    'title' => $item->name,
+                    'subtitle' => $subtitle,
+                    'url' => route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment'])
+                ];
+            });
+
+        return response()->json($equipment);
+    }
+    public function returnEquipment($id)
+    {
+        $user = Auth::user();
+
+        $equipment = Equipment::where('id', $id)
+            ->where('current_user_id', $user->id)
+            ->where('status', 'in_use')
+            ->firstOrFail();
+
+        $oldUserId = $equipment->current_user_id;
+        $oldLocationId = $equipment->location_id;
+
+        $equipment->update([
+            'status' => 'in_stock',
+            'current_user_id' => null,
+        ]);
+
+        Equipment_history::create([
+            'equipment_id' => $equipment->id,
+            'action_type' => 'returned',
+            'user_id' => auth()->id(),
+            'from_user_id' => $oldUserId,
+            'from_location_id' => $oldLocationId,
+            'new_status' => 'in_stock',
+            'comment' => 'Возвращено сотрудником на склад'
+        ]);
+
+        return redirect()->back()->with('success', 'Оборудование "' . $equipment->name . '" возвращено на склад');
     }
 }

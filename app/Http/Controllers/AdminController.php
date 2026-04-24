@@ -98,6 +98,8 @@ class AdminController extends Controller
         $totalInLocations = $locationStats->sum('equipment_count');
 
 
+
+
         return view('admin.dashboard', compact(
             'totalEquipments',
             'inUseEquipments',
@@ -180,14 +182,17 @@ class AdminController extends Controller
         $equipment = Equipment::where('name', 'like', "%{$query}%")
             ->orWhere('inventory_number', 'like', "%{$query}%")
             ->orWhere('serial_number', 'like', "%{$query}%")
-            ->limit(5)
             ->get(['id', 'name', 'inventory_number', 'serial_number'])
             ->map(function ($item) {
+                $subtitle = $item->inventory_number;
+                if ($item->serial_number) {
+                    $subtitle .= ' | SN: ' . $item->serial_number;
+                }
                 return [
                     'id' => $item->id,
                     'type' => 'equipment',
                     'title' => $item->name,
-                    'subtitle' => $item->inventory_number,
+                    'subtitle' => $subtitle,
                     'url' => route('admin.equipment.show', $item->id)
                 ];
             });
@@ -198,7 +203,6 @@ class AdminController extends Controller
             $users = User::where('surname', 'like', "%{$query}%")
                 ->orWhere('name', 'like', "%{$query}%")
                 ->orWhere('email', 'like', "%{$query}%")
-                ->limit(5)
                 ->get(['id', 'surname', 'name', 'email'])
                 ->map(function ($item) {
                     return [
@@ -215,7 +219,6 @@ class AdminController extends Controller
         $categories = collect();
         if (auth()->user()->isAdmin()) {
             $categories = Category::where('name', 'like', "%{$query}%")
-                ->limit(5)
                 ->get(['id', 'name'])
                 ->map(function ($item) {
                     return [
@@ -232,7 +235,6 @@ class AdminController extends Controller
         $locations = collect();
         if (auth()->user()->isAdmin()) {
             $locations = Location::where('name', 'like', "%{$query}%")
-                ->limit(5)
                 ->get(['id', 'name'])
                 ->map(function ($item) {
                     return [

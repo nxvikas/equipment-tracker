@@ -22,7 +22,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Обработка аватара
+
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
@@ -31,7 +31,7 @@ class ProfileController extends Controller
             $user->avatar = $path;
         }
 
-        // Обработка остальных полей
+
         $data = [
             'surname' => $request->surname,
             'name' => $request->name,

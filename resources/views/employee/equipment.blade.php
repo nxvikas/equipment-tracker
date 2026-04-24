@@ -78,7 +78,8 @@
                                 </li>
                             @endforeach
                         </ul>
-                        <input type="hidden" name="category_id" class="custom-select-input" value="{{ request('category_id') }}">
+                        <input type="hidden" name="category_id" class="custom-select-input"
+                               value="{{ request('category_id') }}">
                     </div>
 
                     <div class="dropdown custom-select">
@@ -93,10 +94,12 @@
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu custom-select-menu">
-                            <li><a class="dropdown-item {{ !request('status') ? 'active' : '' }}" href="#" data-value="">Все статусы</a></li>
+                            <li><a class="dropdown-item {{ !request('status') ? 'active' : '' }}" href="#"
+                                   data-value="">Все статусы</a></li>
                             @foreach($statuses as $value => $label)
                                 <li>
-                                    <a class="dropdown-item {{ request('status') == $value ? 'active' : '' }}" href="#" data-value="{{ $value }}">
+                                    <a class="dropdown-item {{ request('status') == $value ? 'active' : '' }}" href="#"
+                                       data-value="{{ $value }}">
                                         {{ $label }}
                                     </a>
                                 </li>
@@ -129,7 +132,7 @@
                         <th>Серийный номер</th>
                         <th>Статус</th>
                         <th>Локация</th>
-                        <th></th>
+                        <th>Действия</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -138,14 +141,19 @@
                             <td style="text-align: center;">
                                 @if($item->qr_code)
                                     <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('equipment.qrcode', $item->id) }}" alt="QR" style="width: 40px; height: 40px;">
+                                        <img src="{{ route('equipment.qrcode', $item->id) }}" alt="QR"
+                                             style="width: 40px; height: 40px;">
                                     </div>
                                 @else
                                     <span class="text-secondary">—</span>
                                 @endif
                             </td>
                             <td class="inv-number">{{ $item->inventory_number }}</td>
-                            <td class="equipment-name">{{ $item->name }}</td>
+                            <td class="equipment-name">
+                                <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}" class="equipment-name">
+                                    {{ $item->name }}
+                                </a>
+                            </td>
                             <td>{{ $item->category->name ?? '—' }}</td>
                             <td>{{ $item->model ?? '—' }}</td>
                             <td class="serial-number">{{ $item->serial_number ?? '—' }}</td>
@@ -166,14 +174,24 @@
                             </td>
                             <td>{{ $item->location->name ?? '—' }}</td>
                             <td>
-                                <a href="{{ route('admin.equipment.show', $item->id) }}" class="action-btn" title="Посмотреть">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                                @if($item->status === 'in_use')
+                                    <button type="button"
+                                            class="return-btn"
+                                            data-equipment-id="{{ $item->id }}"
+                                            data-equipment-name="{{ $item->name }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#returnConfirmModal"
+                                            title="Вернуть на склад">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                    </button>
+                                @else
+                                    <span class="text-secondary">—</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="p-0 border-bottom-0">
+                            <td colspan="8" class="p-0 border-bottom-0">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper">
                                         <i class="bi bi-inbox"></i>
@@ -187,12 +205,41 @@
                     </tbody>
                 </table>
             </div>
-
             @if($equipments->hasPages())
                 <div class="pagination-wrapper">
                     {{ $equipments->appends(request()->query())->links() }}
                 </div>
             @endif
+        </div>
+    </div>
+
+    <div class="modal fade" id="returnConfirmModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-warning">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Подтверждение возврата
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-question-circle" style="font-size: 48px; color: var(--warning);"></i>
+                    <p class="mt-3 mb-0">Вы уверены, что хотите вернуть оборудование на склад?</p>
+                    <p class="text-secondary mt-2" id="returnEquipmentName"></p>
+                    <p class="text-warning small mt-3">
+                        <i class="bi bi-exclamation-circle"></i> После возврата оборудование будет доступно для выдачи другим сотрудникам.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                    <form action="" method="POST" id="returnForm">
+                        @csrf
+                        <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                            <i class="bi bi-box-arrow-in-right"></i> Подтвердить возврат
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -208,6 +255,23 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initCustomSelects();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const returnButtons = document.querySelectorAll('.return-btn');
+            const returnForm = document.getElementById('returnForm');
+            const returnEquipmentName = document.getElementById('returnEquipmentName');
+
+            returnButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const equipmentId = this.dataset.equipmentId;
+                    const equipmentName = this.dataset.equipmentName;
+
+                    returnEquipmentName.innerHTML = `<strong>${equipmentName}</strong>`;
+                    returnForm.action = `/employee/equipment/${equipmentId}/return`;
+                });
+            });
         });
     </script>
 @endpush

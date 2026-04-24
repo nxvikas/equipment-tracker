@@ -185,7 +185,35 @@ body.light .popover-shortcut {
 .search-result-item:hover {
     background: rgba(190, 242, 100, 0.05);
 }
+.search-result-item .search-result-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    transition: color 0.2s;
+}
 
+.search-result-item:hover .search-result-title {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+.search-result-item .search-result-info {
+    flex: 1;
+}
+
+.search-result-item .search-result-subtitle {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+body.light .search-result-item .search-result-title {
+    color: #65a30d;
+}
+
+body.light .search-result-item .search-result-title:hover {
+    color: #4a7c0e;
+}
 .search-result-item i {
     font-size: 18px;
     color: var(--accent);
@@ -206,7 +234,7 @@ body.light .popover-shortcut {
     color: var(--text-secondary);
 }
 
-/* User area */
+
 .user-area {
     display: flex;
     align-items: center;

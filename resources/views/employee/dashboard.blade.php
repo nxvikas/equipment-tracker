@@ -4,6 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 @endpush
 
 @section('content')
@@ -22,7 +23,7 @@
             </div>
         </div>
 
-        {{-- СТАТИСТИКА ДЛЯ СОТРУДНИКА --}}
+
         <div class="stats-container">
             <div class="stat-item">
                 <div class="stat-icon-wrapper green">
@@ -34,212 +35,143 @@
                     <span class="stat-change">единиц в использовании</span>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon-wrapper orange">
-                    <i class="bi bi-tools"></i>
+        </div>
+
+
+        <div class="charts-grid-2cols">
+
+            <div class="chart-panel">
+                <div class="chart-head">
+                    <h3><i class="bi bi-graph-up"></i> Динамика операций</h3>
+                    <span class="chart-badge">последние 6 месяцев</span>
                 </div>
-                <div class="stat-info">
-                    <span class="stat-label">В ремонте</span>
-                    <span class="stat-number">{{ $totalRepairEquipment }}</span>
-                    <span class="stat-change warning">требуют внимания</span>
+                <div class="chart-body">
+                    <canvas id="employeeStatsChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-dot green"></div>
+                    <span>Выдано техники</span>
+                    <div class="legend-dot blue"></div>
+                    <span>Возвращено</span>
                 </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon-wrapper blue">
-                    <i class="bi bi-building"></i>
+
+
+            <div class="recent-assigns-card">
+                <div class="recent-assigns-header">
+                    <h3><i class="bi bi-clock-history"></i> Последние выдачи</h3>
+                    <a href="{{ route('employee.equipment') }}" class="link-btn">
+                        Всё оборудование <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
-                <div class="stat-info">
-                    <span class="stat-label">Мой отдел</span>
-                    <span class="stat-number" style="font-size: 18px;">{{ $user->department->name ?? 'Не назначен' }}</span>
-                    <span class="stat-change">{{ $user->position->name ?? '' }}</span>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon-wrapper blue">
-                    <i class="bi bi-envelope"></i>
-                </div>
-                <div class="stat-info">
-                    <span class="stat-label">Контактные данные</span>
-                    <span class="stat-number" style="font-size: 14px;">{{ $user->email }}</span>
-                    <span class="stat-change">{{ $user->phone ?? '—' }}</span>
+                <div class="recent-assigns-list">
+                    @forelse($recentAssigns as $assign)
+
+                        <a href="{{ route('public.equipment', ['id' => $assign->equipment_id]) }}"
+                           class="recent-assign-item">
+                            <div class="recent-assign-icon">
+                                <i class="bi bi-laptop"></i>
+                            </div>
+                            <div class="recent-assign-info">
+                                <div class="recent-assign-name">{{ $assign->equipment->name ?? '—' }}</div>
+                                <div class="recent-assign-date">{{ $assign->created_at->format('d.m.Y') }}</div>
+                            </div>
+                            <div class="recent-assign-badge">
+                                <span class="badge-success">Выдано</span>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="empty-recent">
+                            <i class="bi bi-inbox"></i>
+                            <span>Нет выдач</span>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
-        {{-- МОЁ ОБОРУДОВАНИЕ --}}
-        <div class="section-wrapper">
-            <div class="section-head">
-                <div>
-                    <h2 class="section-title">
-                        <i class="bi bi-laptop me-2"></i>Моё оборудование
-                    </h2>
-                    <p class="section-desc">Техника, которая сейчас у вас в использовании</p>
-                </div>
-            </div>
 
-            @if($myEquipment->count() > 0)
-                <div class="table-wrapper">
-                    <div class="table-responsive">
-                        <table class="custom-table">
-                            <thead>
-                            <tr>
-                                <th>Название</th>
-                                <th>Инв. номер</th>
-                                <th>Категория</th>
-                                <th>Модель</th>
-                                <th>Серийный номер</th>
-                                <th>Статус</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($myEquipment as $item)
-                                <tr>
-                                    <td class="equipment-name">{{ $item->name }}</td>
-                                    <td class="inv-number">{{ $item->inventory_number }}</td>
-                                    <td>{{ $item->category->name ?? '—' }}</td>
-                                    <td>{{ $item->model ?? '—' }}</td>
-                                    <td class="serial-number">{{ $item->serial_number ?? '—' }}</td>
-                                    <td>
-                                        <span class="status-badge success">В использовании</span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.equipment.show', $item->id) }}"
-                                           class="action-btn"
-                                           title="Посмотреть">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-icon-wrapper">
-                        <i class="bi bi-inbox"></i>
-                    </div>
-                    <h4 class="empty-title">Нет оборудования</h4>
-                    <p class="empty-desc">У вас пока нет выданного оборудования</p>
-                </div>
-            @endif
-        </div>
 
-        {{-- ОБОРУДОВАНИЕ В РЕМОНТЕ --}}
-        @if($repairEquipment->count() > 0)
+        @if($totalRepairEquipment > 0)
             <div class="section-wrapper">
                 <div class="section-head">
                     <div>
                         <h2 class="section-title">
-                            <i class="bi bi-tools me-2"></i>Оборудование в ремонте
+                            <i class="bi bi-tools me-2"></i>В ремонте
                         </h2>
                         <p class="section-desc">Техника, которая находится в сервисном центре</p>
                     </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <div class="table-responsive">
-                        <table class="custom-table">
-                            <thead>
-                            <tr>
-                                <th>Название</th>
-                                <th>Инв. номер</th>
-                                <th>Категория</th>
-                                <th>Модель</th>
-                                <th>Серийный номер</th>
-                                <th>Статус</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($repairEquipment as $item)
-                                <tr>
-                                    <td class="equipment-name">{{ $item->name }}</td>
-                                    <td class="inv-number">{{ $item->inventory_number }}</td>
-                                    <td>{{ $item->category->name ?? '—' }}</td>
-                                    <td>{{ $item->model ?? '—' }}</td>
-                                    <td class="serial-number">{{ $item->serial_number ?? '—' }}</td>
-                                    <td>
-                                        <span class="status-badge warning">В ремонте</span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('admin.equipment.show', $item->id) }}"
-                                           class="action-btn"
-                                           title="Посмотреть">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    <a href="{{ route('employee.equipment', ['status' => 'repair']) }}" class="link-btn">
+                        Все в ремонте <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         @endif
-
-        {{-- ИСТОРИЯ ОПЕРАЦИЙ --}}
-        <div class="section-wrapper">
-            <div class="section-head">
-                <div>
-                    <h2 class="section-title">
-                        <i class="bi bi-clock-history me-2"></i>История операций
-                    </h2>
-                    <p class="section-desc">Действия с оборудованием, связанные с вами</p>
-                </div>
-            </div>
-
-            @if($recentHistory->count() > 0)
-                <div class="table-wrapper">
-                    <div class="table-responsive">
-                        <table class="custom-table">
-                            <thead>
-                            <tr>
-                                <th>Дата</th>
-                                <th>Оборудование</th>
-                                <th>Инв. номер</th>
-                                <th>Действие</th>
-                                <th>Комментарий</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($recentHistory as $record)
-                                <tr>
-                                    <td class="date">{{ $record->created_at->format('d.m.Y H:i') }}</td>
-                                    <td class="equipment-name">{{ $record->equipment->name ?? '—' }}</td>
-                                    <td class="inv-number">{{ $record->equipment->inventory_number ?? '—' }}</td>
-                                    <td>
-                                        @php
-                                            $operationText = \App\Http\Enums\TypeEquipmentHistory::ruValues()[$record->action_type] ?? $record->action_type;
-                                            $operationClass = match($record->action_type) {
-                                                'assigned' => 'assign',
-                                                'returned' => 'return',
-                                                'repaired' => 'repair',
-                                                default => 'receive'
-                                            };
-                                        @endphp
-                                        <span class="operation {{ $operationClass }}">{{ $operationText }}</span>
-                                    </td>
-                                    <td>
-                                        <small class="text-secondary">{{ Str::limit($record->comment, 50) }}</small>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-icon-wrapper">
-                        <i class="bi bi-inbox"></i>
-                    </div>
-                    <h4 class="empty-title">Нет операций</h4>
-                    <p class="empty-desc">История операций с вашим участием пока пуста</p>
-                </div>
-            @endif
-        </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            const chartMonths = @json($chartMonths);
+            const chartAssigned = @json($chartAssigned);
+            const chartReturned = @json($chartReturned);
+
+            const ctx = document.getElementById('employeeStatsChart')?.getContext('2d');
+            if (ctx && chartMonths.length > 0) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartMonths,
+                        datasets: [
+                            {
+                                label: 'Выдано',
+                                data: chartAssigned,
+                                backgroundColor: 'rgba(190, 242, 100, 0.7)',
+                                borderColor: '#bef264',
+                                borderWidth: 1,
+                                borderRadius: 8
+                            },
+                            {
+                                label: 'Возвращено',
+                                data: chartReturned,
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1,
+                                borderRadius: 8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {color: '#94a3b8', font: {size: 11}}
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(17, 20, 31, 0.96)',
+                                titleColor: '#f1f5f9',
+                                bodyColor: '#94a3b8',
+                                borderColor: 'rgba(190, 242, 100, 0.3)',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {stepSize: 1, color: '#94a3b8'},
+                                grid: {color: 'rgba(255, 255, 255, 0.05)'}
+                            },
+                            x: {
+                                ticks: {color: '#94a3b8'},
+                                grid: {display: false}
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+@endpush

@@ -15,19 +15,26 @@
                 <h1 class="page-title">{{ $equipment->name }}</h1>
                 <p class="page-subtitle">Инвентарный номер: {{ $equipment->inventory_number }}</p>
                 @if(auth()->user()->isAdmin())
-                    <a href="{{ route('admin.equipment.show', $equipment->id) }}" class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.equipment.show', $equipment->id) }}"
+                       class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Вернуться к админ-панели
                     </a>
                 @else
-                    <a href="{{ route('employee.dashboard') }}" class="text-secondary text-decoration-none">
-                        <i class="bi bi-arrow-left"></i> На главную
-                    </a>
+                    @if(request('from') === 'employee_equipment')
+                        <a href="{{ route('employee.equipment') }}" class="text-secondary text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Назад к моему оборудованию
+                        </a>
+                    @else
+                        <a href="{{ route('employee.dashboard') }}" class="text-secondary text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> На главную
+                        </a>
+                    @endif
                 @endif
             </div>
         </div>
 
         <div class="row g-4">
-            {{-- ЛЕВАЯ КОЛОНКА: QR-код --}}
+
             <div class="col-lg-4 col-md-5">
                 <div class="equipment-card">
                     <div class="equipment-card-body text-center">
@@ -52,7 +59,7 @@
                 </div>
             </div>
 
-            {{-- ПРАВАЯ КОЛОНКА: ИНФОРМАЦИЯ --}}
+
             <div class="col-lg-8 col-md-7">
                 <div class="equipment-card">
                     <div class="equipment-card-body">
@@ -65,26 +72,19 @@
                             <div class="info-item">
                                 <span class="info-label">Статус</span>
                                 <span class="info-value">
-                                    @php
-                                        $statusClass = match($equipment->status) {
-                                            'in_use' => 'success',
-                                            'in_stock' => 'neutral',
-                                            'repair' => 'warning',
-                                            'written' => 'danger',
-                                            default => 'neutral'
-                                        };
-                                        $statusText = match($equipment->status) {
-                                            'in_use' => 'В использовании',
-                                            'in_stock' => 'На складе',
-                                            'repair' => 'В ремонте',
-                                            'written' => 'Списано',
-                                            default => $equipment->status
-                                        };
-                                    @endphp
-                                    <span class="status-badge {{ $statusClass }}">
-                                        {{ $statusText }}
-                                    </span>
-                                </span>
+        @php
+            $statusClass = match($equipment->status) {
+                'in_use' => 'success',
+                'in_stock' => 'neutral',
+                'repair' => 'warning',
+                'written' => 'danger',
+                default => 'neutral'
+            };
+        @endphp
+        <span class="status-badge {{ $statusClass }}">
+            {{ \App\Http\Enums\StatusEquipment::ruValues()[$equipment->status] ?? $equipment->status }}
+        </span>
+    </span>
                             </div>
 
                             <div class="info-item">
@@ -119,6 +119,9 @@
                                         {{ $equipment->currentUser->surname }} {{ $equipment->currentUser->name }}
                                         @if($equipment->currentUser->patronymic)
                                             {{ $equipment->currentUser->patronymic }}
+                                        @endif
+                                        @if(auth()->id() === $equipment->current_user_id)
+                                            <span class="text-secondary">(это Вы)</span>
                                         @endif
                                     @else
                                         <span class="text-secondary">Не назначен</span>
@@ -170,7 +173,7 @@
             </div>
         </div>
 
-        {{-- ИСТОРИЯ ОПЕРАЦИЙ (только для администратора) --}}
+
         @if(auth()->user()->isAdmin() && $equipment->relationLoaded('history'))
             <div class="history-section">
                 <div class="history-header">

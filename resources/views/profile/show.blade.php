@@ -31,14 +31,14 @@
             </div>
         </div>
 
-        {{-- ОДНА ФОРМА НА ВСЮ СТРАНИЦУ --}}
+
         <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <div class="row g-4">
 
-                {{-- ЛЕВАЯ КОЛОНКА: АВАТАР --}}
+
                 <div class="col-lg-4 col-md-5">
                     <div class="equipment-card">
                         <div class="equipment-card-body text-center">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                {{-- ПРАВАЯ КОЛОНКА: ДАННЫЕ --}}
+
                 <div class="col-lg-8 col-md-7">
                     <div class="equipment-card">
                         <div class="equipment-card-body">

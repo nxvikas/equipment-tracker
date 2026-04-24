@@ -176,11 +176,7 @@
                 <i class="bi bi-gear"></i> Действия с оборудованием
             </div>
             <div class="actions-grid">
-                @if($equipment->status === 'written')
-                    <div class="text-secondary py-2">
-                        <i class="bi bi-info-circle"></i> Оборудование списано. Действия недоступны.
-                    </div>
-                @else
+                @if($equipment->status !== 'written')
                     <button type="button" class="action-button" data-bs-toggle="modal"
                             data-bs-target="#editEquipmentModal">
                         <i class="bi bi-pencil"></i> Редактировать
@@ -200,7 +196,7 @@
                         </button>
                     @endif
 
-                    @if($equipment->status !== 'repair' && $equipment->status !== 'written')
+                    @if($equipment->status !== 'repair')
                         <button type="button" class="action-button" data-bs-toggle="modal"
                                 data-bs-target="#repairModal">
                             <i class="bi bi-tools"></i> В ремонт
@@ -215,25 +211,20 @@
                     @endif
 
 
-                    @if($equipment->status !== 'written')
                         <button type="button" class="action-button action-danger" data-bs-toggle="modal"
                                 data-bs-target="#writeOffModal">
                             <i class="bi bi-trash"></i> Списать
                         </button>
-                    @endif
 
-                    @php
-                        $otherActions = $equipment->history->filter(function($record) {
-                            return $record->action_type !== \App\Http\Enums\TypeEquipmentHistory::CREATED->value;
-                        })->count();
-                    @endphp
 
-                    @if($otherActions === 0)
-                        <button type="button" class="action-button action-danger" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal">
-                            <i class="bi bi-x-circle"></i> Удалить
-                        </button>
-                    @endif
+                    
+                @else
+                    <button class="action-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            title="Удалить">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 @endif
             </div>
         </div>

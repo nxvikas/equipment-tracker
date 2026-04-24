@@ -387,3 +387,356 @@
         gap: 16px;
     }
 }
+
+
+.timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.2s;
+}
+
+.timeline-item:hover {
+    transform: translateX(4px);
+    border-color: var(--accent);
+}
+
+.timeline-month {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-month i {
+    font-size: 18px;
+}
+
+.timeline-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.timeline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.timeline-badge.assigned {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.timeline-badge.returned {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.timeline-badge.repaired {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+@media (max-width: 768px) {
+    .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .timeline-month {
+        min-width: auto;
+    }
+}
+
+.charts-grid-2cols {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+
+.recent-assigns-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.recent-assigns-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.recent-assigns-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recent-assigns-header h3 i {
+    color: var(--accent);
+}
+
+.recent-assigns-list {
+    padding: 8px 0;
+}
+
+.recent-assign-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--border);
+}
+
+.recent-assign-item:hover {
+    background: rgba(190, 242, 100, 0.04);
+}
+
+.recent-assign-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(190, 242, 100, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recent-assign-icon i {
+    font-size: 20px;
+    color: var(--accent);
+}
+
+.recent-assign-info {
+    flex: 1;
+}
+
+.recent-assign-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.recent-assign-date {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.badge-success {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+}
+
+.empty-recent {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-recent i {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+
+.long-term-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.long-term-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.long-term-info {
+    flex: 1;
+}
+
+.long-term-info strong {
+    font-size: 14px;
+}
+
+.long-term-days {
+    font-size: 12px;
+    color: #f59e0b;
+    margin-right: 12px;
+}
+
+.btn-sm {
+    background: rgba(190, 242, 100, 0.1);
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Адаптив */
+@media (max-width: 992px) {
+    .charts-grid-2cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+.recent-assign-item .recent-assign-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 2px;
+    color: var(--accent);
+    transition: color 0.2s;
+}
+
+.recent-assign-item:hover .recent-assign-name {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+
+.recent-assign-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--border);
+}
+
+.recent-assign-item:hover {
+    background: rgba(190, 242, 100, 0.04);
+}
+
+
+.recent-assign-item:hover .recent-assign-icon i {
+    color: var(--accent-hover);
+    transform: scale(1.05);
+}
+
+
+.return-btn {
+    background: transparent;
+    border: none;
+    color: #10b981;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.return-btn:hover {
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+    transform: scale(1.05);
+}
+
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 40px;
+    font-size: 11px;
+    font-weight: 500;
+    gap: 6px;
+}
+
+.status-badge.success {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.status-badge.warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.status-badge.neutral {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.status-badge.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+
+.status-badge.info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+
+.operation {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.operation.assign {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.operation.receive {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.operation.return {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+.operation.repair {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}

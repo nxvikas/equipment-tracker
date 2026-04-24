@@ -175,12 +175,7 @@
                                         title="Редактировать">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                @php
-                                    $otherActions = $equipment->history->filter(function($record) {
-                                        return $record->action_type !== \App\Http\Enums\TypeEquipmentHistory::CREATED->value;
-                                    })->count();
-                                @endphp
-                                @if($otherActions === 0)
+                                @if($equipment->status === 'written' && $equipment->history->count() <= 1)
                                     <button class="action-btn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteEquipmentModal{{ $equipment->id }}"
@@ -566,11 +561,10 @@
                             </div>
 
                             <div class="row justify-content-end">
-                                <div class="col-md-6 mb-3 user-field" style="display: none;">
-                                    <label class="form-label" id="editUserLabel">Сотрудник <span
-                                            class="text-danger">*</span></label>
+                                <div class="col-md-6 mb-3 user-field" id="editUserField">
+                                    <label class="form-label" id="editUserLabel">Сотрудник</label>
                                     <select name="current_user_id" class="form-control-custom custom-dark-select">
-                                        <option value="">Выберите сотрудника</option>
+                                        <option value="">Не назначен</option>
                                         @foreach($users as $user)
                                             <option
                                                 value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
@@ -582,12 +576,10 @@
 
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex justify-content-between align-items-end mb-2">
-                                        <label class="form-label mb-0">Выбор локации <span
-                                                class="text-danger">*</span></label>
+                                        <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
                                            style="font-size: 12px; color: var(--accent); text-decoration: none;">+
-                                            Добавить
-                                            новую</a>
+                                            Добавить новую</a>
                                     </div>
                                     <select name="location_id" id="editLocationSelect"
                                             class="form-control-custom custom-dark-select">
@@ -773,22 +765,32 @@
 
 @push('scripts')
     <script>
-        const initUserFieldToggle = () => {
-            const statusSelect = document.querySelector('#addEquipmentModal select[name="status"]');
-            const userField = document.querySelector('#addEquipmentModal .user-field');
+        const initEditUserFieldToggle = () => {
+            const statusSelect = document.querySelector('#editEquipmentModal select[name="status"]');
+            const userField = document.querySelector('#editEquipmentModal .user-field');
+            const userLabel = document.querySelector('#editUserLabel');
 
             if (!statusSelect || !userField) return;
 
             const toggle = () => {
                 const isInUse = statusSelect.value === 'in_use';
-                userField.style.display = isInUse ? 'block' : 'none';
-                if (!isInUse) {
+
+
+                if (isInUse) {
+                    userField.style.display = 'block';
+                    if (userLabel) {
+                        userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
+                    }
+                } else {
+                    userField.style.display = 'block'; // Всегда показываем, но делаем необязательным
+                    if (userLabel) {
+                        userLabel.innerHTML = 'Сотрудник';
+                    }
+
                     const select = userField.querySelector('select');
-                    if (select) select.value = '';
-                }
-                const label = userField.querySelector('.form-label');
-                if (label) {
-                    label.innerHTML = isInUse ? 'Сотрудник <span class="text-danger">*</span>' : 'Сотрудник';
+                    if (select && statusSelect.value !== 'in_use') {
+                        select.value = '';
+                    }
                 }
             };
 

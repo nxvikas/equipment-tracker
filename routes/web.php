@@ -119,6 +119,9 @@ Route::middleware('web')->group(function () {
 
         Route::get('/equipment', [\App\Http\Controllers\EmployeeController::class, 'myEquipment'])->name('equipment');
         Route::get('/export/equipment', [\App\Http\Controllers\EmployeeController::class, 'exportMyEquipment'])->name('export.equipment');
+        Route::post('/equipment/{equipment}/return', [\App\Http\Controllers\EmployeeController::class, 'returnEquipment'])->name('equipment.return');
+
+        Route::get('/search', [\App\Http\Controllers\EmployeeController::class, 'globalSearch'])->name('global.search');
     });
 });
 

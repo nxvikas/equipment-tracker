@@ -58,7 +58,7 @@
     </div>
 @endguest
 
-@include('partials.footer')
+
 <div class="modal fade" id="qrScannerModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">

@@ -34,7 +34,7 @@ body {
     font-size: 0.875rem;
 }
 
-/* АДАПТИВ ДЛЯ MAIN-CONTENT */
+/* АДАПТИВ  */
 @media (max-width: 992px) {
     .main-content {
         margin-left: var(--sidebar-collapsed) !important;

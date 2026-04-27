@@ -205,7 +205,7 @@
                                 default => '#94a3b8'
                             };
 
-                            // Используем существующий enum для русских названий
+
                             $typeLabel = \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type;
                         @endphp
                         <div class="location-progress-item">

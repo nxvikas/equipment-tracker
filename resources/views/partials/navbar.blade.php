@@ -79,7 +79,13 @@
                     </div>
                 </div>
                 <div class="user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'НУ', 0, 2)) }}
+                    @if(auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                             alt="Аватар"
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'НУ', 0, 2)) }}
+                    @endif
                 </div>
             </button>
             <ul class="dropdown-menu dropdown-menu-end profile-menu">

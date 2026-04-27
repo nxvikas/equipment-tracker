@@ -140,7 +140,7 @@ class EquipmentController extends Controller
             $validated['current_user_id'] = null;
         }
 
-        // Сохраняем старые значения для сравнения
+
         $oldStatus = $equipment->status;
         $oldUserId = $equipment->current_user_id;
         $oldLocationId = $equipment->location_id;
@@ -148,9 +148,7 @@ class EquipmentController extends Controller
 
         $equipment->update($validated);
 
-        // ========== ЗАПИСЫВАЕМ В ИСТОРИЮ ==========
 
-        // 1. Если изменился сотрудник (выдали новому сотруднику)
         if ($oldUserId != $equipment->current_user_id && $equipment->current_user_id !== null) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -164,7 +162,7 @@ class EquipmentController extends Controller
             ]);
         }
 
-        // 2. Если оборудование вернули на склад (было у сотрудника, стало на складе)
+
         if ($oldUserId !== null && $equipment->current_user_id === null && $equipment->status === 'in_stock') {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -176,7 +174,7 @@ class EquipmentController extends Controller
             ]);
         }
 
-        // 3. Если изменился статус (кроме случаев, уже обработанных выше)
+
         if ($oldStatus !== $equipment->status && $equipment->status !== 'in_stock') {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -188,7 +186,7 @@ class EquipmentController extends Controller
             ]);
         }
 
-        // 4. Если изменилась локация
+
         if ($oldLocationId != $equipment->location_id) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -201,7 +199,7 @@ class EquipmentController extends Controller
             ]);
         }
 
-        // 5. Если изменилась категория (тоже полезно отслеживать)
+
         if ($oldCategoryId != $equipment->category_id) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,

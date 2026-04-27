@@ -31,13 +31,7 @@ class LocationController extends Controller
         return view('admin.locations.index', compact('locations'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -79,21 +73,7 @@ class LocationController extends Controller
         return redirect()->route('admin.locations.index')->with('success', 'Локация добавлена');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Location $location)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Location $location)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

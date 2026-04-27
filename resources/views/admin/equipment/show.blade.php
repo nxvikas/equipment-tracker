@@ -217,7 +217,7 @@
                         </button>
 
 
-                    
+
                 @else
                     <button class="action-btn"
                             data-bs-toggle="modal"
@@ -724,9 +724,11 @@
                                 </a>
                             </div>
                             <select name="location_id" class="form-control-custom custom-dark-select">
-                                <option value="">Оставить текущую ({{ $equipment->location->name ?? '—' }})</option>
-                                @foreach($locations->where('type', 'office') as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                @foreach($locations->whereNotIn('type', ['service', 'warehouse']) as $location)
+                                    <option value="{{ $location->id }}">
+                                        {{ $location->name }}
+                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Enums\TypeEquipmentHistory;
 use App\Models\Department;
+use App\Models\Equipment;
+use App\Models\Equipment_history;
+use App\Http\Enums\StatusEquipment;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\UpdateUserQuickRequest;
 use App\Http\Requests\UpdateUserFullRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -38,6 +43,7 @@ class UserController extends Controller
 
         return view('admin.users.index', compact('users', 'departments', 'positions', 'statuses'));
     }
+
     public function makeAdmin(User $user)
     {
         if ($user->id === auth()->id()) {
@@ -76,7 +82,15 @@ class UserController extends Controller
     {
         $user->load(['department', 'position', 'role']);
 
-        $history = \App\Models\Equipment_history::with(['equipment', 'user', 'toUser', 'fromUser', 'toLocation', 'fromLocation'])
+        $assignedEquipments = Equipment::where('current_user_id', $user->id)
+            ->where('status', 'in_use')
+            ->with('category')
+            ->get();
+        $availableEquipments = Equipment::where('status', 'in_stock')
+            ->with('category', 'location')
+            ->get();
+
+        $history = Equipment_history::with(['equipment', 'user', 'toUser', 'fromUser', 'toLocation', 'fromLocation'])
             ->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                     ->orWhere('to_user_id', $user->id)
@@ -89,7 +103,14 @@ class UserController extends Controller
         $departments = Department::orderBy('name')->get();
         $positions = Position::orderBy('name')->get();
 
-        return view('admin.users.show', compact('user', 'history', 'actionTypes', 'departments', 'positions'));
+        return view('admin.users.show',
+            compact('user',
+                'assignedEquipments',
+                'availableEquipments',
+                'history',
+                'actionTypes',
+                'departments',
+                'positions'));
     }
 
     public function updateQuick(UpdateUserQuickRequest $request, User $user)
@@ -135,9 +156,33 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Нельзя удалить самого себя');
         }
 
+
+        $equipments = Equipment::where('current_user_id', $user->id)->get();
+
+        foreach ($equipments as $equipment) {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => TypeEquipmentHistory::RETURNED->value,
+                'user_id' => Auth::id(),
+                'from_user_id' => $user->id,
+                'new_status' => StatusEquipment::IN_STOCK->value,
+                'comment' => 'Автоматический возврат при удалении сотрудника',
+            ]);
+        }
+
+        Equipment::where('current_user_id', $user->id)->update([
+            'status' => StatusEquipment::IN_STOCK->value,
+            'current_user_id' => null,
+        ]);
+
+
+        Equipment_history::where('user_id', $user->id)->update(['user_id' => null]);
+        Equipment_history::where('from_user_id', $user->id)->update(['from_user_id' => null]);
+        Equipment_history::where('to_user_id', $user->id)->update(['to_user_id' => null]);
+
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Сотрудник удалён');
+        return redirect()->route('admin.users.index')->with('success', 'Сотрудник удалён. Оборудование возвращено на склад.');
     }
 
     public function approve(User $user)
@@ -156,8 +201,27 @@ class UserController extends Controller
 
     public function block(User $user)
     {
+
+        $equipments = Equipment::where('current_user_id', $user->id)->get();
+
+        foreach ($equipments as $equipment) {
+            Equipment_history::create([
+                'equipment_id' => $equipment->id,
+                'action_type' => TypeEquipmentHistory::RETURNED->value,
+                'user_id' => Auth::id(),
+                'from_user_id' => $user->id,
+                'new_status' => StatusEquipment::IN_STOCK->value,
+                'comment' => 'Автоматический возврат при блокировке сотрудника',
+            ]);
+        }
+
+        Equipment::where('current_user_id', $user->id)->update([
+            'status' => StatusEquipment::IN_STOCK->value,
+            'current_user_id' => null,
+        ]);
+
         $user->update(['status' => \App\Http\Enums\UserStatus::BLOCKED->value]);
-        session()->flash('success', 'Пользователь заблокирован');
+        session()->flash('success', 'Пользователь заблокирован. Оборудование возвращено на склад.');
         return redirect()->back();
     }
 

@@ -22,25 +22,26 @@
             </div>
         @endif
 
-            <div class="page-header">
-                <div>
-                    @if(request('from_dashboard'))
-                        <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
-                            <i class="bi bi-arrow-left"></i> Назад на главную
-                        </a>
-                    @endif
-                    <h1 class="page-title mt-2">Локации</h1>
-                    <p class="page-subtitle">Управление местоположениями оборудования</p>
-                </div>
-                <div class="page-actions">
-                    <a href="{{ route('admin.export.locations') }}" class="btn-outline" title="Экспорт в Excel" style="margin-right: 10px">
-                        <i class="bi bi-download"></i> Экспорт
+        <div class="page-header">
+            <div>
+                @if(request('from_dashboard'))
+                    <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад на главную
                     </a>
-                    <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
-                        <i class="bi bi-plus-lg"></i> Добавить локацию
-                    </button>
-                </div>
+                @endif
+                <h1 class="page-title mt-2">Локации</h1>
+                <p class="page-subtitle">Управление местоположениями оборудования</p>
             </div>
+            <div class="page-actions">
+                <a href="{{ route('admin.export.locations') }}" class="btn-outline" title="Экспорт в Excel"
+                   style="margin-right: 10px">
+                    <i class="bi bi-download"></i> Экспорт
+                </a>
+                <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                    <i class="bi bi-plus-lg"></i> Добавить локацию
+                </button>
+            </div>
+        </div>
 
 
         <div class="filters-bar">
@@ -142,7 +143,11 @@
                     @forelse($locations as $location)
                         <tr>
                             <td>{{ $location->id }}</td>
-                            <td class="equipment-name">{{ $location->name }}</td>
+                            <td class="equipment-name">
+                                <a href="{{ route('admin.locations.show', $location->id) }}">
+                                    {{ $location->name }}
+                                </a>
+                            </td>
                             <td>{{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}</td>
                             <td class="location-address">{{ $location->address ?: '—' }}</td>
                             <td>{{ $location->equipment_count }}</td>

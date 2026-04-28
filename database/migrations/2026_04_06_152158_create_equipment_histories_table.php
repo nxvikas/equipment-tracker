@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignIdFor(\App\Models\Equipment::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->enum('action_type', \App\Http\Enums\TypeEquipmentHistory::values());
-            $table->foreignIdFor(\App\Models\User::class, 'user_id')->constrained();
+            $table->foreignIdFor(\App\Models\User::class, 'user_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(\App\Models\User::class, 'from_user_id')->nullable()->constrained();
             $table->foreignIdFor(\App\Models\User::class, 'to_user_id')->nullable()->constrained();
             $table->foreignIdFor(\App\Models\Location::class, 'from_location_id')->nullable()->constrained();

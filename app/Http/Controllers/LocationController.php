@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Equipment;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -142,5 +143,20 @@ class LocationController extends Controller
         }
 
         return redirect()->route('admin.locations.index')->with('success', 'Локация удалена');
+    }
+    public function show(Request $request, Location $location)
+    {
+        $location->loadCount('equipment');
+
+        $equipments = Equipment::where('location_id', $location->id)
+            ->with(['category', 'currentUser'])
+            ->get();
+
+
+        $availableEquipments = Equipment::where('location_id', '!=', $location->id)
+            ->with(['category', 'location'])
+            ->get();
+
+        return view('admin.locations.show', compact('location', 'equipments', 'availableEquipments'));
     }
 }

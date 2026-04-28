@@ -224,21 +224,33 @@ class EquipmentController extends Controller
             ->with('success', 'Оборудование обновлено');
     }
 
-    public function destroy(Equipment $equipment)
+    public function destroy(Request $request, Equipment $equipment)
     {
-        $otherActions = $equipment->history()
-            ->where('action_type', '!=', TypeEquipmentHistory::CREATED->value)
-            ->exists();
-
-        if ($otherActions) {
-            return redirect()->back()->with('error', 'Нельзя удалить оборудование с историей операций');
+        if (in_array($equipment->status, ['in_use', 'repair'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Нельзя удалить оборудование, которое выдано сотруднику или находится в ремонте'
+                ]);
+            }
+            return redirect()->back()->with('error', 'Нельзя удалить оборудование, которое выдано сотруднику или находится в ремонте');
         }
 
         $name = $equipment->name;
         $equipment->delete();
 
+
+        session()->flash('success', "Оборудование \"$name\" удалено");
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Оборудование \"$name\" удалено"
+            ]);
+        }
+
         return redirect()->route('admin.equipment')
-            ->with('success', "Оборудование $name удалено");
+            ->with('success', "Оборудование \"$name\" удалено");
     }
 
 
@@ -444,23 +456,35 @@ class EquipmentController extends Controller
         }
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'location_id' => ['required', 'exists:locations,id'],
             'comment' => ['required', 'string', 'max:500'],
         ], [
+            'location_id.required' => 'Выберите склад для хранения списанного оборудования',
             'comment.required' => 'Укажите причину списания',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()->toArray()
-            ], 422);
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()->toArray()
+                ], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $location = Location::find($request->location_id);
+        if ($location->type !== 'warehouse') {
+            return redirect()->back()->with('error', 'Для списания необходимо выбрать помещение типа "Склад"');
         }
 
         $oldStatus = $equipment->status;
         $oldUserId = $equipment->current_user_id;
+        $oldLocationId = $equipment->location_id;
 
         $equipment->update([
             'status' => StatusEquipment::WRITTEN->value,
+            'location_id' => $request->location_id,
             'status_comment' => $request->comment,
             'current_user_id' => null,
         ]);
@@ -470,12 +494,14 @@ class EquipmentController extends Controller
             'action_type' => TypeEquipmentHistory::WRITTEN->value,
             'user_id' => Auth::id(),
             'from_user_id' => $oldUserId,
+            'from_location_id' => $oldLocationId,
+            'to_location_id' => $request->location_id,
             'old_status' => $oldStatus,
             'new_status' => StatusEquipment::WRITTEN->value,
             'comment' => $request->comment,
         ]);
 
-        session()->flash('success', 'Оборудование списано');
+        session()->flash('success', 'Оборудование списано и перемещено на склад');
 
         return response()->json(['success' => true]);
     }
@@ -491,5 +517,66 @@ class EquipmentController extends Controller
         }
 
         return view('public.equipment', compact('equipment'));
+    }
+    public function returnFromUser(Request $request)
+    {
+        $equipment = Equipment::findOrFail($request->equipment_id);
+
+        if ($equipment->status !== StatusEquipment::IN_USE->value) {
+            return redirect()->back()->with('error', 'Оборудование не находится в использовании');
+        }
+
+        $oldUserId = $equipment->current_user_id;
+
+        $equipment->update([
+            'status' => StatusEquipment::IN_STOCK->value,
+            'current_user_id' => null,
+        ]);
+
+        Equipment_history::create([
+            'equipment_id' => $equipment->id,
+            'action_type' => TypeEquipmentHistory::RETURNED->value,
+            'user_id' => Auth::id(),
+            'from_user_id' => $oldUserId,
+            'new_status' => StatusEquipment::IN_STOCK->value,
+            'comment' => 'Возвращено на склад из карточки сотрудника',
+        ]);
+
+        return redirect()->back()->with('success', 'Оборудование возвращено на склад');
+    }
+    public function assignToUser(Request $request)
+    {
+        $equipment = Equipment::findOrFail($request->equipment_id);
+
+
+        $user = User::findOrFail($request->user_id);
+
+        if ($user->status->value !== 'active') {
+            return redirect()->back()->with('error', 'Нельзя выдать оборудование заблокированному или неактивному сотруднику.');
+        }
+
+        if ($equipment->status !== StatusEquipment::IN_STOCK->value) {
+            return redirect()->back()->with('error', 'Оборудование должно быть на складе для выдачи');
+        }
+
+        $oldLocationId = $equipment->location_id;
+
+        $equipment->update([
+            'status' => StatusEquipment::IN_USE->value,
+            'current_user_id' => $request->user_id,
+        ]);
+
+        Equipment_history::create([
+            'equipment_id' => $equipment->id,
+            'action_type' => TypeEquipmentHistory::ASSIGNED->value,
+            'user_id' => Auth::id(),
+            'to_user_id' => $request->user_id,
+            'from_location_id' => $oldLocationId,
+            'to_location_id' => $equipment->location_id,
+            'new_status' => StatusEquipment::IN_USE->value,
+            'comment' => 'Выдано сотруднику из карточки пользователя',
+        ]);
+
+        return redirect()->back()->with('success', 'Оборудование выдано сотруднику');
     }
 }

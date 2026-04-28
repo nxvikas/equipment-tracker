@@ -26,7 +26,12 @@
 
         <div class="page-header">
             <div>
-                @if(request('from_user'))
+                @if(request('from_location'))
+                    <a href="{{ route('admin.locations.show', ['location' => request('from_location'), 'from_equipment' => $equipment->id]) }}"
+                       class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к локации
+                    </a>
+                @elseif(request('from_user'))
                     <a href="{{ route('admin.users.show', request('from_user')) }}"
                        class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к сотруднику
@@ -110,13 +115,15 @@
                             <div class="info-item">
                                 <span class="info-label">Местоположение</span>
                                 <span class="info-value">
-                                {{ $equipment->location->name ?? '—' }}
-                                    @if($equipment->location)
-                                        <span class="location-type-badge">
-                                        {{ \App\Http\Enums\TypeLocation::ruValues()[$equipment->location->type] ?? '' }}
-                                    </span>
+    @if($equipment->location)
+                                        <a href="{{ route('admin.locations.show', ['location' => $equipment->location->id, 'from_equipment' => $equipment->id]) }}"
+                                           style="color: var(--accent);">
+            {{ $equipment->location->name }}
+        </a>
+                                    @else
+                                        —
                                     @endif
-                            </span>
+</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Сотрудник</span>
@@ -210,20 +217,22 @@
                         </button>
                     @endif
 
+                    <button type="button" class="action-button action-danger" data-bs-toggle="modal"
+                            data-bs-target="#writeOffModal">
+                        <i class="bi bi-trash"></i> Списать
+                    </button>
 
+                    @if($equipment->status === 'in_stock')
                         <button type="button" class="action-button action-danger" data-bs-toggle="modal"
-                                data-bs-target="#writeOffModal">
-                            <i class="bi bi-trash"></i> Списать
+                                data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i> Удалить
                         </button>
-
-
+                    @endif
 
                 @else
-                    <button class="action-btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
-                            title="Удалить">
-                        <i class="bi bi-trash"></i>
+                    <button type="button" class="action-button action-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                        <i class="bi bi-trash"></i> Удалить
                     </button>
                 @endif
             </div>
@@ -299,15 +308,11 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
-                <div class="modal-body text-center py-4">
-                    <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                    <p class="mt-3 mb-0">Вы уверены, что хотите удалить оборудование?</p>
-                    <p class="text-secondary mt-2">
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить оборудование?</p>
+                    <p class="text-secondary">
                         <strong>{{ $equipment->name }}</strong><br>
                         {{ $equipment->inventory_number }}
-                    </p>
-                    <p class="text-danger small mt-3">
-                        <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -668,13 +673,21 @@
                             {{ $equipment->inventory_number }}
                         </p>
                         <div class="mb-3">
+                            <label class="form-label">Склад для хранения <span class="text-danger">*</span></label>
+                            <select name="location_id" class="form-control-custom custom-dark-select">
+                                <option value="">Выберите склад</option>
+                                @foreach($locations->where('type', 'warehouse') as $location)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Причина списания <span class="text-danger">*</span></label>
                             <textarea name="comment" class="form-control-custom" rows="3"
                                       placeholder="Укажите причину"></textarea>
                         </div>
                         <p class="text-danger small">
-                            <i class="bi bi-exclamation-circle"></i> После списания оборудование нельзя будет
-                            восстановить.
+                            <i class="bi bi-exclamation-circle"></i> После списания оборудование нельзя будет восстановить.
                         </p>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -727,7 +740,8 @@
                                 @foreach($locations->whereNotIn('type', ['service', 'warehouse']) as $location)
                                     <option value="{{ $location->id }}">
                                         {{ $location->name }}
-                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
+                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
+                                        )
                                     </option>
                                 @endforeach
                             </select>

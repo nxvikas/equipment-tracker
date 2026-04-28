@@ -9,6 +9,7 @@ use App\Exports\admin\HistoryExport;
 use App\Exports\admin\LocationExport;
 use App\Exports\admin\StructureExport;
 use App\Exports\admin\UserExport;
+use App\Http\Enums\StatusEquipment;
 use App\Http\Enums\TypeEquipmentHistory;
 use App\Models\Category;
 use App\Models\Department;
@@ -19,6 +20,7 @@ use App\Models\Position;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -76,12 +78,31 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
-        $monthlyAssigns = Equipment_history::where('action_type', 'assigned')
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subMonths(6))
+
+        $months = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $months[$date->format('Y-m')] = 0;
+        }
+        $rawAssigns = Equipment::where('status', 'in_use')
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count")
+            ->where('created_at', '>=', now()->subMonths(6)->startOfMonth())
             ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+            ->pluck('count', 'month')
+            ->toArray();
+        $monthlyAssigns = [];
+        $cumulative = Equipment::where('status', 'in_use')
+            ->where('created_at', '<', now()->subMonths(6)->startOfMonth())
+            ->count();
+        foreach ($months as $month => $default) {
+            $cumulative += $rawAssigns[$month] ?? 0;
+            $monthlyAssigns[] = [
+                'month' => $month,
+                'count' => $cumulative,
+            ];
+        }
+
+        $monthlyAssigns = collect($monthlyAssigns);
 
         $topUsers = User::where('status', 'active')
             ->withCount(['equipment as equipment_count' => function ($query) {
@@ -96,6 +117,32 @@ class AdminController extends Controller
             ->orderBy('equipment_count', 'desc')
             ->get();
         $totalInLocations = $locationStats->sum('equipment_count');
+
+        $chartData = [];
+        foreach (StatusEquipment::cases() as $status) {
+            $count = match($status->value) {
+                'in_use' => $inUseEquipments,
+                'in_stock' => $inStockEquipments,
+                'repair' => $inRepairEquipments,
+                'written' => $writtenEquipments,
+                default => 0
+            };
+
+            $color = match($status->value) {
+                'in_use' => '#bef264',
+                'in_stock' => '#3b82f6',
+                'repair' => '#f59e0b',
+                'written' => '#ef4444',
+                default => '#94a3b8'
+            };
+
+            $chartData[] = [
+                'value' => $status->value,
+                'label' => StatusEquipment::ruValues()[$status->value],
+                'count' => $count,
+                'color' => $color,
+            ];
+        }
 
 
 
@@ -112,6 +159,7 @@ class AdminController extends Controller
             'topUsers',
             'locationStats',
             'totalInLocations',
+            'chartData',
         ));
     }
 

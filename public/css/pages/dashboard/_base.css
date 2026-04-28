@@ -180,6 +180,7 @@
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
     gap: 12px;
+    border-radius: 24px 24px 0 0;
 }
 
 .chart-head h3 {
@@ -206,7 +207,7 @@
 }
 
 .chart-body {
-    padding: 24px;
+    padding: 20px;
     min-height: 280px;
     display: flex;
     align-items: center;
@@ -214,25 +215,30 @@
 }
 
 .chart-body canvas {
-    max-height: 260px;
-    width: 100%;
+    max-width: 100%;
+    max-height: 280px;
 }
 
 .chart-legend {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 20px;
     padding: 16px 24px 24px;
     border-top: 1px solid var(--border);
     flex-wrap: wrap;
+    border-radius: 0 0 24px 24px;
 }
 
 .legend-dot {
     width: 12px;
     height: 12px;
     border-radius: 4px;
-    display: inline-block;
-    margin-right: 8px;
+    flex-shrink: 0;
+}
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .legend-dot.green {
@@ -252,9 +258,6 @@
 .chart-legend span {
     font-size: 13px;
     color: var(--text-secondary);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
 }
 
 .chart-legend strong {

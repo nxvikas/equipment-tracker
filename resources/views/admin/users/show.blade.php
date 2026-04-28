@@ -23,28 +23,29 @@
             </div>
         @endif
 
-            <div class="page-header">
-                <div>
-                    @if(request('from_equipment'))
+        <div class="page-header">
+            <div>
+                @if(request('from_equipment'))
 
-                        <a href="{{ route('admin.equipment.show', request('from_equipment')) }}" class="text-secondary text-decoration-none">
-                            <i class="bi bi-arrow-left"></i> Назад к оборудованию
-                        </a>
-                    @elseif(request('from_dashboard'))
+                    <a href="{{ route('admin.equipment.show', request('from_equipment')) }}"
+                       class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к оборудованию
+                    </a>
+                @elseif(request('from_dashboard'))
 
-                        <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
-                            <i class="bi bi-arrow-left"></i> Назад на главную
-                        </a>
-                    @else
+                    <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад на главную
+                    </a>
+                @else
 
-                        <a href="{{ route('admin.users.index') }}" class="text-secondary text-decoration-none">
-                            <i class="bi bi-arrow-left"></i> Назад к списку
-                        </a>
-                    @endif
-                    <h1 class="page-title mt-2">{{ $user->surname }} {{ $user->name }} {{ $user->patronymic }}</h1>
-                    <p class="page-subtitle">{{ $user->email }}</p>
-                </div>
+                    <a href="{{ route('admin.users.index') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к списку
+                    </a>
+                @endif
+                <h1 class="page-title mt-2">{{ $user->surname }} {{ $user->name }} {{ $user->patronymic }}</h1>
+                <p class="page-subtitle">{{ $user->email }}</p>
             </div>
+        </div>
 
         <div class="row g-4">
             <div class="col-lg-4 col-md-5">
@@ -152,19 +153,15 @@
                         </button>
                     </form>
                 @elseif($currentStatus === 'active')
-                    <form action="{{ route('admin.users.block', $user) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="action-button text-warning">
-                            <i class="bi bi-lock"></i> Заблокировать
-                        </button>
-                    </form>
+                    <button type="button" class="action-button text-warning" data-bs-toggle="modal"
+                            data-bs-target="#blockUserModal">
+                        <i class="bi bi-lock"></i> Заблокировать
+                    </button>
                 @elseif(in_array($currentStatus, ['blocked', 'rejected']))
-                    <form action="{{ route('admin.users.activate', $user) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="action-button text-success">
-                            <i class="bi bi-unlock"></i> Активировать
-                        </button>
-                    </form>
+                    <button type="button" class="action-button text-success" data-bs-toggle="modal"
+                            data-bs-target="#activateUserModal">
+                        <i class="bi bi-unlock"></i> Активировать
+                    </button>
                 @endif
 
                 @if($user->status->value !== 'pending' && $user->role->name !== 'admin')
@@ -173,17 +170,142 @@
                     </button>
                 @elseif($user->status->value !== 'pending' && $user->role->name === 'admin')
                     @if($user->id !== auth()->id())
-                        <button type="button" class="action-button action-danger" data-bs-toggle="modal" data-bs-target="#removeAdminModal">
+                        <button type="button" class="action-button action-danger" data-bs-toggle="modal"
+                                data-bs-target="#removeAdminModal">
                             <i class="bi bi-shield-slash"></i> Снять права администратора
                         </button>
                     @endif
                 @endif
 
                 @if($user->id !== auth()->id())
-                    <button type="button" class="action-button action-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                    <button type="button" class="action-button action-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteUserModal">
                         <i class="bi bi-trash"></i> Удалить
                     </button>
                 @endif
+            </div>
+        </div>
+
+        <div class="equipment-section mt-4">
+            <div class="row g-4">
+
+                <div class="col-lg-6">
+                    <div class="table-wrapper">
+                        <div class="table-head">
+                            <div>
+                                <h3><i class="bi bi-laptop"></i> Выданное оборудование</h3>
+                                <p class="table-desc">Техника, закреплённая за сотрудником</p>
+                            </div>
+                            @if($assignedEquipments->isNotEmpty())
+                                <span class="chart-badge">{{ $assignedEquipments->count() }} ед.</span>
+                            @endif
+                        </div>
+                        <div class="table-responsive">
+                            @if($assignedEquipments->isNotEmpty())
+                                <table class="custom-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Инв. номер</th>
+                                        <th>Название</th>
+                                        <th>Категория</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($assignedEquipments as $equipment)
+                                        <tr>
+                                            <td class="inv-number">{{ $equipment->inventory_number }}</td>
+                                            <td class="equipment-name">
+                                                <a href="{{ route('admin.equipment.show', ['equipment' => $equipment->id, 'from_user' => $user->id]) }}">
+                                                    {{ $equipment->name }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $equipment->category->name ?? '—' }}</td>
+                                            <td>
+                                                <button class="action-btn btn-return"
+                                                        data-equipment-id="{{ $equipment->id }}"
+                                                        data-equipment-name="{{ $equipment->name }}"
+                                                        data-user-id="{{ $user->id }}"
+                                                        title="Вернуть на склад">
+                                                    <i class="bi bi-box-arrow-in-right" style="color: #10b981;"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="text-center text-secondary py-4">
+                                    <i class="bi bi-inbox"></i> Нет выданного оборудования
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-6">
+                    <div class="table-wrapper">
+                        <div class="table-head">
+                            <div>
+                                <h3><i class="bi bi-box-seam"></i> Доступно для выдачи</h3>
+                                <p class="table-desc">Оборудование на складе</p>
+                            </div>
+                            @if($availableEquipments->isNotEmpty())
+                                <span class="chart-badge" style="background: rgba(59,130,246,0.12); color: #3b82f6;">
+                            {{ $availableEquipments->count() }} ед.
+                        </span>
+                            @endif
+                        </div>
+                        <div class="table-responsive">
+                            @if($availableEquipments->isNotEmpty())
+                                <table class="custom-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Инв. номер</th>
+                                        <th>Название</th>
+                                        <th>Категория</th>
+                                        <th>Локация</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($availableEquipments as $equipment)
+                                        <tr>
+                                            <td class="inv-number">{{ $equipment->inventory_number }}</td>
+                                            <td class="equipment-name">
+                                                <a href="{{ route('admin.equipment.show', ['equipment' => $equipment->id, 'from_user' => $user->id]) }}">
+                                                    {{ $equipment->name }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $equipment->category->name ?? '—' }}</td>
+                                            <td>{{ $equipment->location->name ?? '—' }}</td>
+                                            <td>
+                                                @if($user->status->value === 'active')
+                                                    <button class="action-btn btn-assign"
+                                                            data-equipment-id="{{ $equipment->id }}"
+                                                            data-equipment-name="{{ $equipment->name }}"
+                                                            data-user-id="{{ $user->id }}"
+                                                            data-user-name="{{ $user->surname }} {{ $user->name }}"
+                                                            title="Выдать сотруднику">
+                                                        <i class="bi bi-person-check" style="color: var(--accent);"></i>
+                                                    </button>
+                                                @else
+                                                    <span class="text-secondary" title="Сотрудник заблокирован">—</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            @else
+                                <div class="text-center text-secondary py-4">
+                                    <i class="bi bi-inbox"></i> Нет доступного оборудования
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -313,26 +435,38 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
-                                <select name="status" class="form-control-custom custom-dark-select @error('status') is-invalid @enderror">
+                                <select name="status"
+                                        class="form-control-custom custom-dark-select @error('status') is-invalid @enderror">
                                     @php $currentStatus = old('status', $user->status->value ?? $user->status); @endphp
 
                                     @if($currentStatus === 'pending')
-                                        <option value="pending" @selected($currentStatus == 'pending')>Ожидает подтверждения</option>
-                                        <option value="active" @selected($currentStatus == 'active')>Активировать</option>
-                                        <option value="rejected" @selected($currentStatus == 'rejected')>Отклонить</option>
+                                        <option value="pending" @selected($currentStatus == 'pending')>Ожидает
+                                            подтверждения
+                                        </option>
+                                        <option value="active" @selected($currentStatus == 'active')>Активировать
+                                        </option>
+                                        <option value="rejected" @selected($currentStatus == 'rejected')>Отклонить
+                                        </option>
                                     @elseif($currentStatus === 'active')
                                         <option value="active" @selected($currentStatus == 'active')>Активен</option>
-                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокировать</option>
+                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокировать
+                                        </option>
                                     @elseif($currentStatus === 'blocked')
-                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокирован</option>
-                                        <option value="active" @selected($currentStatus == 'active')>Активировать</option>
+                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокирован
+                                        </option>
+                                        <option value="active" @selected($currentStatus == 'active')>Активировать
+                                        </option>
                                     @elseif($currentStatus === 'rejected')
-                                        <option value="rejected" @selected($currentStatus == 'rejected')>Отклонён</option>
-                                        <option value="active" @selected($currentStatus == 'active')>Активировать</option>
-                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокировать</option>
+                                        <option value="rejected" @selected($currentStatus == 'rejected')>Отклонён
+                                        </option>
+                                        <option value="active" @selected($currentStatus == 'active')>Активировать
+                                        </option>
+                                        <option value="blocked" @selected($currentStatus == 'blocked')>Заблокировать
+                                        </option>
                                     @else
                                         @foreach(\App\Http\Enums\UserStatus::cases() as $status)
-                                            <option value="{{ $status->value }}" @selected($currentStatus == $status->value)>
+                                            <option
+                                                value="{{ $status->value }}" @selected($currentStatus == $status->value)>
                                                 {{ \App\Http\Enums\UserStatus::ruValues()[$status->value] }}
                                             </option>
                                         @endforeach
@@ -345,12 +479,15 @@
                             <div class="col-md-4 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
                                     <label class="form-label mb-0">Отдел</label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addDepartmentModal" style="font-size: 12px; color: var(--accent);">+ Добавить</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"
+                                       style="font-size: 12px; color: var(--accent);">+ Добавить</a>
                                 </div>
-                                <select name="department_id" class="form-control-custom custom-dark-select @error('department_id') is-invalid @enderror">
+                                <select name="department_id"
+                                        class="form-control-custom custom-dark-select @error('department_id') is-invalid @enderror">
                                     <option value="">Не назначен</option>
                                     @foreach($departments as $dept)
-                                        <option value="{{ $dept->id }}" @selected(old('department_id', $user->department_id) == $dept->id)>
+                                        <option
+                                            value="{{ $dept->id }}" @selected(old('department_id', $user->department_id) == $dept->id)>
                                             {{ $dept->name }}
                                         </option>
                                     @endforeach
@@ -362,12 +499,15 @@
                             <div class="col-md-4 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
                                     <label class="form-label mb-0">Должность</label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addPositionModal" style="font-size: 12px; color: var(--accent);">+ Добавить</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addPositionModal"
+                                       style="font-size: 12px; color: var(--accent);">+ Добавить</a>
                                 </div>
-                                <select name="position_id" class="form-control-custom custom-dark-select @error('position_id') is-invalid @enderror">
+                                <select name="position_id"
+                                        class="form-control-custom custom-dark-select @error('position_id') is-invalid @enderror">
                                     <option value="">Не назначена</option>
                                     @foreach($positions as $pos)
-                                        <option value="{{ $pos->id }}" @selected(old('position_id', $user->position_id) == $pos->id)>
+                                        <option
+                                            value="{{ $pos->id }}" @selected(old('position_id', $user->position_id) == $pos->id)>
                                             {{ $pos->name }}
                                         </option>
                                     @endforeach
@@ -439,6 +579,73 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="returnFromUserModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-arrow-in-right me-2" style="color: var(--accent);"></i>
+                        Подтверждение возврата
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <form action="{{ route('admin.equipment.return-from-user') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="equipment_id" id="returnEquipmentId">
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите вернуть оборудование на склад?</p>
+                        <p class="text-secondary">
+                            Сотрудник: <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                            Оборудование: <strong id="returnEquipmentName">—</strong>
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label">Комментарий</label>
+                            <textarea name="comment" class="form-control-custom" rows="2"
+                                      placeholder="Необязательно"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn-primary">Подтвердить возврат</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="assignToUserModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-check me-2" style="color: var(--accent);"></i>
+                        Выдача оборудования
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <form action="{{ route('admin.equipment.assign-to-user') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="equipment_id" id="assignEquipmentId">
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                    <div class="modal-body">
+                        <p class="text-secondary">
+                            Сотрудник: <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                            Оборудование: <strong id="assignEquipmentName">—</strong>
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn-primary">Выдать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <div class="modal fade" id="deleteUserModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -448,15 +655,11 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
-                <div class="modal-body text-center py-4">
-                    <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                    <p class="mt-3 mb-0">Вы уверены, что хотите удалить сотрудника?</p>
-                    <p class="text-secondary mt-2">
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить сотрудника?</p>
+                    <p class="text-secondary">
                         <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
                         {{ $user->email }}
-                    </p>
-                    <p class="text-danger small mt-3">
-                        <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
                     </p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
@@ -473,6 +676,65 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="blockUserModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-warning">
+                        <i class="bi bi-lock me-2"></i>Подтверждение блокировки
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите заблокировать сотрудника?</p>
+                    <p class="text-secondary">
+                        <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                        {{ $user->email }}
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                    <form action="{{ route('admin.users.block', $user) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                            <i class="bi bi-lock"></i> Заблокировать
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="activateUserModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-success">
+                        <i class="bi bi-unlock me-2"></i>Подтверждение активации
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите активировать сотрудника?</p>
+                    <p class="text-secondary">
+                        <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
+                        {{ $user->email }}
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                    <form action="{{ route('admin.users.activate', $user) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn-primary" style="background: var(--success); color: white;">
+                            <i class="bi bi-unlock"></i> Активировать
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     @if($user->role->name !== 'admin')
         <div class="modal fade" id="makeAdminModal" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
@@ -483,22 +745,19 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                     </div>
-                    <div class="modal-body text-center py-4">
-                        <i class="bi bi-shield-shaded" style="font-size: 48px; color: var(--warning);"></i>
-                        <p class="mt-3 mb-0">Вы уверены, что хотите назначить администратором?</p>
-                        <p class="text-secondary mt-2">
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите назначить администратором?</p>
+                        <p class="text-secondary">
                             <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
                             {{ $user->email }}
-                        </p>
-                        <p class="text-warning small mt-3">
-                            <i class="bi bi-exclamation-circle"></i> Администратор имеет полный доступ к системе.
                         </p>
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
-                        <form action="{{ route('admin.users.make-admin', $user) }}" method="POST" class="make-admin-form">
+                        <form action="{{ route('admin.users.make-admin', $user) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                            <button type="submit" class="btn-primary"
+                                    style="background: var(--warning); color: #02040a;">
                                 <i class="bi bi-shield-plus"></i> Назначить
                             </button>
                         </form>
@@ -515,24 +774,22 @@
                             <h5 class="modal-title text-danger">
                                 <i class="bi bi-shield-slash me-2"></i>Снятие прав администратора
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-shield-exclamation" style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите снять права администратора?</p>
-                            <p class="text-secondary mt-2">
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите снять права администратора?</p>
+                            <p class="text-secondary">
                                 <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
                                 {{ $user->email }}
-                            </p>
-                            <p class="text-danger small mt-3">
-                                <i class="bi bi-exclamation-circle"></i> Пользователь потеряет доступ к админ-панели.
                             </p>
                         </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
-                            <form action="{{ route('admin.users.remove-admin', $user) }}" method="POST" class="remove-admin-form">
+                            <form action="{{ route('admin.users.remove-admin', $user) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
+                                <button type="submit" class="btn-primary"
+                                        style="background: var(--danger); color: white;">
                                     <i class="bi bi-shield-slash"></i> Снять права
                                 </button>
                             </form>
@@ -563,6 +820,24 @@
             document.querySelector('.add-position-form')?.addEventListener('submit', (e) => {
                 e.preventDefault();
                 submitAjaxForm(e.target, 'addPositionModal', {selectName: 'position_id', reloadOnSuccess: false});
+            });
+            document.querySelectorAll('.btn-return').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const equipmentId = this.dataset.equipmentId;
+                    const equipmentName = this.dataset.equipmentName;
+
+                    document.getElementById('returnEquipmentId').value = equipmentId;
+                    document.getElementById('returnEquipmentName').textContent = equipmentName;
+
+                    new bootstrap.Modal(document.getElementById('returnFromUserModal')).show();
+                });
+            });
+            document.querySelectorAll('.btn-assign').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.getElementById('assignEquipmentId').value = this.dataset.equipmentId;
+                    document.getElementById('assignEquipmentName').textContent = this.dataset.equipmentName;
+                    new bootstrap.Modal(document.getElementById('assignToUserModal')).show();
+                });
             });
         });
     </script>

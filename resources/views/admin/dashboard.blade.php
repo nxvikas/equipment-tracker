@@ -111,20 +111,27 @@
                     <canvas id="statusChart"></canvas>
                 </div>
                 <div class="chart-legend">
-                    <div class="legend-dot green"></div>
-                    <span>Выдано <strong>{{ $inUseEquipments }}</strong></span>
-                    <div class="legend-dot blue"></div>
-                    <span>На складе <strong>{{ $inStockEquipments }}</strong></span>
-                    <div class="legend-dot orange"></div>
-                    <span>В ремонте <strong>{{ $inRepairEquipments }}</strong></span>
-                    <div class="legend-dot red"></div>
-                    <span>Списано <strong>{{ $writtenEquipments }}</strong></span>
+                    @foreach($chartData as $item)
+                        @php
+                            $colorClass = match($item['value']) {
+                                'in_use' => 'green',
+                                'in_stock' => 'blue',
+                                'repair' => 'orange',
+                                'written' => 'red',
+                                default => 'blue'
+                            };
+                        @endphp
+                        <div class="legend-item">
+                            <div class="legend-dot {{ $colorClass }}"></div>
+                            <span>{{ $item['label'] }} <strong>{{ $item['count'] }}</strong></span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
             <div class="chart-panel">
                 <div class="chart-head">
-                    <h3><i class="bi bi-graph-up"></i> Динамика выдачи</h3>
+                    <h3><i class="bi bi-graph-up"></i> Динамика выдачи сотрудникам</h3>
                     <span class="chart-badge">последние 6 месяцев</span>
                 </div>
                 <div class="chart-body">
@@ -137,31 +144,47 @@
 
             <div class="top-users-card">
                 <div class="top-users-header">
-                    <h3>
-                        <i class="bi bi-trophy-fill"></i>
-                        Топ сотрудников по технике
-                    </h3>
+                    <div>
+                        <h3>
+                            <i class="bi bi-people-fill"></i>
+                            Распределение по сотрудникам
+                        </h3>
+                        <p>Кто использует оборудование</p>
+                    </div>
                     <a href="{{ route('admin.users.index', ['from_dashboard' => 1]) }}" class="link-btn">
                         Управление сотрудниками <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
                 <div class="top-users-list">
                     @forelse($topUsers as $index => $user)
-                        <a href="{{ route('admin.users.show', ['user' => $user, 'from_dashboard' => 1]) }}" class="user-rank-item">
-                            <div class="user-rank-info">
-                                <div class="user-rank-number">#{{ $index + 1 }}</div>
-                                <div class="user-rank-avatar">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->surname, 0, 1)) }}
+                        @php
+                            $percentage = $totalEquipments > 0 ? round(($user->equipment_count / $totalEquipments) * 100) : 0;
+                        @endphp
+                        <div class="user-progress-item">
+                            <a href="{{ route('admin.users.show', ['user' => $user, 'from_dashboard' => 1]) }}"
+                               class="user-rank-item">
+                                <div class="user-rank-info">
+                                    <div class="user-rank-avatar">
+                                        @if($user->avatar)
+                                            <img src="{{ asset('storage/' . $user->avatar) }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                                        @else
+                                            {{ strtoupper(mb_substr($user->surname, 0, 1)) }}{{ strtoupper(mb_substr($user->name, 0, 1)) }}
+                                        @endif
+                                    </div>
+                                    <div class="user-rank-details">
+                                        <div class="user-rank-name">{{ $user->surname }} {{ $user->name }}</div>
+                                        <div class="user-rank-dept">{{ $user->department->name ?? 'Без отдела' }}</div>
+                                    </div>
                                 </div>
-                                <div class="user-rank-details">
-                                    <div class="user-rank-name">{{ $user->surname }} {{ $user->name }}</div>
-                                    <div class="user-rank-dept">{{ $user->department->name ?? 'Без отдела' }}</div>
+                                <div class="user-rank-count">
+                                    {{ $user->equipment_count }} ед. ({{ $percentage }}%)
                                 </div>
-                            </div>
-                            <div class="user-rank-count">
-                                {{ $user->equipment_count }} ед.
-                            </div>
-                        </a>
+                            </a>
+                        </div>
+
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
+                        </div>
                     @empty
                         <div class="text-center text-secondary py-4">
                             <i class="bi bi-inbox"></i> Нет данных
@@ -205,24 +228,26 @@
                                 default => '#94a3b8'
                             };
 
-
                             $typeLabel = \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type;
                         @endphp
-                        <div class="location-progress-item">
-                            <div class="location-progress-info">
-                                <div class="location-name">
-                                    <i class="bi {{ $typeIcon }}" style="color: {{ $typeColor }};"></i>
-                                    {{ $location->name }}
-                                    <small style="color: {{ $typeColor }};">({{ $typeLabel }})</small>
+                        <a href="{{ route('admin.locations.show', ['location' => $location->id, 'from_dashboard' => 1]) }}"
+                           class="text-decoration-none">
+                            <div class="location-progress-item">
+                                <div class="location-progress-info">
+                                    <div class="location-name">
+                                        <i class="bi {{ $typeIcon }}" style="color: {{ $typeColor }};"></i>
+                                        {{ $location->name }}
+                                        <small style="color: {{ $typeColor }};">({{ $typeLabel }})</small>
+                                    </div>
+                                    <div class="location-count">
+                                        {{ $location->equipment_count }} ед. ({{ $percentage }}%)
+                                    </div>
                                 </div>
-                                <div class="location-count">
-                                    {{ $location->equipment_count }} ед. ({{ $percentage }}%)
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
                                 </div>
                             </div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
-                            </div>
-                        </div>
+                        </a>
                     @empty
                         <div class="text-center text-secondary py-4">
                             <i class="bi bi-inbox"></i> Нет локаций
@@ -305,37 +330,37 @@
 @push('scripts')
     <script src="{{asset('https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js')}}"></script>
     <script>
-        (function () {
-
-            const statusData = {
-                in_use: {{ $inUseEquipments }},
-                in_stock: {{ $inStockEquipments }},
-                repair: {{ $inRepairEquipments }},
-                written: {{ $writtenEquipments }}
-            };
-
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartData = @json($chartData);
             const monthlyData = @json($monthlyAssigns);
 
-
+            //  КРУГОВОЙ ГРАФИК
             const statusCtx = document.getElementById('statusChart')?.getContext('2d');
             if (statusCtx) {
-                const total = statusData.in_use + statusData.in_stock + statusData.repair + statusData.written;
+                const labels = chartData.map(item => item.label);
+                const data = chartData.map(item => item.count);
+                const backgroundColor = chartData.map(item => item.color);
+                const total = data.reduce((sum, val) => sum + val, 0);
 
                 new Chart(statusCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Выдано', 'На складе', 'В ремонте', 'Списано'],
+                        labels: labels,
                         datasets: [{
-                            data: [statusData.in_use, statusData.in_stock, statusData.repair, statusData.written],
-                            backgroundColor: ['#bef264', '#3b82f6', '#f59e0b', '#ef4444'],
+                            data: data,
+                            backgroundColor: backgroundColor,
                             borderWidth: 0,
-                            hoverOffset: 8,
-                            cutout: '68%'
+                            hoverOffset: 12,
+                            cutout: '68%',
+                            spacing: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
+                        layout: {
+                            padding: 10
+                        },
                         plugins: {
                             legend: {display: false},
                             tooltip: {
@@ -360,7 +385,7 @@
                 });
             }
 
-
+            //  ЛИНЕЙНЫЙ ГРАФИК
             const trendCtx = document.getElementById('trendChart')?.getContext('2d');
             if (trendCtx) {
                 let labels = [];
@@ -383,7 +408,7 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Выдано оборудования',
+                            label: 'Выдано сотрудникам',
                             data: values,
                             borderColor: '#bef264',
                             backgroundColor: 'rgba(190, 242, 100, 0.05)',
@@ -409,13 +434,24 @@
                                 titleColor: '#f1f5f9',
                                 bodyColor: '#94a3b8',
                                 borderColor: 'rgba(190, 242, 100, 0.3)',
-                                borderWidth: 1
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function (context) {
+                                        return `Выдано сотрудникам: ${context.raw} ед.`;
+                                    }
+                                }
                             }
                         },
                         scales: {
                             y: {
                                 grid: {color: 'rgba(255, 255, 255, 0.05)'},
-                                ticks: {color: '#94a3b8'},
+                                ticks: {
+                                    color: '#94a3b8',
+                                    stepSize: 1,
+                                    callback: function (value) {
+                                        return value + ' ед.';
+                                    }
+                                },
                                 beginAtZero: true
                             },
                             x: {
@@ -426,6 +462,6 @@
                     }
                 });
             }
-        })();
+        });
     </script>
 @endpush

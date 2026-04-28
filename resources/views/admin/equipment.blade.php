@@ -175,7 +175,8 @@
                                         title="Редактировать">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                @if($equipment->status === 'written' && $equipment->history->count() <= 1)
+
+                                @if(in_array($equipment->status, ['written', 'in_stock']))
                                     <button class="action-btn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteEquipmentModal{{ $equipment->id }}"
@@ -612,14 +613,8 @@
         </div>
 
 
-        @php
-            $otherActions = $equipment->history->filter(function($record) {
-                return $record->action_type !== \App\Http\Enums\TypeEquipmentHistory::CREATED->value;
-            })->count();
-        @endphp
-        @if($otherActions === 0)
-            <div class="modal fade" id="deleteEquipmentModal{{ $equipment->id }}" tabindex="-1"
-                 data-bs-backdrop="static">
+        @if(in_array($equipment->status, ['written', 'in_stock']))
+            <div class="modal fade" id="deleteEquipmentModal{{ $equipment->id }}" tabindex="-1" data-bs-backdrop="static">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header border-0 pb-0">
@@ -628,15 +623,11 @@
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить оборудование?</p>
-                            <p class="text-secondary mt-2">
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите удалить оборудование?</p>
+                            <p class="text-secondary">
                                 <strong>{{ $equipment->name }}</strong><br>
                                 {{ $equipment->inventory_number }}
-                            </p>
-                            <p class="text-danger small mt-3">
-                                <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
                             </p>
                         </div>
                         <div class="modal-footer border-0 pt-0">
@@ -644,8 +635,7 @@
                             <form action="{{ route('admin.equipment.destroy', $equipment->id) }}" method="POST"
                                   class="delete-equipment-form">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-primary"
-                                        style="background: var(--danger); color: white;">
+                                <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
                                     <i class="bi bi-trash"></i> Удалить
                                 </button>
                             </form>
@@ -866,7 +856,7 @@
             @endif
 
             initCustomSelects();
-            initUserFieldToggle();
+            initEditUserFieldToggle();
             initLiveSearch();
             initLocationFilter();
 

@@ -26,13 +26,6 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -73,21 +66,7 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Категория добавлена');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

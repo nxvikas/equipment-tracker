@@ -128,17 +128,20 @@
 .top-users-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     padding: 18px 24px;
     border-bottom: 1px solid var(--border);
+}
+.top-users-header > div:first-child {
 }
 
 .top-users-header h3 {
     font-size: 16px;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0 4px 0;
     display: flex;
     align-items: center;
+    color: var(--text-primary);
     gap: 10px;
 }
 
@@ -146,57 +149,75 @@
     color: var(--accent);
     font-size: 18px;
 }
+.top-users-header p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
 
 .top-users-list {
-    padding: 8px 0;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.user-progress-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+
+.user-progress-item:hover {
+    background: rgba(190, 242, 100, 0.03);
 }
 
 .user-rank-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
-    transition: background 0.2s;
     text-decoration: none;
     color: var(--text-primary);
+    transition: color 0.2s;
 }
 
 .user-rank-item:hover {
-    background: rgba(190, 242, 100, 0.04);
-    color: var(--text-primary);
+    color: var(--accent);
 }
 
 .user-rank-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     flex: 1;
 }
 
-.user-rank-number {
-    width: 32px;
-    height: 32px;
-    background: rgba(190, 242, 100, 0.1);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
+.user-rank-count {
+    font-size: 13px;
+    font-weight: 600;
     color: var(--accent);
+    white-space: nowrap;
 }
+
+
+
 
 .user-rank-avatar {
     width: 40px;
     height: 40px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--accent);
     border-radius: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     font-size: 14px;
-    color: var(--text-secondary);
+    color: #02040a;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 
 .user-rank-details {
@@ -262,19 +283,38 @@
     padding: 16px 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
 
 .location-progress-item {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+
+.location-progress-item:hover {
+    background: rgba(190, 242, 100, 0.03);
+}
+.location-progress-info a,
+.location-progress-info a:link,
+.location-progress-info a:visited {
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: color 0.2s;
+}
+
+.location-progress-info a:hover {
+    color: var(--accent);
 }
 
 .location-progress-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 4px 0;
 }
 
 .location-name {
@@ -283,6 +323,12 @@
     gap: 8px;
     font-size: 13px;
     font-weight: 500;
+    color: var(--text-primary) !important;
+    text-decoration: none;
+}
+
+.location-name:hover {
+    color: var(--accent) !important;
 }
 
 .location-name i {
@@ -347,7 +393,6 @@
         padding: 16px 20px;
     }
     .user-rank-item {
-        flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
@@ -363,6 +408,11 @@
     .locations-header {
         flex-direction: column;
         gap: 12px;
+    }
+    .top-users-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }
 

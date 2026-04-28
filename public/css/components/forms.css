@@ -162,3 +162,14 @@ body.light .custom-dark-select {
 .input-icon {
     display: none;
 }
+
+@media (min-width: 769px) {
+    .form-control-custom,
+    select.form-control-custom,
+    input.form-control-custom,
+    textarea.form-control-custom {
+        min-height: auto;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}

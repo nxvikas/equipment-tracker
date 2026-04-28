@@ -311,7 +311,7 @@ body.light .search-result-item .search-result-title:hover {
     color: var(--text-secondary);
 }
 
-/* Dropdown меню */
+
 .dropdown-menu {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -373,7 +373,7 @@ body.light .search-result-item .search-result-title:hover {
     width: 240px;
 }
 
-/* Бургер-кнопка */
+
 .burger-btn {
     background: transparent;
     border: none;
@@ -396,16 +396,10 @@ body.light .search-result-item .search-result-title:hover {
     color: var(--accent);
 }
 
-/* Адаптив */
-@media (min-width: 769px) {
-    .burger-btn {
-        display: none !important;
-    }
-}
-
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .header {
-        padding: 12px 16px;
+        padding: 12px 20px;
+        gap: 12px;
     }
 
     .search-wrapper {
@@ -417,12 +411,33 @@ body.light .search-result-item .search-result-title:hover {
         display: none;
     }
 
+}
+/* Адаптив */
+
+
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 16px;
+        flex-wrap: nowrap;
+    }
+
+    .burger-btn {
+        display: flex !important;
+        margin-right: 8px;
+    }
+
+    .search-wrapper {
+        flex: 1;
+    }
+
     .user-profile {
         padding: 6px;
     }
 
-    .notification-menu {
-        width: 320px;
+    .notification-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
     }
 }
 
@@ -430,17 +445,14 @@ body.light .search-result-item .search-result-title:hover {
     .search-hint-btn {
         padding: 4px;
         font-size: 14px;
+        right: 4px;
+    }
+
+    .search-input {
+        padding: 10px 40px 10px 40px;
     }
 
     .popover {
         max-width: 280px;
-    }
-
-    .popover-content-wrapper {
-        min-width: 220px;
-    }
-
-    .popover-item {
-        font-size: 11px;
     }
 }

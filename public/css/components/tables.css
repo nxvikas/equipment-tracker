@@ -175,17 +175,7 @@
     display: none !important;
 }
 
-/* АДАПТИВ ДЛЯ ПАГИНАЦИИ */
-@media (max-width: 768px) {
-    .pagination-wrapper {
-        justify-content: center;
-    }
 
-    .pagination-wrapper .page-item .page-link {
-        padding: 6px 10px !important;
-        font-size: 12px !important;
-    }
-}
 /* ССЫЛКИ В ТАБЛИЦАХ */
 .equipment-name a,
 a.equipment-name {
@@ -230,3 +220,14 @@ body.light .custom-table tbody tr:hover {
     background: rgba(132, 204, 22, 0.08);
 }
 
+/* АДАПТИВ */
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        justify-content: center;
+    }
+
+    .pagination-wrapper .page-item .page-link {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+    }
+}

@@ -24,6 +24,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'phone' => '+79990000001',
             'role_id' => 1,
+            'department_id' => null,
+            'position_id' => null,
             'status' => UserStatus::ACTIVE->value,
             'created_at' => now(),
             'updated_at' => now(),
@@ -31,33 +33,106 @@ class UserSeeder extends Seeder
 
 
         $employees = [
+
             [
                 'surname' => 'Иванов',
                 'name' => 'Иван',
                 'patronymic' => 'Иванович',
                 'email' => 'ivanov@example.com',
                 'phone' => '+79990000002',
+                'department_id' => 1,
+                'position_id' => 1,
             ],
             [
-                'surname' => 'Петрова',
-                'name' => 'Анна',
-                'patronymic' => 'Сергеевна',
-                'email' => 'petrova@example.com',
+                'surname' => 'Петров',
+                'name' => 'Петр',
+                'patronymic' => 'Петрович',
+                'email' => 'petrov@example.com',
                 'phone' => '+79990000003',
+                'department_id' => 1,
+                'position_id' => 2,
             ],
             [
-                'surname' => 'Сидоров',
-                'name' => 'Сергей',
-                'patronymic' => 'Алексеевич',
-                'email' => 'sidorov@example.com',
+                'surname' => 'Сидорова',
+                'name' => 'Мария',
+                'patronymic' => 'Алексеевна',
+                'email' => 'sidorova@example.com',
                 'phone' => '+79990000004',
+                'department_id' => 1,
+                'position_id' => 3,
             ],
+
+
             [
                 'surname' => 'Кузнецова',
                 'name' => 'Екатерина',
                 'patronymic' => 'Дмитриевна',
                 'email' => 'kuznetsova@example.com',
                 'phone' => '+79990000005',
+                'department_id' => 2,
+                'position_id' => 5,
+            ],
+            [
+                'surname' => 'Смирнова',
+                'name' => 'Ольга',
+                'patronymic' => 'Владимировна',
+                'email' => 'smirnova@example.com',
+                'phone' => '+79990000006',
+                'department_id' => 2,
+                'position_id' => 4,
+            ],
+
+
+            [
+                'surname' => 'Волков',
+                'name' => 'Дмитрий',
+                'patronymic' => 'Сергеевич',
+                'email' => 'volkov@example.com',
+                'phone' => '+79990000007',
+                'department_id' => 3,
+                'position_id' => 7,
+            ],
+            [
+                'surname' => 'Морозова',
+                'name' => 'Анна',
+                'patronymic' => 'Игоревна',
+                'email' => 'morozova@example.com',
+                'phone' => '+79990000008',
+                'department_id' => 3,
+                'position_id' => 8,
+            ],
+
+
+            [
+                'surname' => 'Новикова',
+                'name' => 'Татьяна',
+                'patronymic' => 'Павловна',
+                'email' => 'novikova@example.com',
+                'phone' => '+79990000009',
+                'department_id' => 4,
+                'position_id' => 10,
+            ],
+
+
+            [
+                'surname' => 'Федоров',
+                'name' => 'Андрей',
+                'patronymic' => 'Николаевич',
+                'email' => 'fedorov@example.com',
+                'phone' => '+79990000010',
+                'department_id' => 5,
+                'position_id' => 12,
+            ],
+
+
+            [
+                'surname' => 'Михайлов',
+                'name' => 'Сергей',
+                'patronymic' => 'Александрович',
+                'email' => 'mikhailov@example.com',
+                'phone' => '+79990000011',
+                'department_id' => 6,
+                'position_id' => 14,
             ],
         ];
 
@@ -70,6 +145,8 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('employee123'),
                 'phone' => $employee['phone'],
                 'role_id' => 2,
+                'department_id' => $employee['department_id'],
+                'position_id' => $employee['position_id'],
                 'status' => UserStatus::ACTIVE->value,
                 'created_at' => now(),
                 'updated_at' => now(),

@@ -30,7 +30,6 @@ class AuthController extends Controller
 
     public function showWaitingPage()
     {
-
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->status === UserStatus::ACTIVE) {
@@ -40,26 +39,19 @@ class AuthController extends Controller
                     default => redirect()->route('auth.login')
                 };
             }
-
             Auth::logout();
         }
-
         if (!session()->has('pending_user_id')) {
             return redirect()->route('auth.register');
         }
-
         $user = User::find(session('pending_user_id'));
-
         if (!$user) {
             session()->forget('pending_user_id');
             return redirect()->route('auth.register');
         }
-
         if ($user->status !== UserStatus::PENDING) {
             session()->forget('pending_user_id');
-
             if ($user->status === UserStatus::ACTIVE) {
-
                 Auth::login($user);
                 return match ($user->role->name) {
                     'admin' => redirect()->route('admin.dashboard'),
@@ -67,16 +59,13 @@ class AuthController extends Controller
                     default => redirect()->route('auth.login')
                 };
             }
-
             if ($user->status === UserStatus::REJECTED) {
                 return redirect()->route('auth.register')->with('error', 'Ваша заявка отклонена.');
             }
-
             if ($user->status === UserStatus::BLOCKED) {
                 return redirect()->route('auth.login')->with('error', 'Ваш аккаунт заблокирован.');
             }
         }
-
         return view('auth.waiting', ['user' => $user]);
     }
 
@@ -167,10 +156,8 @@ class AuthController extends Controller
                 'email' => 'Неизвестный статус аккаунта. Обратитесь к администратору.'
             ])->onlyInput('email');
         }
-
         Auth::login($user, $request->boolean('remember'));
         session()->forget('pending_user_id');
-
         return match ($user->role->name) {
             'admin' => redirect()->route('admin.dashboard'),
             'employee' => redirect()->route('employee.dashboard'),

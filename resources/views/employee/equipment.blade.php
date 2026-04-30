@@ -40,7 +40,6 @@
             </div>
         </div>
 
-
         <div class="filters-bar">
             <form method="GET" action="{{ route('employee.equipment') }}" id="filterForm"
                   class="d-flex w-100 gap-3 justify-content-between">
@@ -48,11 +47,9 @@
                 <div class="search-input-wrapper">
                     <i class="bi bi-search"></i>
                     <input type="text"
-                           name="search"
                            id="searchEquipment"
                            class="search-input"
-                           placeholder="Поиск по названию, инв. номеру..."
-                           value="{{ request('search') }}">
+                           placeholder="Поиск по названию, инв. номеру...">
                 </div>
 
                 <div class="filters-group">
@@ -72,7 +69,8 @@
                             @foreach($categories as $category)
                                 <li>
                                     <a class="dropdown-item {{ request('category_id') == $category->id ? 'active' : '' }}"
-                                       href="#" data-value="{{ $category->id }}">
+                                       href="#"
+                                       data-value="{{ $category->id }}">
                                         {{ $category->name }}
                                     </a>
                                 </li>
@@ -118,13 +116,12 @@
             </form>
         </div>
 
-
         <div class="table-wrapper">
             <div class="table-responsive">
                 <table class="custom-table">
                     <thead>
                     <tr>
-                        <th>QR</th>
+                        <th style="width: 60px; text-align: center;">QR</th>
                         <th>Инв. номер</th>
                         <th>Название</th>
                         <th>Категория</th>
@@ -150,7 +147,8 @@
                             </td>
                             <td class="inv-number">{{ $item->inventory_number }}</td>
                             <td class="equipment-name">
-                                <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}" class="equipment-name">
+                                <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}"
+                                   class="equipment-name" style="color: var(--accent); text-decoration: underline; text-underline-offset: 2px;">
                                     {{ $item->name }}
                                 </a>
                             </td>
@@ -176,13 +174,13 @@
                             <td>
                                 @if($item->status === 'in_use')
                                     <button type="button"
-                                            class="return-btn"
+                                            class="action-btn return-btn"
                                             data-equipment-id="{{ $item->id }}"
                                             data-equipment-name="{{ $item->name }}"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#returnConfirmModal"
+                                            data-bs-target="#returnConfirmModal{{ $item->id }}"
                                             title="Вернуть на склад">
-                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        <i class="bi bi-box-arrow-in-right" style="color: #10b981;"></i>
                                     </button>
                                 @else
                                     <span class="text-secondary">—</span>
@@ -191,7 +189,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="p-0 border-bottom-0">
+                            <td colspan="9" class="p-0 border-bottom-0">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper">
                                         <i class="bi bi-inbox"></i>
@@ -213,35 +211,39 @@
         </div>
     </div>
 
-    <div class="modal fade" id="returnConfirmModal" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title text-warning">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Подтверждение возврата
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <i class="bi bi-question-circle" style="font-size: 48px; color: var(--warning);"></i>
-                    <p class="mt-3 mb-0">Вы уверены, что хотите вернуть оборудование на склад?</p>
-                    <p class="text-secondary mt-2" id="returnEquipmentName"></p>
-                    <p class="text-warning small mt-3">
-                        <i class="bi bi-exclamation-circle"></i> После возврата оборудование будет доступно для выдачи другим сотрудникам.
-                    </p>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
-                    <form action="" method="POST" id="returnForm">
-                        @csrf
-                        <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
-                            <i class="bi bi-box-arrow-in-right"></i> Подтвердить возврат
-                        </button>
-                    </form>
+
+    @foreach($equipments as $item)
+        @if($item->status === 'in_use')
+            <div class="modal fade" id="returnConfirmModal{{ $item->id }}" tabindex="-1" data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-warning">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Подтверждение возврата
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите вернуть оборудование на склад?</p>
+                            <p class="text-secondary">
+                                <strong>{{ $item->name }}</strong><br>
+                                {{ $item->inventory_number }}
+                            </p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                            <form action="{{ route('employee.equipment.return', $item->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                                    <i class="bi bi-box-arrow-in-right"></i> Подтвердить возврат
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        @endif
+    @endforeach
 @endsection
 
 @push('scripts')
@@ -250,28 +252,22 @@
             const searchInput = document.getElementById('searchEquipment');
             if (!searchInput) return;
 
-
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.custom-table tbody tr').forEach(row => {
+                    const text = [
+                        row.querySelector('.inv-number')?.textContent || '',
+                        row.querySelector('.equipment-name')?.textContent || '',
+                        row.querySelector('.serial-number')?.textContent || ''
+                    ].join(' ').toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            initCustomSelects();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const returnButtons = document.querySelectorAll('.return-btn');
-            const returnForm = document.getElementById('returnForm');
-            const returnEquipmentName = document.getElementById('returnEquipmentName');
-
-            returnButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const equipmentId = this.dataset.equipmentId;
-                    const equipmentName = this.dataset.equipmentName;
-
-                    returnEquipmentName.innerHTML = `<strong>${equipmentName}</strong>`;
-                    returnForm.action = `/employee/equipment/${equipmentId}/return`;
-                });
-            });
+            if (typeof initCustomSelects === 'function') initCustomSelects();
+            initLiveSearch();
         });
     </script>
 @endpush

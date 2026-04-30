@@ -16,9 +16,4 @@ class PageController extends Controller
     {
         return view('auth.register');
     }
-
-    public function employeeDashboard()
-    {
-        return view('employee.dashboard');
-    }
 }

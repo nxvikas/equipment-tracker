@@ -40,8 +40,6 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
 
     try {
         const formData = new FormData(form);
-
-
         const methodInput = form.querySelector('input[name="_method"]');
         if (methodInput) {
             formData.append('_method', methodInput.value);
@@ -81,12 +79,16 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
                 onSuccess(data);
             }
 
-            if (reloadOnSuccess) {
+            if (reloadOnSuccess || data.reload) {
                 window.location.reload();
+            } else if (!selectName) {
+                window.showToast(data.message || 'Успешно сохранено', 'success');
             }
         } else {
             if (data.errors) {
                 window.showFormErrors(form, data.errors);
+            } else if (data.message) {
+                window.showToast(data.message, 'danger');
             }
         }
     } catch (error) {

@@ -28,7 +28,8 @@
                 <p class="page-subtitle">Управление категориями для классификации техники</p>
             </div>
             <div class="page-actions">
-                <a href="{{ route('admin.export.categories') }}" class="btn-outline" title="Экспорт в Excel" style="margin-right: 10px">
+                <a href="{{ route('admin.export.categories') }}" class="btn-outline" title="Экспорт в Excel"
+                   style="margin-right: 10px">
                     <i class="bi bi-download"></i> Экспорт
                 </a>
                 <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
@@ -108,7 +109,11 @@
                     @forelse($categories as $category)
                         <tr>
                             <td>{{ $category->id }}</td>
-                            <td class="equipment-name">{{ $category->name }}</td>
+                            <td class="equipment-name">
+                                <a href="{{ route('admin.categories.show', $category->id) }}">
+                                    {{ $category->name }}
+                                </a>
+                            </td>
                             <td>{{ $category->description ?: '—' }}</td>
                             <td>{{ $category->equipment_count }}</td>
                             <td>

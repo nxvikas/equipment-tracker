@@ -26,7 +26,12 @@
 
         <div class="page-header">
             <div>
-                @if(request('from_location'))
+                @if(request('from_category'))
+                    <a href="{{ route('admin.categories.show', ['category' => request('from_category'), 'from_equipment' => $equipment->id]) }}"
+                       class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к категории
+                    </a>
+                @elseif(request('from_location'))
                     <a href="{{ route('admin.locations.show', ['location' => request('from_location'), 'from_equipment' => $equipment->id]) }}"
                        class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к локации
@@ -98,7 +103,15 @@
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Категория</span>
-                                <span class="info-value">{{ $equipment->category->name ?? '—' }}</span>
+                                <span class="info-value">
+    @if($equipment->category)
+                                        <a href="{{ route('admin.categories.show', ['category' => $equipment->category->id, 'from_equipment' => $equipment->id]) }}">
+    {{ $equipment->category->name }}
+</a>
+                                    @else
+                                        —
+                                    @endif
+</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Производитель</span>
@@ -130,7 +143,7 @@
                                 <span class="info-value">
         @if($equipment->currentUser)
                                         <a href="{{ route('admin.users.show', ['user' => $equipment->currentUser->id, 'from_equipment' => $equipment->id]) }}"
-                                           class="text-decoration-none" style="color: var(--accent);">
+                                           style="color: var(--accent);">
                 {{ $equipment->currentUser->surname }} {{ $equipment->currentUser->name }}
             </a>
                                     @else
@@ -687,7 +700,8 @@
                                       placeholder="Укажите причину"></textarea>
                         </div>
                         <p class="text-danger small">
-                            <i class="bi bi-exclamation-circle"></i> После списания оборудование нельзя будет восстановить.
+                            <i class="bi bi-exclamation-circle"></i> После списания оборудование нельзя будет
+                            восстановить.
                         </p>
                     </div>
                     <div class="modal-footer border-0 pt-0">

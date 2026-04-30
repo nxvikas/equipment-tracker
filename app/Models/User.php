@@ -61,10 +61,6 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Equipment_history::class, 'from_user_id');
     }
 
-    public function notifications()
-    {
-        return $this->hasMany(\App\Models\Notification::class);
-    }
 
     public function isAdmin()
     {

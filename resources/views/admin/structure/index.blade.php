@@ -116,6 +116,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
+                            <th>Должности</th>
                             <th>Кол-во сотрудников</th>
                             <th>Действия</th>
                         </tr>
@@ -125,26 +126,58 @@
                             <tr>
                                 <td>{{ $department->id }}</td>
                                 <td class="equipment-name">{{ $department->name }}</td>
+                                <td style="max-width: 300px;">
+                                    @if($department->positions->count() > 0)
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                            @foreach($department->positions->take(5) as $position)
+                                                <span
+                                                    style="background: rgba(190, 242, 100, 0.08); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--accent);">
+                                                    {{ $position->name }}
+                                                </span>
+                                            @endforeach
+                                            @if($department->positions->count() > 5)
+                                                <span
+                                                    style="background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--text-secondary);">
+                                                    +{{ $department->positions->count() - 5 }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-secondary">—</span>
+                                    @endif
+                                </td>
                                 <td>{{ $department->users_count }}</td>
-                                <td>
-                                    <button class="action-btn" data-bs-toggle="modal"
-                                            data-bs-target="#editDepartmentModal{{ $department->id }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+                                <td style="white-space: nowrap;">
+                                    @if($department->users_count > 0)
+                                        <button class="action-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewDepartmentUsersModal{{ $department->id }}"
+                                                title="Список сотрудников">
+                                            <i class="bi bi-people"></i>
+                                        </button>
+                                    @endif
+
+
+
                                     @if($department->users_count == 0)
                                         <button class="action-btn" data-bs-toggle="modal"
                                                 data-bs-target="#deleteDepartmentModal{{ $department->id }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     @endif
+                                    <button class="action-btn" data-bs-toggle="modal"
+                                            data-bs-target="#editDepartmentModal{{ $department->id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="p-0 border-bottom-0">
+                                <td colspan="5" class="p-0 border-bottom-0">
                                     <div class="empty-state">
                                         <div class="empty-icon-wrapper"><i class="bi bi-inbox"></i></div>
-                                        <h4 class="empty-title">Нет отделов</h4></div>
+                                        <h4 class="empty-title">Нет отделов</h4>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -205,6 +238,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Название</th>
+                            <th>Отдел</th>
                             <th>Кол-во сотрудников</th>
                             <th>Действия</th>
                         </tr>
@@ -214,31 +248,54 @@
                             <tr>
                                 <td>{{ $position->id }}</td>
                                 <td class="equipment-name">{{ $position->name }}</td>
-                                <td>{{ $position->users_count }}</td>
                                 <td>
-                                    <button class="action-btn" data-bs-toggle="modal"
-                                            data-bs-target="#editPositionModal{{ $position->id }}">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+                                    @if($position->department)
+                                        <span
+                                            style="background: rgba(190, 242, 100, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 12px;">
+                                            {{ $position->department->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-secondary">—</span>
+                                    @endif
+                                </td>
+                                <td>{{ $position->users_count }}</td>
+                                <td style="white-space: nowrap;">
+                                    @if($position->users_count > 0)
+                                        <button class="action-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewPositionUsersModal{{ $position->id }}"
+                                                title="Список сотрудников">
+                                            <i class="bi bi-people"></i>
+                                        </button>
+                                    @endif
+
+
+
                                     @if($position->users_count == 0)
                                         <button class="action-btn" data-bs-toggle="modal"
                                                 data-bs-target="#deletePositionModal{{ $position->id }}">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     @endif
+                                        <button class="action-btn" data-bs-toggle="modal"
+                                                data-bs-target="#editPositionModal{{ $position->id }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="p-0 border-bottom-0">
+                                <td colspan="5" class="p-0 border-bottom-0">
                                     <div class="empty-state">
                                         <div class="empty-icon-wrapper"><i class="bi bi-inbox"></i></div>
-                                        <h4 class="empty-title">Нет должностей</h4></div>
+                                        <h4 class="empty-title">Нет должностей</h4>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
                         </tbody>
                     </table>
+
                 </div>
                 @if($positions->hasPages())
                     <div class="pagination-wrapper">{{ $positions->appends(request()->query())->links() }}</div>
@@ -248,19 +305,137 @@
     </div>
 
 
+    @foreach($departments as $department)
+        @if($department->users_count > 0)
+            <div class="modal fade" id="viewDepartmentUsersModal{{ $department->id }}" tabindex="-1"
+                 data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title">
+                                <i class="bi bi-people me-2" style="color: var(--accent);"></i>
+                                Сотрудники отдела: {{ $department->name }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if($department->users->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="custom-table" style="width: 100%;">
+                                        <thead>
+                                        <tr>
+                                            <th>Сотрудник</th>
+                                            <th>Email</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($department->users as $user)
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ route('admin.users.show', $user->id) }}"
+                                                       class="equipment-name" style="text-decoration: underline;">
+                                                        {{ $user->surname }} {{ $user->name }}{{ $user->patronymic ? ' ' . $user->patronymic : '' }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ $user->email }}</td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center text-secondary py-4">
+                                    <i class="bi bi-inbox"></i> Нет сотрудников
+                                </div>
+                            @endif
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+
+
+    @foreach($positions as $position)
+        @if($position->users_count > 0)
+            <div class="modal fade" id="viewPositionUsersModal{{ $position->id }}" tabindex="-1"
+                 data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title">
+                                <i class="bi bi-people me-2" style="color: var(--accent);"></i>
+                                Сотрудники должности: {{ $position->name }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body">
+                            @if($position->users->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="custom-table" style="width: 100%;">
+                                        <thead>
+                                        <tr>
+                                            <th>Сотрудник</th>
+                                            <th>Email</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($position->users as $user)
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ route('admin.users.show', $user->id) }}"
+                                                       class="equipment-name" style="text-decoration: underline;">
+                                                        {{ $user->surname }} {{ $user->name }}{{ $user->patronymic ? ' ' . $user->patronymic : '' }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ $user->email }}</td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center text-secondary py-4">
+                                    <i class="bi bi-inbox"></i> Нет сотрудников
+                                </div>
+                            @endif
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn-outline" data-bs-dismiss="modal">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+
+
     <div class="modal fade" id="addDepartmentModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header border-0 pb-0"><h5 class="modal-title">Новый отдел</h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">Новый отдел</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('admin.departments.store') }}" method="POST" id="addDepartmentForm">
                     @csrf
                     <div class="modal-body">
-                        <div class="mb-3"><label class="form-label">Название <span
-                                    class="text-danger">*</span></label><input type="text" name="name"
-                                                                               class="form-control-custom"
-                                                                               placeholder="Например: IT-отдел"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Название <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name') is-invalid @enderror"
+                                   placeholder="Например: IT-отдел"
+                                   value="{{ old('name') }}">
+                            @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
@@ -274,16 +449,39 @@
     <div class="modal fade" id="addPositionModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header border-0 pb-0"><h5 class="modal-title">Новая должность</h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">Новая должность</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form action="{{ route('admin.positions.store') }}" method="POST" id="addPositionForm">
                     @csrf
                     <div class="modal-body">
-                        <div class="mb-3"><label class="form-label">Название <span
-                                    class="text-danger">*</span></label><input type="text" name="name"
-                                                                               class="form-control-custom"
-                                                                               placeholder="Например: Разработчик">
+                        <div class="mb-3">
+                            <label class="form-label">Название <span class="text-danger">*</span></label>
+                            <input type="text"
+                                   name="name"
+                                   class="form-control-custom @error('name') is-invalid @enderror"
+                                   placeholder="Например: Разработчик"
+                                   value="{{ old('name') }}">
+                            @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Отдел <span class="text-danger">*</span></label>
+                            <select name="department_id"
+                                    class="form-control-custom custom-dark-select @error('department_id') is-invalid @enderror">
+                                <option value="">Выберите отдел</option>
+                                @foreach($departments as $department)
+                                    <option
+                                        value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                        {{ $department->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('department_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -300,17 +498,18 @@
         <div class="modal fade" id="editDepartmentModal{{ $department->id }}" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header border-0 pb-0"><h5 class="modal-title">Редактировать отдел</h5>
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title">Редактировать отдел</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form action="{{ route('admin.departments.update', $department) }}" method="POST"
                           class="edit-department-form">
                         @csrf @method('PUT')
                         <div class="modal-body">
-                            <div class="mb-3"><label class="form-label">Название <span
-                                        class="text-danger">*</span></label><input type="text" name="name"
-                                                                                   class="form-control-custom"
-                                                                                   value="{{ $department->name }}">
+                            <div class="mb-3">
+                                <label class="form-label">Название <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control-custom"
+                                       value="{{ $department->name }}">
                             </div>
                         </div>
                         <div class="modal-footer border-0 pt-0">
@@ -326,24 +525,27 @@
                  data-bs-backdrop="static">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header border-0 pb-0"><h5 class="modal-title text-danger"><i
-                                    class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4"><i class="bi bi-trash"
-                                                                    style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить отдел?</p>
-                            <p class="text-secondary mt-2"><strong>{{ $department->name }}</strong></p>
-                            <p class="text-danger small mt-3"><i class="bi bi-exclamation-circle"></i> Это действие
-                                нельзя отменить.</p></div>
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите удалить отдел?</p>
+                            <p class="text-secondary">
+                                <strong>{{ $department->name }}</strong>
+                            </p>
+                        </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
                             <form action="{{ route('admin.departments.destroy', $department) }}" method="POST"
                                   class="delete-department-form">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn-primary"
-                                        style="background: var(--danger); color: white;"><i class="bi bi-trash"></i>
-                                    Удалить
+                                        style="background: var(--danger); color: white;">
+                                    <i class="bi bi-trash"></i> Удалить
                                 </button>
                             </form>
                         </div>
@@ -358,17 +560,40 @@
         <div class="modal fade" id="editPositionModal{{ $position->id }}" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header border-0 pb-0"><h5 class="modal-title">Редактировать должность</h5>
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title">Редактировать должность</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form action="{{ route('admin.positions.update', $position) }}" method="POST"
                           class="edit-position-form">
                         @csrf @method('PUT')
                         <div class="modal-body">
-                            <div class="mb-3"><label class="form-label">Название <span
-                                        class="text-danger">*</span></label><input type="text" name="name"
-                                                                                   class="form-control-custom"
-                                                                                   value="{{ $position->name }}"></div>
+                            <div class="mb-3">
+                                <label class="form-label">Название <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       name="name"
+                                       class="form-control-custom @error('name') is-invalid @enderror"
+                                       value="{{ $position->name }}">
+                                @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Отдел <span class="text-danger">*</span></label>
+                                <select name="department_id"
+                                        class="form-control-custom custom-dark-select @error('department_id') is-invalid @enderror">
+                                    <option value="">Выберите отдел</option>
+                                    @foreach($departments as $department)
+                                        <option value="{{ $department->id }}"
+                                            {{ ($position->department_id == $department->id) ? 'selected' : '' }}>
+                                            {{ $department->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('department_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
@@ -382,24 +607,27 @@
             <div class="modal fade" id="deletePositionModal{{ $position->id }}" tabindex="-1" data-bs-backdrop="static">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <div class="modal-header border-0 pb-0"><h5 class="modal-title text-danger"><i
-                                    class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title text-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4"><i class="bi bi-trash"
-                                                                    style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить должность?</p>
-                            <p class="text-secondary mt-2"><strong>{{ $position->name }}</strong></p>
-                            <p class="text-danger small mt-3"><i class="bi bi-exclamation-circle"></i> Это действие
-                                нельзя отменить.</p></div>
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите удалить должность?</p>
+                            <p class="text-secondary">
+                                <strong>{{ $position->name }}</strong>
+                            </p>
+                        </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
                             <form action="{{ route('admin.positions.destroy', $position) }}" method="POST"
                                   class="delete-position-form">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn-primary"
-                                        style="background: var(--danger); color: white;"><i class="bi bi-trash"></i>
-                                    Удалить
+                                        style="background: var(--danger); color: white;">
+                                    <i class="bi bi-trash"></i> Удалить
                                 </button>
                             </form>
                         </div>
@@ -412,7 +640,7 @@
 
 @push('scripts')
     <script>
-        const initLiveSearch = (inputId, columnIndex) => {
+        const initLiveSearch = (inputId) => {
             const searchInput = document.getElementById(inputId);
             if (!searchInput) return;
             searchInput.addEventListener('input', (e) => {
@@ -425,43 +653,82 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            initCustomSelects();
+            if (typeof initCustomSelects === 'function') initCustomSelects();
             initLiveSearch('searchDepartment');
             initLiveSearch('searchPosition');
 
 
             const addDeptForm = document.getElementById('addDepartmentForm');
-            if (addDeptForm) addDeptForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(addDeptForm, 'addDepartmentModal', {reloadOnSuccess: true});
-            });
+            if (addDeptForm) {
+                addDeptForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(addDeptForm, 'addDepartmentModal', {reloadOnSuccess: true});
+                    } else {
+                        addDeptForm.submit();
+                    }
+                });
+            }
 
 
             const addPosForm = document.getElementById('addPositionForm');
-            if (addPosForm) addPosForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(addPosForm, 'addPositionModal', {reloadOnSuccess: true});
+            if (addPosForm) {
+                addPosForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(addPosForm, 'addPositionModal', {reloadOnSuccess: true});
+                    } else {
+                        addPosForm.submit();
+                    }
+                });
+            }
+
+
+            document.querySelectorAll('.edit-department-form').forEach(f => {
+                f.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
+                    } else {
+                        f.submit();
+                    }
+                });
             });
 
-            document.querySelectorAll('.edit-department-form').forEach(f => f.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
-            }));
+            document.querySelectorAll('.delete-department-form').forEach(f => {
+                f.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
+                    } else {
+                        f.submit();
+                    }
+                });
+            });
 
-            document.querySelectorAll('.delete-department-form').forEach(f => f.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
-            }));
 
-            document.querySelectorAll('.edit-position-form').forEach(f => f.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
-            }));
+            document.querySelectorAll('.edit-position-form').forEach(f => {
+                f.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
+                    } else {
+                        f.submit();
+                    }
+                });
+            });
 
-            document.querySelectorAll('.delete-position-form').forEach(f => f.addEventListener('submit', (e) => {
-                e.preventDefault();
-                submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
-            }));
+
+            document.querySelectorAll('.delete-position-form').forEach(f => {
+                f.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (typeof submitAjaxForm === 'function') {
+                        submitAjaxForm(f, f.closest('.modal').id, {reloadOnSuccess: true});
+                    } else {
+                        f.submit();
+                    }
+                });
+            });
         });
     </script>
 @endpush

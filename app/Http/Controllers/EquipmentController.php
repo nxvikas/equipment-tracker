@@ -30,7 +30,6 @@ class EquipmentController extends Controller
         if (!$equipment->qr_code) {
             abort(404, 'QR-код не найден');
         }
-
         $size = Config::get('app.qr_code.size', 300);
         $margin = Config::get('app.qr_code.margin', 10);
 
@@ -43,9 +42,7 @@ class EquipmentController extends Controller
             margin: $margin,
             roundBlockSizeMode: RoundBlockSizeMode::Margin
         );
-
         $qrCode = $result->build();
-
         return response($qrCode->getString())
             ->header('Content-Type', $qrCode->getMimeType());
     }
@@ -54,7 +51,6 @@ class EquipmentController extends Controller
     {
         $validated = $request->validated();
 
-
         if ($validated['status'] === 'in_use' && empty($validated['current_user_id'])) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -62,7 +58,6 @@ class EquipmentController extends Controller
                     'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
                 ], 422);
             }
-
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
                 ->with('reopen_equipment_modal', true)
@@ -94,12 +89,14 @@ class EquipmentController extends Controller
             'comment' => 'Оборудование добавлено в систему'
         ]);
 
+        session()->flash('success', 'Оборудование "' . $equipment->name . '" успешно добавлено');
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Оборудование "' . $equipment->name . '" успешно добавлено',
-                'item' => $equipment
+                'item' => $equipment,
+                'reload' => true
             ]);
         }
 

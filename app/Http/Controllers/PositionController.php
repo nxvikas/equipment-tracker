@@ -17,9 +17,12 @@ class PositionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255', 'unique:positions,name'],
+            'department_id' => ['required', 'exists:departments,id'],
         ], [
             'name.required' => 'Название должности обязательно',
             'name.unique' => 'Должность с таким названием уже существует',
+            'department_id.required' => 'Выберите отдел',
+            'department_id.exists' => 'Выбранный отдел не существует',
         ]);
 
         if ($validator->fails()) {
@@ -44,21 +47,19 @@ class PositionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.structure.index')->with('success', 'Должность добавлена');
+        return redirect()->route('admin.structure.index', ['tab' => 'positions'])->with('success', 'Должность добавлена');
     }
 
-
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Position $position)
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255', 'unique:positions,name,' . $position->id],
+            'department_id' => ['required', 'exists:departments,id'],
         ], [
             'name.required' => 'Название должности обязательно',
             'name.unique' => 'Должность с таким названием уже существует',
+            'department_id.required' => 'Выберите отдел',
+            'department_id.exists' => 'Выбранный отдел не существует',
         ]);
 
         if ($validator->fails()) {
@@ -83,12 +84,9 @@ class PositionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.structure.index')->with('success', 'Должность обновлена');
+        return redirect()->route('admin.structure.index', ['tab' => 'positions'])->with('success', 'Должность обновлена');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Request $request, Position $position)
     {
         if ($position->users()->exists()) {
@@ -112,6 +110,6 @@ class PositionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.structure.index')->with('success', 'Должность удалена');
+        return redirect()->route('admin.structure.index', ['tab' => 'positions'])->with('success', 'Должность удалена');
     }
 }

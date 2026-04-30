@@ -54,8 +54,6 @@ Route::middleware('web')->group(function () {
         Route::get('/equipment/{equipment}', [\App\Http\Controllers\EquipmentController::class, 'show'])->name('equipment.show');
 
 
-
-
         Route::post('/equipment/{equipment}/assign', [\App\Http\Controllers\EquipmentController::class, 'assign'])->name('equipment.assign');
         Route::post('/equipment/{equipment}/return', [\App\Http\Controllers\EquipmentController::class, 'return'])->name('equipment.return');
         Route::post('/equipment/{equipment}/repair', [\App\Http\Controllers\EquipmentController::class, 'repair'])->name('equipment.repair');
@@ -70,6 +68,7 @@ Route::middleware('web')->group(function () {
         Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
         Route::put('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
         Route::delete('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
+        Route::get('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 
         Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
         Route::post('/locations', [\App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');

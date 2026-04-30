@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCategoryRequest;
 use App\Models\Category;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,16 @@ class CategoryController extends Controller
         $categories = $query->paginate(15)->withQueryString();
 
         return view('admin.categories.index', compact('categories'));
+    }
+    public function show(Category $category)
+    {
+        $category->loadCount('equipment');
+
+        $equipments = Equipment::where('category_id', $category->id)
+            ->with(['location', 'currentUser'])
+            ->get();
+
+        return view('admin.categories.show', compact('category', 'equipments'));
     }
 
 

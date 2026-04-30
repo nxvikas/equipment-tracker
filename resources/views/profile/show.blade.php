@@ -221,7 +221,7 @@
 
 @push('scripts')
     <script>
-        // Только предпросмотр аватара (форма отправляется при нажатии "Сохранить изменения")
+
         document.getElementById('avatarInput')?.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {

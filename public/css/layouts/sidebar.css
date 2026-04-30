@@ -216,6 +216,7 @@
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 10px 16px;
     background: rgba(190, 242, 100, 0.1);
@@ -226,10 +227,16 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-height: 44px;
 }
 
 .qr-scan-btn i {
     font-size: 18px;
+    flex-shrink: 0;
+}
+.qr-scan-btn span {
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .qr-scan-btn:hover {
@@ -304,6 +311,26 @@
     .sidebar .nav-link span {
         display: none;
     }
+    .sidebar-qr-btn {
+        padding: 10px 8px;
+        margin: 8px;
+    }
+
+    .qr-scan-btn {
+        justify-content: center;
+        padding: 10px 0;
+        gap: 0;
+        border-radius: 12px;
+    }
+
+    .qr-scan-btn span {
+        display: none;
+    }
+
+    .qr-scan-btn i {
+        font-size: 22px;
+        margin: 0;
+    }
 
     .sidebar .nav-link {
         justify-content: center;
@@ -351,7 +378,18 @@
     .sidebar-footer {
         justify-content: space-between;
     }
-    .sidebar-qr-btn .qr-scan-btn span {
+    .sidebar-qr-btn {
+        padding: 12px 16px;
+        margin: 8px 12px;
+    }
+
+    .qr-scan-btn {
+        justify-content: flex-start;
+        padding: 10px 16px;
+        gap: 12px;
+    }
+
+    .qr-scan-btn span {
         display: inline;
     }
 

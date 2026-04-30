@@ -772,7 +772,7 @@
                         userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
                     }
                 } else {
-                    userField.style.display = 'block'; // Всегда показываем, но делаем необязательным
+                    userField.style.display = 'block';
                     if (userLabel) {
                         userLabel.innerHTML = 'Сотрудник';
                     }

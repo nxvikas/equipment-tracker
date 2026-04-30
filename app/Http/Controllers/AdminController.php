@@ -203,14 +203,15 @@ class AdminController extends Controller
     {
         $activeTab = $request->get('tab', 'departments');
 
-        // Отделы
-        $departmentsQuery = Department::withCount('users');
+
+        $departmentsQuery = Department::withCount('users')
+            ->with(['users:id,surname,name,patronymic,email,department_id', 'positions:id,name,department_id']);
         $direction = $request->get('direction', 'desc');
         $departmentsQuery->orderBy('users_count', $direction)->orderBy('name', 'asc');
         $departments = $departmentsQuery->paginate(15, ['*'], 'departments_page')->withQueryString();
 
-        // Должности
-        $positionsQuery = Position::withCount('users');
+
+        $positionsQuery = Position::with('department')->withCount('users')->with('users:id,surname,name,patronymic,email,position_id');
         $posDirection = $request->get('pos_direction', 'desc');
         $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
         $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();
@@ -290,7 +291,7 @@ class AdminController extends Controller
                         'type' => 'location',
                         'title' => $item->name,
                         'subtitle' => 'Локация',
-                        'url' => route('admin.locations.index') . '?search=' . $item->name
+                        'url' => route('admin.locations.show', $item->id)
                     ];
                 });
         }

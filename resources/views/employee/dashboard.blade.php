@@ -23,7 +23,6 @@
             </div>
         </div>
 
-
         <div class="stats-container">
             <div class="stat-item">
                 <div class="stat-icon-wrapper green">
@@ -36,7 +35,6 @@
                 </div>
             </div>
         </div>
-
 
         <div class="charts-grid-2cols">
 
@@ -57,40 +55,43 @@
             </div>
 
 
-            <div class="recent-assigns-card">
-                <div class="recent-assigns-header">
-                    <h3><i class="bi bi-clock-history"></i> Последние выдачи</h3>
+            <div class="top-users-card">
+                <div class="top-users-header">
+                    <div>
+                        <h3><i class="bi bi-clock-history"></i> Последние выдачи</h3>
+                        <p>Недавние операции с вашим оборудованием</p>
+                    </div>
                     <a href="{{ route('employee.equipment') }}" class="link-btn">
                         Всё оборудование <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
-                <div class="recent-assigns-list">
+                <div class="top-users-list">
                     @forelse($recentAssigns as $assign)
-
-                        <a href="{{ route('public.equipment', ['id' => $assign->equipment_id]) }}"
-                           class="recent-assign-item">
-                            <div class="recent-assign-icon">
-                                <i class="bi bi-laptop"></i>
+                        <a href="{{ route('public.equipment', ['id' => $assign->equipment_id, 'from' => 'employee_dashboard']) }}"
+                           class="user-rank-item">
+                            <div class="user-rank-info">
+                                <div class="recent-assign-icon">
+                                    <i class="bi bi-laptop"></i>
+                                </div>
+                                <div class="user-rank-details">
+                                    <div class="user-rank-name">{{ $assign->equipment->name ?? '—' }}</div>
+                                    <div class="user-rank-dept">
+                                        Инв. номер: {{ $assign->equipment->inventory_number ?? '—' }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="recent-assign-info">
-                                <div class="recent-assign-name">{{ $assign->equipment->name ?? '—' }}</div>
-                                <div class="recent-assign-date">{{ $assign->created_at->format('d.m.Y') }}</div>
-                            </div>
-                            <div class="recent-assign-badge">
-                                <span class="badge-success">Выдано</span>
+                            <div class="user-rank-count">
+                                {{ $assign->created_at->format('d.m.Y') }}
                             </div>
                         </a>
                     @empty
-                        <div class="empty-recent">
-                            <i class="bi bi-inbox"></i>
-                            <span>Нет выдач</span>
+                        <div class="text-center text-secondary py-4">
+                            <i class="bi bi-inbox"></i> Нет выдач
                         </div>
                     @endforelse
                 </div>
             </div>
         </div>
-
-
 
         @if($totalRepairEquipment > 0)
             <div class="section-wrapper">

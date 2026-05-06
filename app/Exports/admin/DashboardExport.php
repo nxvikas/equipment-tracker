@@ -74,7 +74,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 1. ОСНОВНЫЕ МЕТРИКИ
+
         $exportData[] = ['1. ОСНОВНЫЕ МЕТРИКИ'];
         $exportData[] = ['Показатель', 'Значение'];
         $exportData[] = ['Всего активов', $this->data['total']];
@@ -85,7 +85,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 2. ТОП КАТЕГОРИЙ
         $exportData[] = ['2. ПОПУЛЯРНЫЕ КАТЕГОРИИ ОБОРУДОВАНИЯ'];
         $exportData[] = ['Название категории', 'Количество'];
         foreach ($this->categories as $category) {
@@ -94,7 +93,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 3. ТОП СОТРУДНИКОВ
+
         $exportData[] = ['3. ТОП СОТРУДНИКОВ ПО ТЕХНИКЕ'];
         $exportData[] = ['№', 'Сотрудник', 'Отдел', 'Кол-во техники'];
         $index = 1;
@@ -109,7 +108,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 4. РАСПРЕДЕЛЕНИЕ ПО ЛОКАЦИЯМ
+
         $exportData[] = ['4. РАСПРЕДЕЛЕНИЕ ПО ЛОКАЦИЯМ'];
         $exportData[] = ['Название локации', 'Тип', 'Кол-во оборудования'];
         foreach ($this->locationStats as $location) {
@@ -119,7 +118,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 5. ДИНАМИКА ВЫДАЧ ПО МЕСЯЦАМ
+
         $exportData[] = ['5. ДИНАМИКА ВЫДАЧ (ПОСЛЕДНИЕ 6 МЕСЯЦЕВ)'];
         $exportData[] = ['Месяц', 'Количество выдач'];
         foreach ($this->monthlyAssigns as $item) {
@@ -129,7 +128,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-        // 6. ПОСЛЕДНИЕ ОПЕРАЦИИ
+
         $exportData[] = ['6. ПОСЛЕДНИЕ ОПЕРАЦИИ (10 последних)'];
         $exportData[] = ['Дата', 'Оборудование', 'Инв. номер', 'Операция', 'Кто выполнил'];
         foreach ($this->recentOperations as $operation) {

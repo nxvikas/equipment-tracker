@@ -44,7 +44,20 @@
                     <span class="chart-badge">последние 6 месяцев</span>
                 </div>
                 <div class="chart-body">
-                    <canvas id="employeeStatsChart"></canvas>
+                    @php
+
+                        $hasEmployeeData = !empty($chartAssigned) && !empty($chartReturned) && (array_sum($chartAssigned) + array_sum($chartReturned)) > 0;
+                    @endphp
+
+                    @if($hasEmployeeData)
+                        <canvas id="employeeStatsChart"></canvas>
+                    @else
+                        <div class="empty-chart-state">
+                            <i class="bi bi-bar-chart" style="font-size: 48px; opacity: 0.5;"></i>
+                            <p class="mt-2 text-secondary">Нет данных по операциям</p>
+                            <small class="text-secondary">Здесь появится история ваших выдач и возвратов</small>
+                        </div>
+                    @endif
                 </div>
                 <div class="chart-legend">
                     <div class="legend-dot green"></div>

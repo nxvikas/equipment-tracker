@@ -327,9 +327,9 @@
     text-decoration: none;
 }
 
-.location-name:hover {
-    color: var(--accent) !important;
-}
+/*.location-name:hover {*/
+/*    color: var(--accent) !important;*/
+/*}*/
 
 .location-name i {
     font-size: 14px;

@@ -728,6 +728,16 @@
     color: #f59e0b;
 }
 
+.empty-chart-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
 /* Адаптив */
 @media (max-width: 992px) {
     .charts-grid-2cols {

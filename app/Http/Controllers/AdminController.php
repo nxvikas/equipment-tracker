@@ -180,6 +180,7 @@ class AdminController extends Controller
         $locations = Location::all();
         $users = User::where('status', 'active')->orderBy('name')->get();
 
+
         return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users'));
     }
 

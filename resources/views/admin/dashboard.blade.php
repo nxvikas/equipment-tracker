@@ -167,36 +167,40 @@
                         Управление сотрудниками <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
-                <div class="top-users-list">
+                <div class="top-users-list" style="gap: 20px;">
                     @forelse($topUsers as $index => $user)
                         @php
                             $percentage = $totalEquipments > 0 ? round(($user->equipment_count / $totalEquipments) * 100) : 0;
                         @endphp
-                        <div class="user-progress-item">
-                            <a href="{{ route('admin.users.show', ['user' => $user, 'from_dashboard' => 1]) }}"
-                               class="user-rank-item">
-                                <div class="user-rank-info">
-                                    <div class="user-rank-avatar">
-                                        @if($user->avatar)
-                                            <img src="{{ asset('storage/' . $user->avatar) }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
-                                        @else
-                                            {{ strtoupper(mb_substr($user->surname, 0, 1)) }}{{ strtoupper(mb_substr($user->name, 0, 1)) }}
-                                        @endif
+                        <a href="{{ route('admin.users.show', ['user' => $user, 'from_dashboard' => 1]) }}"
+                           class="text-decoration-none">
+                            <div class="location-progress-item">
+                                <div class="location-progress-info">
+                                    <div class="location-name" style="gap: 12px;">
+                                        <div class="user-rank-avatar"
+                                             style="width: 32px; height: 32px; font-size: 11px;">
+                                            @if($user->avatar)
+                                                <img src="{{ asset('storage/' . $user->avatar) }}"
+                                                     style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+                                            @else
+                                                {{ mb_strtoupper(mb_substr($user->surname, 0, 1)) }}{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                                            @endif
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                                            <span>{{ $user->surname }} {{ $user->name }}</span>
+                                            <small class="text-secondary mt-1"
+                                                   style="font-size: 11px;">{{ $user->position->name ?? 'Должность не указана' }}</small>
+                                        </div>
                                     </div>
-                                    <div class="user-rank-details">
-                                        <div class="user-rank-name">{{ $user->surname }} {{ $user->name }}</div>
-                                        <div class="user-rank-dept">{{ $user->department->name ?? 'Без отдела' }}</div>
+                                    <div class="location-count">
+                                        {{ $user->equipment_count }} ед. ({{ $percentage }}%)
                                     </div>
                                 </div>
-                                <div class="user-rank-count">
-                                    {{ $user->equipment_count }} ед. ({{ $percentage }}%)
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
                                 </div>
-                            </a>
-                        </div>
-
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" style="width: {{ $percentage }}%;"></div>
-                        </div>
+                            </div>
+                        </a>
                     @empty
                         <div class="text-center text-secondary py-4">
                             <i class="bi bi-inbox"></i> Нет данных
@@ -219,7 +223,7 @@
                         Управление локациями <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
-                <div class="location-progress-list">
+                <div class="location-progress-list" style="gap: 20px;">
                     @forelse($locationStats as $location)
                         @php
                             $percentage = $totalInLocations > 0 ? round(($location->equipment_count / $totalInLocations) * 100) : 0;
@@ -246,10 +250,14 @@
                            class="text-decoration-none">
                             <div class="location-progress-item">
                                 <div class="location-progress-info">
-                                    <div class="location-name">
-                                        <i class="bi {{ $typeIcon }}" style="color: {{ $typeColor }};"></i>
-                                        {{ $location->name }}
-                                        <small style="color: {{ $typeColor }};">({{ $typeLabel }})</small>
+                                    <div class="location-name" style="gap: 12px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: {{ $typeColor }}20;">
+                                            <i class="bi {{ $typeIcon }}" style="color: {{ $typeColor }}; font-size: 14px;"></i>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                                            <span style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ $location->name }}</span>
+                                            <small class="text-secondary mt-1" style="font-size: 11px;">{{ $typeLabel }}</small>
+                                        </div>
                                     </div>
                                     <div class="location-count">
                                         {{ $location->equipment_count }} ед. ({{ $percentage }}%)

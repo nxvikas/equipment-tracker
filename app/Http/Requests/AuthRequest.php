@@ -34,8 +34,10 @@ class AuthRequest extends FormRequest
         return [
             'email.required' => 'Введите email',
             'email.email' => 'Введите корректный email',
+
             'password.required' => 'Введите пароль',
             'password.min' => 'Пароль должен состоять минимум из 8 символов',
+            'password.regex' => 'Пароль может содержать только латинские буквы (A-Z, a-z) и цифры (0-9)',
         ];
     }
 }

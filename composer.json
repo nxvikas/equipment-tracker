@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.4",
         "ext-gd": "*",
+        "ext-zip": "*",
         "endroid/qr-code": "^6.1",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",

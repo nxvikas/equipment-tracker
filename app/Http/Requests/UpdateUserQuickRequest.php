@@ -23,6 +23,7 @@ class UpdateUserQuickRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'status.string' => 'Статус должен быть текстовым',
             'status.in' => 'Выбран недопустимый статус',
             'department_id.exists' => 'Выбранный отдел не существует',
             'position_id.exists' => 'Выбранная должность не существует',

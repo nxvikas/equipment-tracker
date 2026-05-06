@@ -31,6 +31,7 @@ class UpdateEquipmentRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
+
     public function withValidator($validator)
     {
         $validator->sometimes('current_user_id', 'required', function ($input) {
@@ -41,22 +42,46 @@ class UpdateEquipmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Название обязательно для заполнения',
+            'required' => 'Поле обязательно для заполнения',
+            'string' => 'Поле должно быть текстовым',
+
+            'name.max' => 'Название не должно превышать 255 символов',
+
             'serial_number.unique' => 'Оборудование с таким серийным номером уже существует',
+            'serial_number.max' => 'Серийный номер не должен превышать 255 символов',
+
             'inventory_number.unique' => 'Оборудование с таким инвентарным номером уже существует',
+            'inventory_number.max' => 'Инвентарный номер не должен превышать 255 символов',
+
+            'manufacturer.max' => 'Производитель не должен превышать 255 символов',
+
+            'model.max' => 'Модель не должна превышать 255 символов',
+
             'category_id.required' => 'Выберите категорию',
+            'category_id.integer' => 'Категория должна быть выбрана корректно',
             'category_id.exists' => 'Выбранная категория не найдена',
+
             'location_id.required' => 'Выберите местоположение',
+            'location_id.integer' => 'Местоположение должно быть выбрано корректно',
             'location_id.exists' => 'Выбранная локация не найдена',
+
             'status.required' => 'Выберите статус',
             'status.in' => 'Выбран недопустимый статус',
+
             'current_user_id.required' => 'Для статуса "В работе" необходимо выбрать сотрудника',
+            'current_user_id.integer' => 'Сотрудник должен быть выбран корректно',
             'current_user_id.exists' => 'Выбранный сотрудник не найден',
+
             'purchase_date.date' => 'Введите корректную дату',
+
             'purchase_price.numeric' => 'Стоимость должна быть числом',
             'purchase_price.min' => 'Стоимость не может быть отрицательной',
+
             'warranty_date.date' => 'Введите корректную дату',
             'warranty_date.after_or_equal' => 'Дата гарантии не может быть раньше даты покупки',
+
+            'notes.string' => 'Примечание должно быть текстовым',
+            'notes.max' => 'Примечание не должно превышать 1000 символов',
         ];
     }
 }

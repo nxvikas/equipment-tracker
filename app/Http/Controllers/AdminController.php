@@ -211,7 +211,8 @@ class AdminController extends Controller
         $departments = $departmentsQuery->paginate(15, ['*'], 'departments_page')->withQueryString();
 
 
-        $positionsQuery = Position::with('department')->withCount('users')->with('users:id,surname,name,patronymic,email,position_id');
+        $positionsQuery = Position::with('department')->withCount('users')
+            ->with('users:id,surname,name,patronymic,email,position_id');
         $posDirection = $request->get('pos_direction', 'desc');
         $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
         $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();

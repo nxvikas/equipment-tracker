@@ -40,34 +40,6 @@
 
     <div class="user-area">
 
-        <div class="dropdown">
-            <button class="notification-btn dropdown-toggle" type="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-bell"></i>
-                <span class="notification-dot"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end notification-menu">
-                <li class="dropdown-header">Уведомления</li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li>
-                    <a class="dropdown-item notification-item unread" href="#">
-                        <i class="bi bi-laptop me-2"></i>
-                        <div>
-                            <div class="fw-semibold small">Вам выдано оборудование</div>
-                            <div class="small text-secondary">MacBook Pro 14" передан вам</div>
-                            <div class="small text-muted">5 минут назад</div>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item text-center" href="#">Все уведомления</a></li>
-            </ul>
-        </div>
-
 
         <div class="dropdown">
             <button class="user-profile dropdown-toggle" type="button"

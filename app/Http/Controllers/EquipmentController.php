@@ -112,7 +112,16 @@ class EquipmentController extends Controller
         $locations = \App\Models\Location::all();
         $users = \App\Models\User::where('status', 'active')->orderBy('name')->get();
 
-        return view('admin.equipment.show', compact('equipment', 'categories', 'locations', 'users'));
+        $locationsForJs = $locations->map(function ($loc) {
+            return [
+                'id' => $loc->id,
+                'name' => $loc->name,
+                'type' => $loc->type,
+                'typeLabel' => \App\Http\Enums\TypeLocation::ruValues()[$loc->type] ?? $loc->type
+            ];
+        });
+
+        return view('admin.equipment.show', compact('equipment', 'categories', 'locations', 'users','locationsForJs'));
     }
 
 
@@ -515,6 +524,7 @@ class EquipmentController extends Controller
 
         return view('public.equipment', compact('equipment'));
     }
+
     public function returnFromUser(Request $request)
     {
         $equipment = Equipment::findOrFail($request->equipment_id);
@@ -541,6 +551,7 @@ class EquipmentController extends Controller
 
         return redirect()->back()->with('success', 'Оборудование возвращено на склад');
     }
+
     public function assignToUser(Request $request)
     {
         $equipment = Equipment::findOrFail($request->equipment_id);

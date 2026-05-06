@@ -343,7 +343,7 @@
                             </div>
                         </div>
 
-                        <!-- СТАТУС И ТИП ЛОКАЦИИ -->
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
@@ -377,7 +377,7 @@
                             </div>
                         </div>
 
-                        <!-- СОТРУДНИК И ВЫБОР ЛОКАЦИИ -->
+
                         <div class="row justify-content-end">
                             <div class="col-md-6 mb-3 user-field" id="userField" style="display: none;">
                                 <label class="form-label" id="userLabel">Сотрудник <span
@@ -455,7 +455,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <form action="{{ route('admin.equipment.update', $equipment->id) }}" method="POST"
-                          class="edit-equipment-form">
+                          class="edit-equipment-form" data-equipment-id="{{ $equipment->id }}">
                         @csrf @method('PUT')
                         <div class="modal-body">
                             <div class="row">
@@ -472,9 +472,9 @@
                                         <label class="form-label mb-0">Категория <span
                                                 class="text-danger">*</span></label>
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal"
+                                           class="add-category-from-edit"
                                            style="font-size: 12px; color: var(--accent); text-decoration: none;">+
-                                            Добавить
-                                            новую</a>
+                                            Добавить новую</a>
                                     </div>
                                     <select name="category_id"
                                             class="form-control-custom custom-dark-select @error('category_id') is-invalid @enderror">
@@ -490,6 +490,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Производитель</label>
@@ -502,6 +503,7 @@
                                            value="{{ old('model', $equipment->model) }}">
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Серийный номер</label>
@@ -514,6 +516,7 @@
                                            value="{{ old('inventory_number', $equipment->inventory_number) }}">
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Дата покупки</label>
@@ -533,10 +536,14 @@
                                            value="{{ old('warranty_date', $equipment->warranty_date?->format('Y-m-d')) }}">
                                 </div>
                             </div>
+
+                            <!-- СТАТУС И ТИП ЛОКАЦИИ -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Статус <span class="text-danger">*</span></label>
-                                    <select name="status" class="form-control-custom custom-dark-select">
+                                    <select name="status"
+                                            class="form-control-custom custom-dark-select edit-status-select"
+                                            data-id="{{ $equipment->id }}">
                                         @foreach(\App\Http\Enums\StatusEquipment::cases() as $status)
                                             @if($status->value !== 'written')
                                                 <option
@@ -547,22 +554,30 @@
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Тип локации <span class="text-danger">*</span></label>
-                                    <select id="editLocationTypeSelect" class="form-control-custom custom-dark-select">
-                                        <option value="">Все типы</option>
+                                    <select id="editLocationTypeSelect{{ $equipment->id }}"
+                                            class="form-control-custom custom-dark-select edit-type-select"
+                                            data-id="{{ $equipment->id }}">
+                                        <option value="">Выберите тип</option>
                                         @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
-                                            <option value="{{ $type->value }}">
+                                            <option value="{{ $type->value }}" data-type-value="{{ $type->value }}"
+                                                {{ $type->value === $equipment->location->type ? 'selected' : '' }}>
                                                 {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    <div class="invalid-feedback edit-type-error"
+                                         id="editTypeError{{ $equipment->id }}"></div>
                                 </div>
                             </div>
 
+                            <!-- СОТРУДНИК И ВЫБОР ЛОКАЦИИ -->
                             <div class="row justify-content-end">
-                                <div class="col-md-6 mb-3 user-field" id="editUserField">
-                                    <label class="form-label" id="editUserLabel">Сотрудник</label>
+                                <div class="col-md-6 mb-3 edit-user-field" id="editUserField{{ $equipment->id }}"
+                                     style="display: {{ $equipment->status === 'in_use' ? 'block' : 'none' }};">
+                                    <label class="form-label edit-user-label" id="editUserLabel{{ $equipment->id }}">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
                                     <select name="current_user_id" class="form-control-custom custom-dark-select">
                                         <option value="">Не назначен</option>
                                         @foreach($users as $user)
@@ -578,15 +593,16 @@
                                     <div class="d-flex justify-content-between align-items-end mb-2">
                                         <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
+                                           class="add-location-from-edit"
                                            style="font-size: 12px; color: var(--accent); text-decoration: none;">+
                                             Добавить новую</a>
                                     </div>
-                                    <select name="location_id" id="editLocationSelect"
-                                            class="form-control-custom custom-dark-select">
+                                    <select name="location_id" id="editLocationSelect{{ $equipment->id }}"
+                                            class="form-control-custom custom-dark-select edit-location-select"
+                                            data-id="{{ $equipment->id }}">
                                         <option value="">Выберите локацию</option>
                                         @foreach($locations as $location)
-                                            <option value="{{ $location->id }}"
-                                                    data-type="{{ $location->type }}"
+                                            <option value="{{ $location->id }}" data-type="{{ $location->type }}"
                                                 {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
                                                 {{ $location->name }}
                                                 ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
@@ -596,6 +612,7 @@
                                     </select>
                                 </div>
                             </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Примечание</label>
                                 <textarea name="notes" class="form-control-custom"
@@ -718,7 +735,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Адрес</label>
-                            <textarea name="address" class="form-control-custom" rows="2" placeholder="Физический адрес (необязательно)"></textarea>
+                            <textarea name="address" class="form-control-custom" rows="2"
+                                      placeholder="Физический адрес (необязательно)"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer border-0 pt-0">
@@ -750,7 +768,10 @@
             });
         };
 
-        // ПРОСТАЯ ФУНКЦИЯ ДЛЯ ЗАВИСИМОСТИ ОТ СТАТУСА
+
+        const allLocationsData = @json($locationsForJs);
+
+
         const initEquipmentFormDependency = () => {
             const statusSelect = document.getElementById('equipmentStatus');
             const typeSelect = document.getElementById('locationTypeSelect');
@@ -760,11 +781,50 @@
 
             if (!statusSelect) return;
 
+            const allLocations = allLocationsData.map(loc => ({
+                value: loc.id,
+                text: loc.name + ' (' + loc.typeLabel + ')',
+                type: loc.type
+            }));
+
+            const filterLocations = () => {
+                const selectedType = typeSelect.value;
+                locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+                if (!selectedType) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Сначала выберите тип локации';
+                    option.disabled = true;
+                    locationSelect.appendChild(option);
+                    return;
+                }
+
+                let hasOptions = false;
+                allLocations.forEach(loc => {
+                    if (loc.type === selectedType) {
+                        const option = document.createElement('option');
+                        option.value = loc.value;
+                        option.textContent = loc.text;
+                        option.dataset.type = loc.type;
+                        locationSelect.appendChild(option);
+                        hasOptions = true;
+                    }
+                });
+
+                if (!hasOptions) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Нет доступных локаций';
+                    option.disabled = true;
+                    locationSelect.appendChild(option);
+                }
+            };
+
             const updateForm = () => {
                 const status = statusSelect.value;
-                console.log('Статус изменён:', status);
 
-                // 1. Поле сотрудника — только для статуса "in_use"
+
                 if (status === 'in_use') {
                     userField.style.display = 'block';
                     if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
@@ -775,7 +835,6 @@
                     if (userSelect) userSelect.value = '';
                 }
 
-                // 2. Если статус не выбран — блокируем всё
                 if (status === '') {
                     typeSelect.disabled = true;
                     locationSelect.disabled = true;
@@ -784,11 +843,9 @@
                     return;
                 }
 
-                // 3. Разблокируем поля
                 typeSelect.disabled = false;
                 locationSelect.disabled = false;
 
-                // 4. Определяем разрешённые типы и значение по умолчанию
                 let allowedTypes = [];
                 let defaultType = '';
 
@@ -804,15 +861,10 @@
                     allowedTypes = ['office', 'remote'];
                     defaultType = '';
                     typeSelect.disabled = false;
-                } else {
-                    allowedTypes = [];
-                    defaultType = '';
-                    typeSelect.disabled = false;
                 }
 
-                // Заполняем select типов локаций
-                typeSelect.innerHTML = '<option value="">Выберите тип</option>';
 
+                typeSelect.innerHTML = '<option value="">Выберите тип</option>';
                 @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
                 if (allowedTypes.length === 0 || allowedTypes.includes('{{ $type->value }}')) {
                     const option = document.createElement('option');
@@ -822,56 +874,128 @@
                 }
                 @endforeach
 
-                // Устанавливаем значение по умолчанию и ВАЖНО: вызываем фильтрацию локаций
                 if (defaultType) {
                     typeSelect.value = defaultType;
-                    // 👇 ЭТА СТРОКА КЛЮЧЕВАЯ — вызывает фильтрацию локаций
-                    filterLocations();
-                } else {
-                    // Если тип не выбран по умолчанию — показываем заглушку
-                    locationSelect.innerHTML = '<option value="">Сначала выберите тип</option>';
                 }
-            };
-
-            // Фильтрация локаций при выборе типа
-            const filterLocations = () => {
-                const selectedType = typeSelect.value;
-                console.log('Фильтрация локаций, выбран тип:', selectedType);
-
-                locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
-
-                if (!selectedType) {
-                    const option = document.createElement('option');
-                    option.value = '';
-                    option.textContent = 'Сначала выберите тип';
-                    option.disabled = true;
-                    locationSelect.appendChild(option);
-                    return;
-                }
-
-                @foreach($locations as $location)
-                if ('{{ $location->type }}' === selectedType) {
-                    const option = document.createElement('option');
-                    option.value = '{{ $location->id }}';
-                    option.textContent = '{{ $location->name }} ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})';
-                    option.dataset.type = '{{ $location->type }}';
-                    locationSelect.appendChild(option);
-                }
-                @endforeach
-
-                if (locationSelect.options.length === 1) {
-                    const option = document.createElement('option');
-                    option.value = '';
-                    option.textContent = 'Нет доступных локаций';
-                    option.disabled = true;
-                    locationSelect.appendChild(option);
-                }
+                filterLocations();
             };
 
             statusSelect.addEventListener('change', updateForm);
             typeSelect.addEventListener('change', filterLocations);
-
             updateForm();
+        };
+
+
+        const initEditFormsDependency = () => {
+            document.querySelectorAll('.edit-equipment-form').forEach(form => {
+                const statusSelect = form.querySelector('.edit-status-select');
+                const typeSelect = form.querySelector('.edit-type-select');
+                const locationSelect = form.querySelector('.edit-location-select');
+                const userField = form.querySelector('.edit-user-field');
+                const userLabel = form.querySelector('.edit-user-label');
+
+                if (!statusSelect || !typeSelect || !locationSelect) return;
+
+                const allLocations = allLocationsData.map(loc => ({
+                    value: loc.id,
+                    text: loc.name + ' (' + loc.typeLabel + ')',
+                    type: loc.type
+                }));
+
+                const filterLocations = () => {
+                    const selectedType = typeSelect.value;
+                    locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+                    if (!selectedType) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Сначала выберите тип локации';
+                        option.disabled = true;
+                        locationSelect.appendChild(option);
+                        return;
+                    }
+
+                    let hasOptions = false;
+                    allLocations.forEach(loc => {
+                        if (loc.type === selectedType) {
+                            const option = document.createElement('option');
+                            option.value = loc.value;
+                            option.textContent = loc.text;
+                            option.dataset.type = loc.type;
+                            locationSelect.appendChild(option);
+                            hasOptions = true;
+                        }
+                    });
+
+                    if (!hasOptions) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Нет доступных локаций';
+                        option.disabled = true;
+                        locationSelect.appendChild(option);
+                    }
+                };
+
+
+                const currentLocationId = locationSelect.value;
+
+                const updateForm = () => {
+                    const status = statusSelect.value;
+
+                    if (status === 'in_use') {
+                        if (userField) userField.style.display = 'block';
+                        if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
+                    } else {
+                        if (userField) userField.style.display = 'none';
+                        if (userLabel) userLabel.innerHTML = 'Сотрудник';
+                        const userSelect = userField?.querySelector('select');
+                        if (userSelect && status !== 'in_use') userSelect.value = '';
+                    }
+
+                    let allowedTypes = [];
+
+                    if (status === 'in_stock') {
+                        allowedTypes = ['warehouse'];
+                        typeSelect.disabled = true;
+                        typeSelect.value = 'warehouse';
+                    } else if (status === 'repair') {
+                        allowedTypes = ['service'];
+                        typeSelect.disabled = true;
+                        typeSelect.value = 'service';
+                    } else if (status === 'in_use') {
+                        allowedTypes = ['office', 'remote'];
+                        typeSelect.disabled = false;
+                        const currentType = typeSelect.value;
+                        if (currentType && !allowedTypes.includes(currentType)) {
+                            typeSelect.value = '';
+                        }
+                    } else {
+                        typeSelect.disabled = false;
+                    }
+
+
+                    Array.from(typeSelect.options).forEach(opt => {
+                        if (opt.value === '') return;
+                        if (allowedTypes.length === 0 || allowedTypes.includes(opt.value)) {
+                            opt.style.display = '';
+                        } else {
+                            opt.style.display = 'none';
+                        }
+                    });
+
+                    filterLocations();
+
+
+                    if (currentLocationId) {
+                        const option = locationSelect.querySelector(`option[value="${currentLocationId}"]`);
+                        if (option) option.selected = true;
+                    }
+                };
+
+                statusSelect.addEventListener('change', updateForm);
+                typeSelect.addEventListener('change', filterLocations);
+                updateForm();
+            });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -886,8 +1010,8 @@
             initCustomSelects();
             initLiveSearch();
             initEquipmentFormDependency();
+            initEditFormsDependency();
 
-            // Обработка формы добавления оборудования
             const equipmentForm = document.querySelector('#addEquipmentModal form');
             if (equipmentForm) {
                 equipmentForm.addEventListener('submit', (e) => {
@@ -896,7 +1020,6 @@
                 });
             }
 
-            // Обработка формы добавления категории
             const categoryForm = document.querySelector('#addCategoryModal form');
             if (categoryForm) {
                 categoryForm.addEventListener('submit', (e) => {
@@ -905,14 +1028,11 @@
                 });
             }
 
-            // Обработка формы добавления локации — ПРОСТАЯ, БЕЗ ЛИШНЕЙ ЛОГИКИ
             const locationForm = document.getElementById('addLocationForm');
             if (locationForm) {
                 locationForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-
                     const formData = new FormData(locationForm);
-
                     fetch(locationForm.action, {
                         method: 'POST',
                         body: formData,
@@ -924,11 +1044,8 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Закрываем модалку
                                 const modal = bootstrap.Modal.getInstance(document.getElementById('addLocationModal'));
                                 if (modal) modal.hide();
-
-                                // Добавляем новую локацию в select
                                 const locationSelect = document.getElementById('locationSelect');
                                 if (locationSelect && data.item) {
                                     const option = document.createElement('option');
@@ -937,10 +1054,7 @@
                                     option.dataset.type = data.item.type;
                                     locationSelect.appendChild(option);
                                 }
-
                                 window.showToast(data.message || 'Локация добавлена', 'success');
-
-                                // Очищаем форму
                                 locationForm.reset();
                             } else if (data.errors) {
                                 window.showFormErrors(locationForm, data.errors);
@@ -956,10 +1070,16 @@
             }
         });
 
-        // Обработка форм редактирования и удаления
         document.querySelectorAll('.edit-equipment-form').forEach(form => {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
+                const typeSelect = form.querySelector('.edit-type-select');
+                if (!typeSelect.value) {
+                    typeSelect.classList.add('is-invalid');
+                    typeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+                typeSelect.classList.remove('is-invalid');
                 submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
             });
         });

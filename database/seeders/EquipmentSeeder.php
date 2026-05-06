@@ -148,7 +148,17 @@ class EquipmentSeeder extends Seeder
         foreach ($equipments as $index => $equipment) {
 
             $userId = ($equipment['status'] === 'in_use') ? $users[$index % count($users)]->id : null;
-            $locationId = $locations[$index % count($locations)]->id;
+            $locationId = match($equipment['status']) {
+                'in_stock' => Location::where('type', 'warehouse')->inRandomOrder()->first()?->id,
+                'in_use' => Location::whereIn('type', ['office', 'remote'])->inRandomOrder()->first()?->id,
+                'repair' => Location::where('type', 'service')->inRandomOrder()->first()?->id,
+                'written' => Location::where('type', 'warehouse')->inRandomOrder()->first()?->id,
+                default => $locations[$index % count($locations)]->id,
+            };
+            if (!$locationId) {
+                $locationId = $locations[$index % count($locations)]->id;
+            }
+
             $categoryId = $categories[$index % count($categories)]->id;
 
             Equipment::create([

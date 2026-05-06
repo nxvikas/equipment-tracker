@@ -180,7 +180,17 @@ class AdminController extends Controller
         $locations = Location::all();
         $users = User::where('status', 'active')->orderBy('name')->get();
 
-        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users'));
+        $locationsForJs = $locations->map(function($loc) {
+            return [
+                'id' => $loc->id,
+                'name' => $loc->name,
+                'type' => $loc->type,
+                'typeLabel' => \App\Http\Enums\TypeLocation::ruValues()[$loc->type] ?? $loc->type
+            ];
+        });
+
+
+        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users','locationsForJs'));
     }
 
     public function history(Request $request)

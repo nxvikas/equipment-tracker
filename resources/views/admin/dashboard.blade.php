@@ -108,7 +108,19 @@
                     <span class="chart-badge">текущее распределение</span>
                 </div>
                 <div class="chart-body">
-                    <canvas id="statusChart"></canvas>
+                    @php
+                        $hasChartData = collect($chartData)->sum('count') > 0;
+                    @endphp
+
+                    @if($hasChartData)
+                        <canvas id="statusChart"></canvas>
+                    @else
+                        <div class="empty-chart-state">
+                            <i class="bi bi-pie-chart" style="font-size: 48px; opacity: 0.5;"></i>
+                            <p class="mt-2 text-secondary">Нет данных для отображения</p>
+                            <small class="text-secondary">Добавьте оборудование в систему</small>
+                        </div>
+                    @endif
                 </div>
                 <div class="chart-legend">
                     @foreach($chartData as $item)

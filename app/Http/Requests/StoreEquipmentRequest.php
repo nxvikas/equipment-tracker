@@ -34,6 +34,7 @@ class StoreEquipmentRequest extends FormRequest
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
+
     public function withValidator($validator)
     {
         $validator->sometimes('current_user_id', 'required', function ($input) {

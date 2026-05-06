@@ -428,46 +428,41 @@
                                        value="{{ old('warranty_date', $equipment->warranty_date?->format('Y-m-d')) }}">
                             </div>
                         </div>
+
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
-                                <select name="status" class="form-control-custom custom-dark-select">
-                                    <option
-                                        value="in_stock" {{ old('status', $equipment->status) == 'in_stock' ? 'selected' : '' }}>
-                                        На складе
-                                    </option>
-                                    <option
-                                        value="in_use" {{ old('status', $equipment->status) == 'in_use' ? 'selected' : '' }}>
-                                        В работе
-                                    </option>
-                                    <option
-                                        value="repair" {{ old('status', $equipment->status) == 'repair' ? 'selected' : '' }}>
-                                        В ремонте
-                                    </option>
+                                <select name="status" id="editEquipmentStatus" class="form-control-custom custom-dark-select">
+                                    <option value="in_stock" {{ old('status', $equipment->status) == 'in_stock' ? 'selected' : '' }}>На складе</option>
+                                    <option value="in_use" {{ old('status', $equipment->status) == 'in_use' ? 'selected' : '' }}>В работе</option>
+                                    <option value="repair" {{ old('status', $equipment->status) == 'repair' ? 'selected' : '' }}>В ремонте</option>
                                 </select>
                             </div>
+
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Тип локации <span class="text-danger">*</span></label>
                                 <select id="editLocationTypeSelect" class="form-control-custom custom-dark-select">
-                                    <option value="">Все типы</option>
+                                    <option value="">Выберите тип</option>
                                     @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
-                                        <option value="{{ $type->value }}">
+                                        <option value="{{ $type->value }}" data-type-value="{{ $type->value }}"
+                                            {{ $type->value === $equipment->location->type ? 'selected' : '' }}>
                                             {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
                                         </option>
                                     @endforeach
                                 </select>
+                                <div class="invalid-feedback" id="editLocationTypeError"></div>
                             </div>
                         </div>
 
+
                         <div class="row justify-content-end">
-                            <div class="col-md-6 mb-3 user-field" style="display: none;">
-                                <label class="form-label" id="editUserLabel">Сотрудник <span
-                                        class="text-danger">*</span></label>
+                            <div class="col-md-6 mb-3 user-field" id="editUserField" style="display: {{ $equipment->status === 'in_use' ? 'block' : 'none' }};">
+                                <label class="form-label" id="editUserLabel">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
                                 <select name="current_user_id" class="form-control-custom custom-dark-select">
-                                    <option value="">Выберите сотрудника</option>
+                                    <option value="">Не назначен</option>
                                     @foreach($users as $user)
-                                        <option
-                                            value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
+                                        <option value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
                                             {{ $user->name }} ({{ $user->email }})
                                         </option>
                                     @endforeach
@@ -476,27 +471,22 @@
 
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Выбор локации <span
-                                            class="text-danger">*</span></label>
+                                    <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
-                                        новую</a>
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
                                 </div>
-                                <select name="location_id" id="editLocationSelect"
-                                        class="form-control-custom custom-dark-select">
+                                <select name="location_id" id="editLocationSelect" class="form-control-custom custom-dark-select">
                                     <option value="">Выберите локацию</option>
                                     @foreach($locations as $location)
-                                        <option value="{{ $location->id }}"
-                                                data-type="{{ $location->type }}"
+                                        <option value="{{ $location->id }}" data-type="{{ $location->type }}"
                                             {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
-                                            {{ $location->name }}
-                                            ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
-                                            )
+                                            {{ $location->name }} ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label">Примечание</label>
                             <textarea name="notes" class="form-control-custom"
@@ -824,71 +814,132 @@
 @push('scripts')
     <script>
 
+        const allLocationsData = @json($locationsForJs);
 
-        const initEditUserFieldToggle = () => {
-            const statusSelect = document.querySelector('#editEquipmentModal select[name="status"]');
-            const userField = document.querySelector('#editEquipmentModal .user-field');
-
-            if (!statusSelect || !userField) return;
-
-            const toggle = () => {
-                const isInUse = statusSelect.value === 'in_use';
-                userField.style.display = isInUse ? 'block' : 'none';
-                if (!isInUse) {
-                    const select = userField.querySelector('select');
-                    if (select) select.value = '';
-                }
-
-                const label = userField.querySelector('.form-label');
-                if (label) {
-                    label.innerHTML = isInUse ? 'Сотрудник <span class="text-danger">*</span>' : 'Сотрудник';
-                }
-            };
-
-            statusSelect.addEventListener('change', toggle);
-            toggle();
-        };
-        const initEditLocationFilter = () => {
+        const initEditEquipmentDependency = () => {
+            const statusSelect = document.getElementById('editEquipmentStatus');
             const typeSelect = document.getElementById('editLocationTypeSelect');
             const locationSelect = document.getElementById('editLocationSelect');
+            const userField = document.getElementById('editUserField');
+            const userLabel = document.getElementById('editUserLabel');
 
-            if (!typeSelect || !locationSelect) return;
+            if (!statusSelect) return;
 
-            const allOptions = Array.from(locationSelect.options);
 
-            typeSelect.addEventListener('change', () => {
+            const allLocations = allLocationsData.map(loc => ({
+                value: loc.id,
+                text: loc.name + ' (' + loc.typeLabel + ')',
+                type: loc.type
+            }));
+
+
+            const currentLocationId = locationSelect.value;
+
+            const filterLocations = () => {
                 const selectedType = typeSelect.value;
                 locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
 
-                allOptions.forEach(option => {
-                    if (option.value === '') return;
-                    const optionType = option.dataset.type;
-                    if (!selectedType || optionType === selectedType) {
-                        locationSelect.appendChild(option.cloneNode(true));
+                if (!selectedType) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Сначала выберите тип локации';
+                    option.disabled = true;
+                    locationSelect.appendChild(option);
+                    return;
+                }
+
+                let hasOptions = false;
+                allLocations.forEach(loc => {
+                    if (loc.type === selectedType) {
+                        const option = document.createElement('option');
+                        option.value = loc.value;
+                        option.textContent = loc.text;
+                        option.dataset.type = loc.type;
+                        locationSelect.appendChild(option);
+                        hasOptions = true;
                     }
                 });
 
-                const savedValue = locationSelect.dataset.savedValue;
-                if (savedValue) {
-                    const optionToSelect = locationSelect.querySelector(`option[value="${savedValue}"]`);
-                    if (optionToSelect) optionToSelect.selected = true;
+                if (!hasOptions) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Нет доступных локаций для выбранного типа';
+                    option.disabled = true;
+                    locationSelect.appendChild(option);
                 }
-            });
 
-            locationSelect.addEventListener('change', () => {
-                locationSelect.dataset.savedValue = locationSelect.value;
-            });
 
-            const selectedOption = Array.from(allOptions).find(opt => opt.selected && opt.value !== '');
-            if (selectedOption) {
-                const optionType = selectedOption.dataset.type;
-                if (optionType) {
-                    typeSelect.value = optionType;
-                    typeSelect.dispatchEvent(new Event('change'));
+                if (currentLocationId && currentLocationId !== '') {
+                    const optionToSelect = locationSelect.querySelector(`option[value="${currentLocationId}"]`);
+                    if (optionToSelect) {
+                        optionToSelect.selected = true;
+                    }
                 }
-            }
+            };
+
+            const updateForm = () => {
+                const status = statusSelect.value;
+                console.log('Редактирование: статус изменён на:', status);
+
+
+                if (status === 'in_use') {
+                    userField.style.display = 'block';
+                    if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
+                } else {
+                    userField.style.display = 'none';
+                    if (userLabel) userLabel.innerHTML = 'Сотрудник';
+                    const userSelect = userField.querySelector('select');
+                    if (userSelect && status !== 'in_use') userSelect.value = '';
+                }
+
+                if (status === '') {
+                    typeSelect.disabled = true;
+                    locationSelect.disabled = true;
+                    return;
+                }
+
+                typeSelect.disabled = false;
+                locationSelect.disabled = false;
+
+                let allowedTypes = [];
+
+                if (status === 'in_stock') {
+                    allowedTypes = ['warehouse'];
+                    typeSelect.disabled = true;
+                    typeSelect.value = 'warehouse';
+                } else if (status === 'repair') {
+                    allowedTypes = ['service'];
+                    typeSelect.disabled = true;
+                    typeSelect.value = 'service';
+                } else if (status === 'in_use') {
+                    allowedTypes = ['office', 'remote'];
+                    typeSelect.disabled = false;
+                    const currentType = typeSelect.value;
+                    if (currentType && !allowedTypes.includes(currentType)) {
+                        typeSelect.value = '';
+                    }
+                }
+
+
+                Array.from(typeSelect.options).forEach(opt => {
+                    if (opt.value === '') {
+                        opt.style.display = '';
+                        return;
+                    }
+                    if (allowedTypes.length === 0 || allowedTypes.includes(opt.value)) {
+                        opt.style.display = '';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                });
+
+                filterLocations();
+            };
+
+            statusSelect.addEventListener('change', updateForm);
+            typeSelect.addEventListener('change', filterLocations);
+            updateForm();
         };
-
 
         document.addEventListener('DOMContentLoaded', () => {
             @if(session('edit_modal_open') || ($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal')))
@@ -903,18 +954,39 @@
             new bootstrap.Modal(document.getElementById('addLocationModal')).show();
             @endif
 
-            initEditUserFieldToggle();
-            initEditLocationFilter();
-
+            initCustomSelects();
+            initEditEquipmentDependency();
 
             const editForm = document.querySelector('#editEquipmentModal form');
             if (editForm) {
                 editForm.addEventListener('submit', (e) => {
                     e.preventDefault();
+
+                    const typeSelect = document.getElementById('editLocationTypeSelect');
+                    const typeError = document.getElementById('editLocationTypeError');
+
+                    if (!typeSelect.value) {
+                        typeSelect.classList.add('is-invalid');
+                        if (!typeError) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.id = 'editLocationTypeError';
+                            errorDiv.className = 'invalid-feedback';
+                            errorDiv.textContent = 'Пожалуйста, выберите тип локации';
+                            typeSelect.parentNode.appendChild(errorDiv);
+                        } else {
+                            typeError.style.display = 'block';
+                            typeError.textContent = 'Пожалуйста, выберите тип локации';
+                        }
+                        typeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    } else {
+                        typeSelect.classList.remove('is-invalid');
+                        if (typeError) typeError.style.display = 'none';
+                    }
+
                     submitAjaxForm(editForm, 'editEquipmentModal', {reloadOnSuccess: true});
                 });
             }
-
 
             const categoryForm = document.querySelector('#addCategoryModal form');
             if (categoryForm) {
@@ -927,7 +999,6 @@
                 });
             }
 
-
             const locationForm = document.querySelector('#addLocationModal form');
             if (locationForm) {
                 locationForm.addEventListener('submit', (e) => {
@@ -939,7 +1010,6 @@
                 });
             }
 
-
             const assignForm = document.querySelector('#assignModal form');
             if (assignForm) {
                 assignForm.addEventListener('submit', (e) => {
@@ -947,7 +1017,6 @@
                     submitAjaxForm(assignForm, 'assignModal', {reloadOnSuccess: true});
                 });
             }
-
 
             const repairForm = document.querySelector('#repairModal form');
             if (repairForm) {
@@ -957,7 +1026,6 @@
                 });
             }
 
-
             const writeOffForm = document.querySelector('#writeOffModal form');
             if (writeOffForm) {
                 writeOffForm.addEventListener('submit', (e) => {
@@ -965,7 +1033,6 @@
                     submitAjaxForm(writeOffForm, 'writeOffModal', {reloadOnSuccess: true});
                 });
             }
-
 
             const returnFromRepairForm = document.querySelector('#returnFromRepairModal form');
             if (returnFromRepairForm) {

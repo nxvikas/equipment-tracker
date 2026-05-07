@@ -642,10 +642,33 @@
                         </div>
                         <div class="modal-body">
                             <p>Вы уверены, что хотите удалить оборудование?</p>
-                            <p class="text-secondary">
-                                <strong>{{ $equipment->name }}</strong><br>
-                                {{ $equipment->inventory_number }}
-                            </p>
+                            <div class="delete-equipment-info">
+                                <div class="info-row">
+                                    <span class="info-label">Название:</span>
+                                    <span class="info-value">{{ $equipment->name }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Инв. номер:</span>
+                                    <span class="info-value">{{ $equipment->inventory_number }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Категория:</span>
+                                    <span class="info-value">{{ $equipment->category->name ?? '—' }}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Статус:</span>
+                                    <span class="info-value">
+                                @php
+                                    $statusText = match($equipment->status) {
+                                        'in_stock' => 'На складе',
+                                        'written' => 'Списан',
+                                        default => $equipment->status
+                                    };
+                                @endphp
+                                        {{ $statusText }}
+                            </span>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>

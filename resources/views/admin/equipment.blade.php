@@ -1067,6 +1067,7 @@
                             newTypeValue = '';
                         }
                     } else {
+
                         allowedTypes = [];
                         shouldDisableTypeSelect = false;
                     }

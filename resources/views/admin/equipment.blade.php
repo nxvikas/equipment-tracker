@@ -769,8 +769,103 @@
         };
 
 
-        const allLocationsData = @json($locationsForJs);
+        let globalLocationsData = @json($locationsForJs);
+        let globalCategoriesData = @json($categoriesForJs);
 
+
+        const refreshAllEditCategorySelects = () => {
+            document.querySelectorAll('.edit-equipment-form select[name="category_id"]').forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Выберите категорию</option>';
+
+                globalCategoriesData.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+
+                if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+                    select.value = currentValue;
+                }
+            });
+        };
+
+
+        const refreshAllEditLocationSelects = () => {
+            document.querySelectorAll('.edit-equipment-form').forEach(form => {
+                const typeSelect = form.querySelector('.edit-type-select');
+                const locationSelect = form.querySelector('.edit-location-select');
+
+                if (!typeSelect || !locationSelect) return;
+
+                const currentTypeValue = typeSelect.value;
+                const currentLocationValue = locationSelect.value;
+
+                locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+                if (!currentTypeValue) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Сначала выберите тип локации';
+                    option.disabled = true;
+                    locationSelect.appendChild(option);
+                    return;
+                }
+
+                globalLocationsData.forEach(loc => {
+                    if (loc.type === currentTypeValue) {
+                        const option = document.createElement('option');
+                        option.value = loc.id;
+                        option.textContent = loc.name + ' (' + loc.typeLabel + ')';
+                        option.dataset.type = loc.type;
+                        locationSelect.appendChild(option);
+                    }
+                });
+
+                if (currentLocationValue && locationSelect.querySelector(`option[value="${currentLocationValue}"]`)) {
+                    locationSelect.value = currentLocationValue;
+                }
+            });
+        };
+
+
+        const refreshAddCategorySelect = () => {
+            const categorySelect = document.querySelector('#addEquipmentModal select[name="category_id"]');
+            if (!categorySelect) return;
+            const currentValue = categorySelect.value;
+            categorySelect.innerHTML = '<option value="">Выберите категорию</option>';
+
+            globalCategoriesData.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                categorySelect.appendChild(option);
+            });
+
+            if (currentValue && categorySelect.querySelector(`option[value="${currentValue}"]`)) {
+                categorySelect.value = currentValue;
+            }
+        };
+
+        const refreshAddLocationSelect = () => {
+            const locationSelect = document.getElementById('locationSelect');
+            if (!locationSelect) return;
+            const currentValue = locationSelect.value;
+            locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
+
+            globalLocationsData.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc.id;
+                option.textContent = loc.name + ' (' + loc.typeLabel + ')';
+                option.dataset.type = loc.type;
+                locationSelect.appendChild(option);
+            });
+
+            if (currentValue && locationSelect.querySelector(`option[value="${currentValue}"]`)) {
+                locationSelect.value = currentValue;
+            }
+        };
 
         const initEquipmentFormDependency = () => {
             const statusSelect = document.getElementById('equipmentStatus');
@@ -781,7 +876,7 @@
 
             if (!statusSelect) return;
 
-            const allLocations = allLocationsData.map(loc => ({
+            const allLocations = globalLocationsData.map(loc => ({
                 value: loc.id,
                 text: loc.name + ' (' + loc.typeLabel + ')',
                 type: loc.type
@@ -824,7 +919,6 @@
             const updateForm = () => {
                 const status = statusSelect.value;
 
-
                 if (status === 'in_use') {
                     userField.style.display = 'block';
                     if (userLabel) userLabel.innerHTML = 'Сотрудник <span class="text-danger">*</span>';
@@ -863,7 +957,6 @@
                     typeSelect.disabled = false;
                 }
 
-
                 typeSelect.innerHTML = '<option value="">Выберите тип</option>';
                 @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
                 if (allowedTypes.length === 0 || allowedTypes.includes('{{ $type->value }}')) {
@@ -885,7 +978,6 @@
             updateForm();
         };
 
-
         const initEditFormsDependency = () => {
             document.querySelectorAll('.edit-equipment-form').forEach(form => {
                 const statusSelect = form.querySelector('.edit-status-select');
@@ -896,14 +988,22 @@
 
                 if (!statusSelect || !typeSelect || !locationSelect) return;
 
-                const allLocations = allLocationsData.map(loc => ({
-                    value: loc.id,
-                    text: loc.name + ' (' + loc.typeLabel + ')',
-                    type: loc.type
-                }));
+
+                const getCurrentLocations = () => {
+                    return globalLocationsData.map(loc => ({
+                        value: loc.id,
+                        text: loc.name + ' (' + loc.typeLabel + ')',
+                        type: loc.type
+                    }));
+                };
 
                 const filterLocations = () => {
                     const selectedType = typeSelect.value;
+                    const currentValue = locationSelect.value;
+
+
+                    const allLocations = getCurrentLocations();
+
                     locationSelect.innerHTML = '<option value="">Выберите локацию</option>';
 
                     if (!selectedType) {
@@ -915,7 +1015,6 @@
                         return;
                     }
 
-                    let hasOptions = false;
                     allLocations.forEach(loc => {
                         if (loc.type === selectedType) {
                             const option = document.createElement('option');
@@ -923,24 +1022,20 @@
                             option.textContent = loc.text;
                             option.dataset.type = loc.type;
                             locationSelect.appendChild(option);
-                            hasOptions = true;
                         }
                     });
 
-                    if (!hasOptions) {
-                        const option = document.createElement('option');
-                        option.value = '';
-                        option.textContent = 'Нет доступных локаций';
-                        option.disabled = true;
-                        locationSelect.appendChild(option);
+
+                    if (currentValue && locationSelect.querySelector(`option[value="${currentValue}"]`)) {
+                        locationSelect.value = currentValue;
+                    } else {
+                        locationSelect.value = '';
                     }
                 };
 
-
-                const currentLocationId = locationSelect.value;
-
                 const updateForm = () => {
                     const status = statusSelect.value;
+
 
                     if (status === 'in_use') {
                         if (userField) userField.style.display = 'block';
@@ -949,33 +1044,41 @@
                         if (userField) userField.style.display = 'none';
                         if (userLabel) userLabel.innerHTML = 'Сотрудник';
                         const userSelect = userField?.querySelector('select');
-                        if (userSelect && status !== 'in_use') userSelect.value = '';
+                        if (userSelect) userSelect.value = '';
                     }
 
                     let allowedTypes = [];
+                    let newTypeValue = typeSelect.value;
+                    let shouldDisableTypeSelect = false;
 
                     if (status === 'in_stock') {
                         allowedTypes = ['warehouse'];
-                        typeSelect.disabled = true;
-                        typeSelect.value = 'warehouse';
+                        newTypeValue = 'warehouse';
+                        shouldDisableTypeSelect = true;
                     } else if (status === 'repair') {
                         allowedTypes = ['service'];
-                        typeSelect.disabled = true;
-                        typeSelect.value = 'service';
+                        newTypeValue = 'service';
+                        shouldDisableTypeSelect = true;
                     } else if (status === 'in_use') {
                         allowedTypes = ['office', 'remote'];
-                        typeSelect.disabled = false;
-                        const currentType = typeSelect.value;
-                        if (currentType && !allowedTypes.includes(currentType)) {
-                            typeSelect.value = '';
+                        shouldDisableTypeSelect = false;
+
+                        if (typeSelect.value && !allowedTypes.includes(typeSelect.value)) {
+                            newTypeValue = '';
                         }
                     } else {
-                        typeSelect.disabled = false;
+                        allowedTypes = [];
+                        shouldDisableTypeSelect = false;
                     }
 
 
-                    Array.from(typeSelect.options).forEach(opt => {
-                        if (opt.value === '') return;
+                    typeSelect.disabled = shouldDisableTypeSelect;
+
+
+                    const allTypeOptions = Array.from(typeSelect.options).filter(opt => opt.value !== '');
+
+
+                    allTypeOptions.forEach(opt => {
                         if (allowedTypes.length === 0 || allowedTypes.includes(opt.value)) {
                             opt.style.display = '';
                         } else {
@@ -983,18 +1086,35 @@
                         }
                     });
 
-                    filterLocations();
+
+                    if (newTypeValue && typeSelect.querySelector(`option[value="${newTypeValue}"]`)) {
+                        typeSelect.value = newTypeValue;
+                    } else if (!newTypeValue) {
+                        typeSelect.value = '';
+                    }
 
 
-                    if (currentLocationId) {
-                        const option = locationSelect.querySelector(`option[value="${currentLocationId}"]`);
-                        if (option) option.selected = true;
+                    setTimeout(() => {
+                        filterLocations();
+                    }, 0);
+                };
+
+
+                const forceUpdateOnModalOpen = () => {
+                    const modal = form.closest('.modal');
+                    if (modal) {
+                        modal.addEventListener('shown.bs.modal', () => {
+                            updateForm();
+                        });
                     }
                 };
 
                 statusSelect.addEventListener('change', updateForm);
                 typeSelect.addEventListener('change', filterLocations);
+
+
                 updateForm();
+                forceUpdateOnModalOpen();
             });
         };
 
@@ -1020,13 +1140,54 @@
                 });
             }
 
+
             const categoryForm = document.querySelector('#addCategoryModal form');
             if (categoryForm) {
                 categoryForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    submitAjaxForm(categoryForm, 'addCategoryModal', {selectName: 'category_id'});
+
+                    const formData = new FormData(categoryForm);
+                    fetch(categoryForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+                                if (modal) modal.hide();
+
+                                globalCategoriesData.push({
+                                    id: data.item.id,
+                                    name: data.item.name
+                                });
+
+                                refreshAddCategorySelect();
+                                refreshAllEditCategorySelects();
+
+                                const categorySelect = document.querySelector('#addEquipmentModal select[name="category_id"]');
+                                if (categorySelect) {
+                                    categorySelect.value = data.item.id;
+                                }
+
+                                window.showToast(data.message || 'Категория добавлена', 'success');
+                                categoryForm.reset();
+                                categoryForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            } else if (data.errors) {
+                                window.showFormErrors(categoryForm, data.errors);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            window.showToast('Ошибка соединения с сервером', 'danger');
+                        });
                 });
             }
+
 
             const locationForm = document.getElementById('addLocationForm');
             if (locationForm) {
@@ -1046,20 +1207,39 @@
                             if (data.success) {
                                 const modal = bootstrap.Modal.getInstance(document.getElementById('addLocationModal'));
                                 if (modal) modal.hide();
-                                const locationSelect = document.getElementById('locationSelect');
-                                if (locationSelect && data.item) {
-                                    const option = document.createElement('option');
-                                    option.value = data.item.id;
-                                    option.textContent = data.item.name + ' (' + data.item.type + ')';
-                                    option.dataset.type = data.item.type;
-                                    locationSelect.appendChild(option);
+
+                                const typeLabelMap = {
+                                    'office': 'Офис',
+                                    'warehouse': 'Склад',
+                                    'service': 'Сервис',
+                                    'remote': 'Удаленно'
+                                };
+
+                                globalLocationsData.push({
+                                    id: data.item.id,
+                                    name: data.item.name,
+                                    type: data.item.type,
+                                    typeLabel: typeLabelMap[data.item.type] || data.item.type
+                                });
+
+                                refreshAddLocationSelect();
+                                refreshAllEditLocationSelects();
+
+                                const typeSelect = document.getElementById('locationTypeSelect');
+                                if (typeSelect) {
+                                    typeSelect.dispatchEvent(new Event('change'));
                                 }
+
+                                const locationSelect = document.getElementById('locationSelect');
+                                if (locationSelect) {
+                                    locationSelect.value = data.item.id;
+                                }
+
                                 window.showToast(data.message || 'Локация добавлена', 'success');
                                 locationForm.reset();
+                                locationForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
                             } else if (data.errors) {
                                 window.showFormErrors(locationForm, data.errors);
-                            } else if (data.message) {
-                                window.showToast(data.message, 'danger');
                             }
                         })
                         .catch(error => {
@@ -1073,13 +1253,6 @@
         document.querySelectorAll('.edit-equipment-form').forEach(form => {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const typeSelect = form.querySelector('.edit-type-select');
-                if (!typeSelect.value) {
-                    typeSelect.classList.add('is-invalid');
-                    typeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                typeSelect.classList.remove('is-invalid');
                 submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
             });
         });

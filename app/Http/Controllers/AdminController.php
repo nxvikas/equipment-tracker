@@ -180,6 +180,13 @@ class AdminController extends Controller
         $locations = Location::all();
         $users = User::where('status', 'active')->orderBy('name')->get();
 
+        $categoriesForJs = $categories->map(function($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name
+            ];
+        });
+
         $locationsForJs = $locations->map(function($loc) {
             return [
                 'id' => $loc->id,
@@ -190,7 +197,7 @@ class AdminController extends Controller
         });
 
 
-        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users','locationsForJs'));
+        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users','locationsForJs','categoriesForJs'));
     }
 
     public function history(Request $request)

@@ -323,10 +323,33 @@
                 </div>
                 <div class="modal-body">
                     <p>Вы уверены, что хотите удалить оборудование?</p>
-                    <p class="text-secondary">
-                        <strong>{{ $equipment->name }}</strong><br>
-                        {{ $equipment->inventory_number }}
-                    </p>
+                    <div class="delete-equipment-info">
+                        <div class="info-row">
+                            <span class="info-label">Название:</span>
+                            <span class="info-value">{{ $equipment->name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Инв. номер:</span>
+                            <span class="info-value">{{ $equipment->inventory_number }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Категория:</span>
+                            <span class="info-value">{{ $equipment->category->name ?? '—' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Статус:</span>
+                            <span class="info-value">
+                                @php
+                                    $statusText = match($equipment->status) {
+                                        'in_stock' => 'На складе',
+                                        'written' => 'Списан',
+                                        default => $equipment->status
+                                    };
+                                @endphp
+                                {{ $statusText }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
@@ -433,10 +456,20 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Статус <span class="text-danger">*</span></label>
-                                <select name="status" id="editEquipmentStatus" class="form-control-custom custom-dark-select">
-                                    <option value="in_stock" {{ old('status', $equipment->status) == 'in_stock' ? 'selected' : '' }}>На складе</option>
-                                    <option value="in_use" {{ old('status', $equipment->status) == 'in_use' ? 'selected' : '' }}>В работе</option>
-                                    <option value="repair" {{ old('status', $equipment->status) == 'repair' ? 'selected' : '' }}>В ремонте</option>
+                                <select name="status" id="editEquipmentStatus"
+                                        class="form-control-custom custom-dark-select">
+                                    <option
+                                        value="in_stock" {{ old('status', $equipment->status) == 'in_stock' ? 'selected' : '' }}>
+                                        На складе
+                                    </option>
+                                    <option
+                                        value="in_use" {{ old('status', $equipment->status) == 'in_use' ? 'selected' : '' }}>
+                                        В работе
+                                    </option>
+                                    <option
+                                        value="repair" {{ old('status', $equipment->status) == 'repair' ? 'selected' : '' }}>
+                                        В ремонте
+                                    </option>
                                 </select>
                             </div>
 
@@ -457,12 +490,15 @@
 
 
                         <div class="row justify-content-end">
-                            <div class="col-md-6 mb-3 user-field" id="editUserField" style="display: {{ $equipment->status === 'in_use' ? 'block' : 'none' }};">
-                                <label class="form-label" id="editUserLabel">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
+                            <div class="col-md-6 mb-3 user-field" id="editUserField"
+                                 style="display: {{ $equipment->status === 'in_use' ? 'block' : 'none' }};">
+                                <label class="form-label"
+                                       id="editUserLabel">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
                                 <select name="current_user_id" class="form-control-custom custom-dark-select">
                                     <option value="">Не назначен</option>
                                     @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ $user->id }}" {{ old('current_user_id', $equipment->current_user_id) == $user->id ? 'selected' : '' }}>
                                             {{ $user->name }} ({{ $user->email }})
                                         </option>
                                     @endforeach
@@ -471,16 +507,21 @@
 
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
+                                    <label class="form-label mb-0">Выбор локации <span
+                                            class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить новую</a>
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                        новую</a>
                                 </div>
-                                <select name="location_id" id="editLocationSelect" class="form-control-custom custom-dark-select">
+                                <select name="location_id" id="editLocationSelect"
+                                        class="form-control-custom custom-dark-select">
                                     <option value="">Выберите локацию</option>
                                     @foreach($locations as $location)
                                         <option value="{{ $location->id }}" data-type="{{ $location->type }}"
                                             {{ old('location_id', $equipment->location_id) == $location->id ? 'selected' : '' }}>
-                                            {{ $location->name }} ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
+                                            {{ $location->name }}
+                                            ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
+                                            )
                                         </option>
                                     @endforeach
                                 </select>
@@ -977,7 +1018,7 @@
                             typeError.style.display = 'block';
                             typeError.textContent = 'Пожалуйста, выберите тип локации';
                         }
-                        typeSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        typeSelect.scrollIntoView({behavior: 'smooth', block: 'center'});
                         return;
                     } else {
                         typeSelect.classList.remove('is-invalid');

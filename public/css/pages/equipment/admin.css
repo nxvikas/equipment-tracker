@@ -67,6 +67,41 @@
     color: var(--accent-hover) !important;
 }
 
+.delete-equipment-info {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.delete-equipment-info .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.delete-equipment-info .info-row:last-child {
+    border-bottom: none;
+}
+
+.delete-equipment-info .info-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.delete-equipment-info .info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+body.light .delete-equipment-info {
+    background: #f8fafc;
+}
 
 @media (max-width: 768px) {
     .custom-table th:nth-child(3),

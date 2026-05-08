@@ -126,7 +126,7 @@ class EmployeeController extends Controller
     }
     public function globalSearch(Request $request)
     {
-        $query = $request->get('q');
+        $query = $request->query('q');
 
         if (strlen($query) < 2) {
             return response()->json([]);

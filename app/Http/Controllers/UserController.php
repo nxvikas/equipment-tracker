@@ -21,10 +21,12 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $direction = $request->query('direction', 'desc');
+
         $query = User::with(['department', 'position', 'role'])
             ->where('id', '!=', auth()->id())
             ->orderByRaw("FIELD(status, 'pending', 'active', 'blocked', 'rejected')")
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at', $direction);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);

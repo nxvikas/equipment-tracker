@@ -269,12 +269,12 @@
     }
 
 
-    .custom-table th:nth-child(1),
-    .custom-table td:nth-child(1),
-    .custom-table th:nth-child(4),
-    .custom-table td:nth-child(4) {
-        display: none;
-    }
+    /*.custom-table th:nth-child(1),*/
+    /*.custom-table td:nth-child(1),*/
+    /*.custom-table th:nth-child(4),*/
+    /*.custom-table td:nth-child(4) {*/
+    /*    display: none;*/
+    /*}*/
 
 
     .equipment-card-body {
@@ -339,10 +339,10 @@
     }
 
 
-    .custom-table th:nth-child(6),
-    .custom-table td:nth-child(6) {
-        display: none;
-    }
+    /*.custom-table th:nth-child(6),*/
+    /*.custom-table td:nth-child(6) {*/
+    /*    display: none;*/
+    /*}*/
     .custom-select-btn{
         min-width: 100%;
         width: 100%;

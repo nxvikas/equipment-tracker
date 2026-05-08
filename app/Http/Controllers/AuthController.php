@@ -158,6 +158,12 @@ class AuthController extends Controller
         }
         Auth::login($user, $request->boolean('remember'));
         session()->forget('pending_user_id');
+
+        $intended = session('url.intended');
+        if ($intended) {
+            session()->forget('url.intended');
+            return redirect($intended);
+        }
         return match ($user->role->name) {
             'admin' => redirect()->route('admin.dashboard'),
             'employee' => redirect()->route('employee.dashboard'),

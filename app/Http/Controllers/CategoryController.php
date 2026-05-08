@@ -17,10 +17,8 @@ class CategoryController extends Controller
     {
         $query = Category::withCount('equipment');
 
-
-        $direction = $request->get('direction', 'desc');
+        $direction = $request->query('direction', 'desc');
         $query->orderBy('equipment_count', $direction);
-        $query->orderBy('name', 'asc');
 
         $categories = $query->paginate(15)->withQueryString();
 

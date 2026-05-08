@@ -24,7 +24,7 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">Категории оборудования</h1>
+                <h1 class="page-title mt-2">Категории оборудования</h1>
                 <p class="page-subtitle">Управление категориями для классификации техники</p>
             </div>
             <div class="page-actions">
@@ -83,6 +83,7 @@
                                value="{{ request('direction', 'desc') }}">
                     </div>
 
+
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
                     </button>
@@ -99,6 +100,7 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Создано</th>
                         <th>Название</th>
                         <th>Описание</th>
                         <th>Кол-во оборудования</th>
@@ -109,6 +111,7 @@
                     @forelse($categories as $category)
                         <tr>
                             <td>{{ $category->id }}</td>
+                            <td class="date">{{ $category->created_at->format('d.m.y H:i') }}</td>
                             <td class="equipment-name">
                                 <a href="{{ route('admin.categories.show', $category->id) }}">
                                     {{ $category->name }}
@@ -135,7 +138,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-0 border-bottom-0">
+                            <td colspan="6" class="p-0 border-bottom-0">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper">
                                         <i class="bi bi-inbox"></i>
@@ -238,15 +241,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить категорию?</p>
-                            <p class="text-secondary mt-2">
-                                <strong>{{ $category->name }}</strong>
-                            </p>
-                            <p class="text-danger small mt-3">
-                                <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
-                            </p>
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите удалить категорию?</p>
+                            <p class="text-secondary"><strong>{{ $category->name }}</strong></p>
                         </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>

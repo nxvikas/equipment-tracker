@@ -18,13 +18,14 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">Оборудование</h1>
-                <p class="page-subtitle">Управление всем оборудованием компании</p>
                 @if(request('from')==='dashboard')
                     <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад на главную
                     </a>
                 @endif
+                <h1 class="page-title mt-2">Оборудование</h1>
+                <p class="page-subtitle">Управление всем оборудованием компании</p>
+
             </div>
             <div class="page-actions">
                 <a href="{{ route('admin.export.equipment') }}" class="btn-outline" title="Экспорт в Excel"
@@ -105,6 +106,36 @@
                         </ul>
                         <input type="hidden" name="status" class="custom-select-input" value="{{ request('status') }}">
                     </div>
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="selected-text">
+            @if(request('direction', 'desc') === 'asc')
+                Сначала старые
+            @else
+                Сначала новые
+            @endif
+        </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu custom-select-menu">
+                            <li>
+                                <a class="dropdown-item {{ request('direction', 'desc') === 'desc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="desc">
+                                    Сначала новые
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request('direction') === 'asc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="asc">
+                                    Сначала старые
+                                </a>
+                            </li>
+                        </ul>
+                        <input type="hidden" name="direction" class="custom-direction-input"
+                               value="{{ request('direction', 'desc') }}">
+                    </div>
 
 
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
@@ -122,7 +153,9 @@
                 <table class="custom-table">
                     <thead>
                     <tr>
-                        <th style="width: 60px; text-align: center;">QR</th>
+
+                        <th>ID</th>
+                        <th>Создано</th>
                         <th>Инв. номер</th>
                         <th>Название</th>
                         <th>Категория</th>
@@ -135,16 +168,10 @@
                     <tbody>
                     @forelse($equipments as $equipment)
                         <tr>
-                            <td style="text-align: center;">
-                                @if($equipment->qr_code)
-                                    <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('equipment.qrcode', $equipment->id) }}" alt="QR"
-                                             style="width: 40px; height: 40px;">
-                                    </div>
-                                @else
-                                    <span class="text-secondary">—</span>
-                                @endif
+                            <td>
+                                {{$equipment->id}}
                             </td>
+                            <td class="date">{{ $equipment->created_at->format('d.m.y H:i') }}</td>
                             <td class="inv-number">{{ $equipment->inventory_number }}</td>
                             <td class="equipment-name">
                                 <a href="{{ route('admin.equipment.show', $equipment->id) }}" class="equipment-name">
@@ -188,7 +215,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="p-0 border-bottom-0">
+                            <td colspan="9" class="p-0 border-bottom-0">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper">
                                         <i class="bi bi-inbox"></i>

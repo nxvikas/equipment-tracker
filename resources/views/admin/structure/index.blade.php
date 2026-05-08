@@ -27,7 +27,7 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">Структура компании</h1>
+                <h1 class="page-title mt-2">Структура компании</h1>
                 <p class="page-subtitle">Управление отделами и должностями</p>
             </div>
             <div class="page-actions">
@@ -115,6 +115,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Создано</th>
                             <th>Название</th>
                             <th>Должности</th>
                             <th>Кол-во сотрудников</th>
@@ -125,6 +126,7 @@
                         @forelse($departments as $department)
                             <tr>
                                 <td>{{ $department->id }}</td>
+                                <td class="date">{{ $department->created_at->format('d.m.y H:i') }}</td>
                                 <td class="equipment-name">{{ $department->name }}</td>
                                 <td style="max-width: 300px;">
                                     @if($department->positions->count() > 0)
@@ -237,6 +239,7 @@
                         <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Создано</th>
                             <th>Название</th>
                             <th>Отдел</th>
                             <th>Кол-во сотрудников</th>
@@ -247,6 +250,7 @@
                         @forelse($positions as $position)
                             <tr>
                                 <td>{{ $position->id }}</td>
+                                <td class="date">{{ $position->created_at->format('d.m.y H:i') }}</td>
                                 <td class="equipment-name">{{ $position->name }}</td>
                                 <td>
                                     @if($position->department)

@@ -17,15 +17,12 @@ class LocationController extends Controller
     {
         $query = Location::withCount('equipment');
 
-
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-
-        $direction = $request->get('direction', 'desc');
+        $direction = $request->query('direction', 'desc');
         $query->orderBy('equipment_count', $direction);
-        $query->orderBy('name', 'asc');
 
         $locations = $query->paginate(15)->withQueryString();
 

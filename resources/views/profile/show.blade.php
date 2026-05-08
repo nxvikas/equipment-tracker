@@ -26,7 +26,7 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">Мой профиль</h1>
+                <h1 class="page-title mt-2">Мой профиль</h1>
                 <p class="page-subtitle">Управление личными данными</p>
             </div>
         </div>

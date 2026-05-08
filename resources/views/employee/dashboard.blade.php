@@ -11,7 +11,7 @@
     <div class="employee-dashboard">
         <div class="dashboard-header">
             <div>
-                <h1 class="dashboard-title">Моя панель</h1>
+                <h1 class="dashboard-title mt-2">Моя панель</h1>
                 <p class="dashboard-subtitle">
                     Добро пожаловать, {{ $user->surname }} {{ $user->name }}!
                 </p>

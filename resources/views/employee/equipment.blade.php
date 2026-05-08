@@ -25,7 +25,7 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">Моё оборудование</h1>
+                <h1 class="page-title mt-2">Моё оборудование</h1>
                 <p class="page-subtitle">Техника, закреплённая за вами</p>
                 @if(request('from')==='dashboard')
                     <a href="{{ route('employee.dashboard') }}" class="text-secondary text-decoration-none">

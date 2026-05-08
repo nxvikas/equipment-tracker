@@ -26,18 +26,14 @@
         <div class="page-header">
             <div>
                 @if(request('from_equipment'))
-
-                    <a href="{{ route('admin.equipment.show', request('from_equipment')) }}"
-                       class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.equipment.show', request('from_equipment')) }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к оборудованию
                     </a>
                 @elseif(request('from_dashboard'))
-
                     <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад на главную
                     </a>
                 @else
-
                     <a href="{{ route('admin.users.index') }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к списку
                     </a>

@@ -12,7 +12,7 @@
 
         <div class="page-header">
             <div>
-                <h1 class="page-title">{{ $equipment->name }}</h1>
+                <h1 class="page-title mt-2">{{ $equipment->name }}</h1>
                 <p class="page-subtitle">Инвентарный номер: {{ $equipment->inventory_number }}</p>
                 @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.equipment.show', $equipment->id) }}"

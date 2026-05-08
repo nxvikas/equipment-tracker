@@ -44,21 +44,19 @@
         <div class="dropdown">
             <button class="user-profile dropdown-toggle" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
-                <div class="user-info">
-                    <div class="user-name">{{ auth()->user()->name ?? 'Не указано' }}</div>
-                    <div class="user-role">
-                        {{auth()->user()->role->display_name ?? 'Не указано'}}
-                    </div>
-                </div>
-                <div class="user-avatar">
-                    @if(auth()->user()->avatar)
+    <span class="user-info">
+        <span class="user-name">{{ auth()->user()->name ?? 'Не указано' }}</span>
+        <span class="user-role">{{ auth()->user()->role->display_name ?? 'Не указано' }}</span>
+    </span>
+                <span class="user-avatar">
+        @if(auth()->user()->avatar)
                         <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
                              alt="Аватар"
                              style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                     @else
                         {{ strtoupper(substr(auth()->user()->name ?? 'НУ', 0, 2)) }}
                     @endif
-                </div>
+    </span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end profile-menu">
                 <li><a class="dropdown-item" href="{{route('profile.show')}}">

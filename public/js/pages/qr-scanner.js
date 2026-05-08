@@ -1,5 +1,5 @@
 (function() {
-    console.log('QR скрипт загружен');
+
 
     const modal = document.getElementById('qrScannerModal');
     if (!modal) {
@@ -28,7 +28,7 @@
         if (scanner && isScanning) {
             scanner.stop().then(() => {
                 isScanning = false;
-                console.log('Сканер остановлен');
+
             }).catch(err => console.error('Ошибка остановки:', err));
         }
     }
@@ -41,7 +41,7 @@
             return;
         }
 
-        console.log('Запуск сканера...');
+
 
 
         readerElement.innerHTML = '';
@@ -57,7 +57,7 @@
             { facingMode: "environment" },
             config,
             (decodedText) => {
-                console.log('QR отсканирован:', decodedText);
+
                 const equipmentId = getEquipmentIdFromUrl(decodedText);
 
                 if (equipmentId) {
@@ -75,7 +75,7 @@
             }
         ).then(() => {
             isScanning = true;
-            console.log('Сканер запущен успешно');
+
         }).catch(err => {
             console.error('Ошибка запуска камеры:', err);
             readerElement.innerHTML = '<div class="text-danger text-center p-3">Ошибка: ' + err + '</div>';
@@ -84,13 +84,13 @@
 
 
     modal.addEventListener('shown.bs.modal', function() {
-        console.log('Модалка открыта');
+
         setTimeout(startScanner, 500);
     });
 
 
     modal.addEventListener('hidden.bs.modal', function() {
-        console.log('Модалка закрыта');
+
         stopScanner();
         const readerElement = document.getElementById('qr-reader');
         if (readerElement) readerElement.innerHTML = '';

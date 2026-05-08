@@ -27,19 +27,20 @@
         <div class="page-header">
             <div>
                 @if(request('from_category'))
-                    <a href="{{ route('admin.categories.show', ['category' => request('from_category'), 'from_equipment' => $equipment->id]) }}"
-                       class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.categories.show', request('from_category')) }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к категории
                     </a>
                 @elseif(request('from_location'))
-                    <a href="{{ route('admin.locations.show', ['location' => request('from_location'), 'from_equipment' => $equipment->id]) }}"
-                       class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.locations.show', request('from_location')) }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к локации
                     </a>
                 @elseif(request('from_user'))
-                    <a href="{{ route('admin.users.show', request('from_user')) }}"
-                       class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.users.show', request('from_user')) }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к сотруднику
+                    </a>
+                @elseif(request('from_history'))
+                    <a href="{{ route('admin.history') }}" class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к истории операций
                     </a>
                 @else
                     <a href="{{ route('admin.equipment') }}" class="text-secondary text-decoration-none">
@@ -920,7 +921,6 @@
 
             const updateForm = () => {
                 const status = statusSelect.value;
-                console.log('Редактирование: статус изменён на:', status);
 
 
                 if (status === 'in_use') {

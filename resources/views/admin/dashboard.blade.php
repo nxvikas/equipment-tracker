@@ -10,7 +10,7 @@
     <div class="admin-dashboard">
         <div class="dashboard-header">
             <div>
-                <h1 class="dashboard-title">Панель управления</h1>
+                <h1 class="dashboard-title mt-2">Панель управления</h1>
                 <p class="dashboard-subtitle">Добро пожаловать! Вот сводка по оборудованию и активам</p>
             </div>
             <div class="dashboard-actions">
@@ -348,7 +348,7 @@
     </div>
 @endsection
 @push('scripts')
-    <script src="{{asset('https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const chartData = @json($chartData);

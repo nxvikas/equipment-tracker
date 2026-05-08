@@ -116,6 +116,7 @@
                                value="{{ request('direction', 'desc') }}">
                     </div>
 
+
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
                     </button>
@@ -132,6 +133,7 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Создано</th>
                         <th>Название</th>
                         <th>Тип</th>
                         <th>Адрес</th>
@@ -143,6 +145,7 @@
                     @forelse($locations as $location)
                         <tr>
                             <td>{{ $location->id }}</td>
+                            <td class="date">{{ $location->created_at->format('d.m.y H:i') }}</td>
                             <td class="equipment-name">
                                 <a href="{{ route('admin.locations.show', $location->id) }}">
                                     {{ $location->name }}

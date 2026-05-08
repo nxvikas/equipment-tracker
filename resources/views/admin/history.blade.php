@@ -58,6 +58,36 @@
                                value="{{ request('action_type') }}">
                     </div>
 
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="selected-text">
+            @if(request('equipment_search'))
+                {{ request('equipment_search') }}
+            @else
+                Всё оборудование
+            @endif
+        </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu custom-select-menu p-2" style="min-width: 280px;">
+                            <input type="text"
+                                   class="form-control-custom mb-2"
+                                   placeholder="Поиск оборудования..."
+                                   id="equipmentSearchInput"
+                                   style="border-radius: 10px; padding: 8px 12px;">
+                            <div id="equipmentList" style="max-height: 200px; overflow-y: auto;">
+                                @foreach($equipments as $eq)
+                                    <a class="dropdown-item" href="#" data-value="{{ $eq->name }}">
+                                        {{ $eq->name }} <small
+                                            class="text-secondary">{{ $eq->inventory_number }}</small>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                        <input type="hidden" name="equipment_search" class="custom-select-input"
+                               value="{{ request('equipment_search') }}">
+                    </div>
+
 
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
@@ -91,7 +121,7 @@
                         <tr>
                             <td class="date">{{ $operation->created_at->format('d.m.Y H:i') }}</td>
                             <td>
-                                <a href="{{ route('admin.equipment.show', $operation->equipment_id) }}"
+                                <a href="{{ route('admin.equipment.show', ['equipment' => $operation->equipment_id, 'from_history' => 1]) }}"
                                    class="equipment-name">
                                     {{ $operation->equipment->name ?? '—' }}
                                 </a>
@@ -186,25 +216,51 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             const customSelects = document.querySelectorAll('.custom-select');
             customSelects.forEach(select => {
                 const btn = select.querySelector('.custom-select-btn');
-                const items = select.querySelectorAll('.dropdown-item');
+                const items = select.querySelectorAll('.dropdown-item[data-value]');
                 const hiddenInput = select.querySelector('.custom-select-input');
-                const selectedText = btn.querySelector('.selected-text');
+                const selectedText = btn?.querySelector('.selected-text');
 
                 items.forEach(item => {
                     item.addEventListener('click', function (e) {
                         e.preventDefault();
                         const value = this.dataset.value;
-                        const text = this.textContent;
-                        selectedText.textContent = text;
+                        const text = this.textContent.trim();
+                        if (selectedText) selectedText.textContent = text;
                         if (hiddenInput) hiddenInput.value = value;
                         items.forEach(i => i.classList.remove('active'));
                         this.classList.add('active');
                     });
                 });
             });
+
+
+            const equipmentSearchInput = document.getElementById('equipmentSearchInput');
+            if (equipmentSearchInput) {
+                equipmentSearchInput.addEventListener('input', function () {
+                    const term = this.value.toLowerCase();
+                    document.querySelectorAll('#equipmentList .dropdown-item').forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        item.style.display = text.includes(term) ? '' : 'none';
+                    });
+                });
+
+
+                document.querySelectorAll('#equipmentList .dropdown-item').forEach(item => {
+                    item.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const value = this.dataset.value;
+                        const parentSelect = this.closest('.custom-select');
+                        const hiddenInput = parentSelect.querySelector('.custom-select-input');
+                        const selectedText = parentSelect.querySelector('.selected-text');
+                        if (hiddenInput) hiddenInput.value = value;
+                        if (selectedText) selectedText.textContent = value;
+                    });
+                });
+            }
         });
     </script>
 @endpush

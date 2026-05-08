@@ -103,11 +103,11 @@ body.light .delete-equipment-info {
     background: #f8fafc;
 }
 
-@media (max-width: 768px) {
-    .custom-table th:nth-child(3),
-    .custom-table td:nth-child(3),
-    .custom-table th:nth-child(4),
-    .custom-table td:nth-child(4) {
-        display: none;
-    }
-}
+/*@media (max-width: 768px) {*/
+/*    .custom-table th:nth-child(3),*/
+/*    .custom-table td:nth-child(3),*/
+/*    .custom-table th:nth-child(4),*/
+/*    .custom-table td:nth-child(4) {*/
+/*        display: none;*/
+/*    }*/
+/*}*/

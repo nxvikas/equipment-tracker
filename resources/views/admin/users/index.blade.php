@@ -120,6 +120,37 @@
                                value="{{ request('position_id') }}">
                     </div>
 
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="selected-text">
+            @if(request('direction', 'desc') === 'asc')
+                Сначала старые
+            @else
+                Сначала новые
+            @endif
+        </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu custom-select-menu">
+                            <li>
+                                <a class="dropdown-item {{ request('direction', 'desc') === 'desc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="desc">
+                                    Сначала новые
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request('direction') === 'asc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="asc">
+                                    Сначала старые
+                                </a>
+                            </li>
+                        </ul>
+                        <input type="hidden" name="direction" class="custom-direction-input"
+                               value="{{ request('direction', 'desc') }}">
+                    </div>
+
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
                     </button>
@@ -136,6 +167,7 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Создано</th>
                         <th>ФИО</th>
                         <th>Email</th>
                         <th>Телефон</th>
@@ -149,6 +181,7 @@
                     @forelse($users as $user)
                         <tr>
                             <td>{{ $user->id }}</td>
+                            <td class="date">{{ $user->created_at->format('d.m.y H:i') }}</td>
                             <td>
                                 <a href="{{ route('admin.users.show', $user) }}" class="equipment-name">
                                     {{ $user->surname }} {{ $user->name }} {{ $user->patronymic }}
@@ -206,7 +239,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="p-0 border-bottom-0">
+                            <td colspan="9" class="p-0 border-bottom-0">
                                 <div class="empty-state">
                                     <div class="empty-icon-wrapper"><i class="bi bi-inbox"></i></div>
                                     <h4 class="empty-title">Нет сотрудников</h4>
@@ -381,18 +414,13 @@
                             <h5 class="modal-title text-warning">
                                 <i class="bi bi-shield-plus me-2"></i>Назначение администратором
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Закрыть"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-shield-shaded" style="font-size: 48px; color: var(--warning);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите назначить администратором?</p>
-                            <p class="text-secondary mt-2">
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите назначить администратором?</p>
+                            <p class="text-secondary">
                                 <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
                                 {{ $user->email }}
-                            </p>
-                            <p class="text-warning small mt-3">
-                                <i class="bi bi-exclamation-circle"></i> Администратор имеет полный доступ к системе.
                             </p>
                         </div>
                         <div class="modal-footer border-0 pt-0">
@@ -418,19 +446,13 @@
                                 <h5 class="modal-title text-danger">
                                     <i class="bi bi-shield-slash me-2"></i>Снятие прав администратора
                                 </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Закрыть"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                             </div>
-                            <div class="modal-body text-center py-4">
-                                <i class="bi bi-shield-exclamation" style="font-size: 48px; color: var(--danger);"></i>
-                                <p class="mt-3 mb-0">Вы уверены, что хотите снять права администратора?</p>
-                                <p class="text-secondary mt-2">
+                            <div class="modal-body">
+                                <p>Вы уверены, что хотите снять права администратора?</p>
+                                <p class="text-secondary">
                                     <strong>{{ $user->surname }} {{ $user->name }}</strong><br>
                                     {{ $user->email }}
-                                </p>
-                                <p class="text-danger small mt-3">
-                                    <i class="bi bi-exclamation-circle"></i> Пользователь потеряет доступ к
-                                    админ-панели.
                                 </p>
                             </div>
                             <div class="modal-footer border-0 pt-0">

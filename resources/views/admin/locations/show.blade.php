@@ -124,11 +124,13 @@
                                 <i class="bi bi-gear"></i> Действия с локацией
                             </div>
                             <div class="actions-grid">
-                                <button type="button" class="action-button" data-bs-toggle="modal" data-bs-target="#editLocationModal">
+                                <button type="button" class="action-button" data-bs-toggle="modal"
+                                        data-bs-target="#editLocationModal">
                                     <i class="bi bi-pencil"></i> Редактировать
                                 </button>
                                 @if($location->equipment_count == 0)
-                                    <button type="button" class="action-button action-danger" data-bs-toggle="modal" data-bs-target="#deleteLocationModal">
+                                    <button type="button" class="action-button action-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteLocationModal">
                                         <i class="bi bi-trash"></i> Удалить
                                     </button>
                                 @endif
@@ -214,14 +216,16 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Название <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control-custom" value="{{ old('name', $location->name) }}">
+                            <input type="text" name="name" class="form-control-custom"
+                                   value="{{ old('name', $location->name) }}">
                             <div class="invalid-feedback" data-error="name"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Тип <span class="text-danger">*</span></label>
                             <select name="type" class="form-control-custom">
                                 @foreach(\App\Http\Enums\TypeLocation::cases() as $type)
-                                    <option value="{{ $type->value }}" {{ old('type', $location->type) == $type->value ? 'selected' : '' }}>
+                                    <option
+                                        value="{{ $type->value }}" {{ old('type', $location->type) == $type->value ? 'selected' : '' }}>
                                         {{ \App\Http\Enums\TypeLocation::ruValues()[$type->value] }}
                                     </option>
                                 @endforeach
@@ -230,7 +234,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Адрес</label>
-                            <textarea name="address" class="form-control-custom" rows="2">{{ old('address', $location->address) }}</textarea>
+                            <textarea name="address" class="form-control-custom"
+                                      rows="2">{{ old('address', $location->address) }}</textarea>
                             <div class="invalid-feedback" data-error="address"></div>
                         </div>
                     </div>
@@ -261,7 +266,8 @@
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
-                        <form action="{{ route('admin.locations.destroy', $location->id) }}" method="POST" id="deleteLocationForm">
+                        <form action="{{ route('admin.locations.destroy', $location->id) }}" method="POST"
+                              id="deleteLocationForm">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
@@ -281,7 +287,7 @@
 
             const editForm = document.getElementById('editLocationForm');
             if (editForm) {
-                editForm.addEventListener('submit', function(e) {
+                editForm.addEventListener('submit', function (e) {
                     e.preventDefault();
 
 
@@ -319,7 +325,7 @@
 
             const deleteForm = document.getElementById('deleteLocationForm');
             if (deleteForm) {
-                deleteForm.addEventListener('submit', function(e) {
+                deleteForm.addEventListener('submit', function (e) {
                     e.preventDefault();
 
                     fetch(this.action, {

@@ -28,6 +28,7 @@ class AdminController extends Controller
     {
         return Excel::download(new DashboardExport(), 'dashboard-report-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
     }
+
     public function exportEquipment()
     {
         return Excel::download(new EquipmentExport(), 'equipment-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
@@ -57,6 +58,7 @@ class AdminController extends Controller
     {
         return Excel::download(new HistoryExport(), 'history-' . now()->format('Y-m-d_H-i-s') . '.xlsx');
     }
+
     public function dashboard()
     {
 
@@ -115,12 +117,13 @@ class AdminController extends Controller
 
         $locationStats = Location::withCount('equipment')
             ->orderBy('equipment_count', 'desc')
+            ->take(5)
             ->get();
         $totalInLocations = $locationStats->sum('equipment_count');
 
         $chartData = [];
         foreach (StatusEquipment::cases() as $status) {
-            $count = match($status->value) {
+            $count = match ($status->value) {
                 'in_use' => $inUseEquipments,
                 'in_stock' => $inStockEquipments,
                 'repair' => $inRepairEquipments,
@@ -128,7 +131,7 @@ class AdminController extends Controller
                 default => 0
             };
 
-            $color = match($status->value) {
+            $color = match ($status->value) {
                 'in_use' => '#bef264',
                 'in_stock' => '#3b82f6',
                 'repair' => '#f59e0b',
@@ -143,8 +146,6 @@ class AdminController extends Controller
                 'color' => $color,
             ];
         }
-
-
 
 
         return view('admin.dashboard', compact(
@@ -174,20 +175,23 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        $equipments = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
+        $direction = $request->query('direction', 'desc');
+        $query->orderBy('created_at', $direction);
+
+        $equipments = $query->paginate(15)->withQueryString();
 
         $categories = Category::all();
         $locations = Location::all();
         $users = User::where('status', 'active')->orderBy('name')->get();
 
-        $categoriesForJs = $categories->map(function($category) {
+        $categoriesForJs = $categories->map(function ($category) {
             return [
                 'id' => $category->id,
                 'name' => $category->name
             ];
         });
 
-        $locationsForJs = $locations->map(function($loc) {
+        $locationsForJs = $locations->map(function ($loc) {
             return [
                 'id' => $loc->id,
                 'name' => $loc->name,
@@ -197,7 +201,7 @@ class AdminController extends Controller
         });
 
 
-        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users','locationsForJs','categoriesForJs'));
+        return view('admin.equipment', compact('equipments', 'categories', 'locations', 'users', 'locationsForJs', 'categoriesForJs'));
     }
 
     public function history(Request $request)
@@ -209,28 +213,37 @@ class AdminController extends Controller
             $query->where('action_type', $request->action_type);
         }
 
-        $operations = $query->paginate(20)->withQueryString();
+        if ($request->filled('equipment_search')) {
+            $search = $request->equipment_search;
+            $query->whereHas('equipment', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('inventory_number', 'like', "%{$search}%");
+            });
+        }
 
+        $operations = $query->paginate(20)->withQueryString();
         $actionTypes = TypeEquipmentHistory::ruValues();
 
-        return view('admin.history', compact('operations', 'actionTypes'));
+        $equipments = Equipment::orderBy('name')->get(['id', 'name', 'inventory_number']);
+
+        return view('admin.history', compact('operations', 'actionTypes','equipments'));
     }
 
     public function structure(Request $request)
     {
-        $activeTab = $request->get('tab', 'departments');
+        $activeTab = $request->query('tab', 'departments');
 
 
         $departmentsQuery = Department::withCount('users')
             ->with(['users:id,surname,name,patronymic,email,department_id', 'positions:id,name,department_id']);
-        $direction = $request->get('direction', 'desc');
+        $direction = $request->query('direction', 'desc');
         $departmentsQuery->orderBy('users_count', $direction)->orderBy('name', 'asc');
         $departments = $departmentsQuery->paginate(15, ['*'], 'departments_page')->withQueryString();
 
 
         $positionsQuery = Position::with('department')->withCount('users')
             ->with('users:id,surname,name,patronymic,email,position_id');
-        $posDirection = $request->get('pos_direction', 'desc');
+        $posDirection = $request->query('pos_direction', 'desc');
         $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
         $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();
 
@@ -239,7 +252,7 @@ class AdminController extends Controller
 
     public function globalSearch(Request $request)
     {
-        $query = $request->get('q');
+        $query = $request->query('q');
 
         if (strlen($query) < 2) {
             return response()->json([]);

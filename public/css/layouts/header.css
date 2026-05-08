@@ -279,6 +279,7 @@ body.light .search-result-item .search-result-title:hover {
     padding: 6px 12px;
     border-radius: 40px;
     color: var(--text-primary);
+    cursor: pointer;
 }
 
 .user-profile:hover {
@@ -295,20 +296,28 @@ body.light .search-result-item .search-result-title:hover {
     justify-content: center;
     font-weight: 600;
     color: #02040a;
+    flex-shrink: 0;
 }
 
 .user-info {
+    display: flex;
+    flex-direction: column;
     text-align: right;
+    gap: 2px;
 }
 
 .user-name {
     font-size: 13px;
     font-weight: 600;
+    display: block;
+    line-height: 1.2;
 }
 
 .user-role {
     font-size: 10px;
     color: var(--text-secondary);
+    display: block;
+    line-height: 1.2;
 }
 
 

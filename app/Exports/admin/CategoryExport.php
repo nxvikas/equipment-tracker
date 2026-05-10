@@ -32,7 +32,7 @@ class CategoryExport implements FromArray, WithHeadings, WithTitle, WithStyles
                 $category->id,
                 $category->name,
                 $category->description ?? '—',
-                $category->equipment_count === 0 ? '0' : $category->equipment_count
+                $category->equipment_count === 0 ?: '0'
             ];
         }
 

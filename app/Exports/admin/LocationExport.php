@@ -37,7 +37,7 @@ class LocationExport implements FromArray, WithHeadings, WithTitle, WithStyles
                 $location->name,
                 $typeLabel,
                 $location->address ?? '—',
-                $location->equipment_count === 0 ? '0' : $location->equipment_count,
+                $location->equipment_count === 0 ?: '0'
             ];
         }
 

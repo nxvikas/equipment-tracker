@@ -24,7 +24,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
 
     public function __construct()
     {
-
         $this->data = [
             'total' => Equipment::count(),
             'in_use' => Equipment::where('status', 'in_use')->count(),
@@ -46,6 +45,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
             ->get();
 
         $this->topUsers = User::where('status', 'active')
+            ->with(['department', 'position'])
             ->withCount(['equipment as equipment_count' => function ($query) {
                 $query->where('status', 'in_use');
             }])
@@ -68,12 +68,10 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
     {
         $exportData = [];
 
-
         $exportData[] = ['ОТЧЕТ ПО ДАШБОРДУ'];
         $exportData[] = ['Дата формирования:', now()->format('d.m.Y H:i:s')];
         $exportData[] = [' '];
         $exportData[] = [' '];
-
 
         $exportData[] = ['1. ОСНОВНЫЕ МЕТРИКИ'];
         $exportData[] = ['Показатель', 'Значение'];
@@ -93,7 +91,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-
         $exportData[] = ['3. ТОП СОТРУДНИКОВ ПО ТЕХНИКЕ'];
         $exportData[] = ['№', 'Сотрудник', 'Отдел', 'Кол-во техники'];
         $index = 1;
@@ -108,7 +105,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-
         $exportData[] = ['4. РАСПРЕДЕЛЕНИЕ ПО ЛОКАЦИЯМ'];
         $exportData[] = ['Название локации', 'Тип', 'Кол-во оборудования'];
         foreach ($this->locationStats as $location) {
@@ -118,7 +114,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         $exportData[] = [' '];
         $exportData[] = [' '];
 
-
         $exportData[] = ['5. ДИНАМИКА ВЫДАЧ (ПОСЛЕДНИЕ 6 МЕСЯЦЕВ)'];
         $exportData[] = ['Месяц', 'Количество выдач'];
         foreach ($this->monthlyAssigns as $item) {
@@ -127,7 +122,6 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
         }
         $exportData[] = [' '];
         $exportData[] = [' '];
-
 
         $exportData[] = ['6. ПОСЛЕДНИЕ ОПЕРАЦИИ (10 последних)'];
         $exportData[] = ['Дата', 'Оборудование', 'Инв. номер', 'Операция', 'Кто выполнил'];

@@ -37,7 +37,7 @@ class StructureExport implements FromArray, WithHeadings, WithTitle, WithStyles
             $exportData[] = [
                 $department->id,
                 $department->name,
-                $department->users_count === 0 ? '0' : $department->users_count,
+                $department->users_count === 0 ?: '0'
             ];
         }
 
@@ -51,7 +51,7 @@ class StructureExport implements FromArray, WithHeadings, WithTitle, WithStyles
             $exportData[] = [
                 $position->id,
                 $position->name,
-                $position->users_count === 0 ? '0' : $position->users_count,
+                $position->users_count === 0 ?: '0'
             ];
         }
 

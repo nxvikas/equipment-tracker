@@ -69,10 +69,14 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'Нельзя изменить свою роль');
         }
 
-
         $statusValue = $user->status->value ?? $user->status;
         if ($statusValue === 'pending') {
             return redirect()->back()->with('error', 'Сначала активируйте пользователя');
+        }
+
+        $adminsCount = User::where('role_id', 1)->where('status', 'active')->count();
+        if ($adminsCount <= 1) {
+            return redirect()->back()->with('error', 'Нельзя снять права у последнего администратора');
         }
 
         $user->update(['role_id' => 2]);
@@ -152,12 +156,22 @@ class UserController extends Controller
         return redirect()->route('admin.users.show', $user);
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         if ($user->id === auth()->id()) {
             return redirect()->back()->with('error', 'Нельзя удалить самого себя');
         }
 
+        if ($user->role_id === 1) {
+            $adminsCount = User::where('role_id', 1)->where('status', 'active')->count();
+            if ($adminsCount <= 1) {
+                return redirect()->back()->with('error', 'Нельзя удалить последнего администратора');
+            }
+        }
+
+        if (!$request->has('confirm_delete')) {
+            return redirect()->back()->with('confirm_delete_user', $user->id);
+        }
 
         $equipments = Equipment::where('current_user_id', $user->id)->get();
 
@@ -176,7 +190,6 @@ class UserController extends Controller
             'status' => StatusEquipment::IN_STOCK->value,
             'current_user_id' => null,
         ]);
-
 
         Equipment_history::where('user_id', $user->id)->update(['user_id' => null]);
         Equipment_history::where('from_user_id', $user->id)->update(['from_user_id' => null]);
@@ -203,7 +216,6 @@ class UserController extends Controller
 
     public function block(User $user)
     {
-
         $equipments = Equipment::where('current_user_id', $user->id)->get();
 
         foreach ($equipments as $equipment) {

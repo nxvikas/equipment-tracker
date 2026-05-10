@@ -21,15 +21,12 @@ class CategoryExport implements FromArray, WithHeadings, WithTitle, WithStyles
     public function array(): array
     {
         $exportData = [];
-
         $exportData[] = ['ОТЧЕТ ПО КАТЕГОРИЯМ'];
         $exportData[] = ['Дата формирования:', now()->format('d.m.Y H:i:s')];
         $exportData[] = [' '];
         $exportData[] = [' '];
-
         $exportData[] = ['СПИСОК КАТЕГОРИЙ'];
         $exportData[] = ['ID', 'Название', 'Описание', 'Кол-во оборудования'];
-
         foreach ($this->categories as $category) {
             $exportData[] = [
                 $category->id,
@@ -41,17 +38,14 @@ class CategoryExport implements FromArray, WithHeadings, WithTitle, WithStyles
 
         return $exportData;
     }
-
     public function headings(): array
     {
         return [];
     }
-
     public function title(): string
     {
         return 'Категории';
     }
-
     public function styles(Worksheet $sheet)
     {
         return [

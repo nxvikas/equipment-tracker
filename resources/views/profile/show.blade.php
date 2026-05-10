@@ -185,20 +185,44 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Новый пароль</label>
-                                        <input type="password"
-                                               name="password"
-                                               class="form-control-custom @error('password') is-invalid @enderror"
-                                               placeholder="Оставьте пустым, если не хотите менять">
+                                        <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-lock"></i>
+                </span>
+                                            <input type="password"
+                                                   name="password"
+                                                   id="password"
+                                                   class="form-control @error('password') is-invalid @enderror"
+                                                   placeholder="Оставьте пустым, если не хотите менять">
+                                            <button class="btn btn-outline-secondary border-start-0"
+                                                    type="button"
+                                                    id="togglePassword"
+                                                    style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                                                <i class="bi bi-eye" id="toggleIcon"></i>
+                                            </button>
+                                        </div>
                                         @error('password')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Подтверждение пароля</label>
-                                        <input type="password"
-                                               name="password_confirmation"
-                                               class="form-control-custom"
-                                               placeholder="Повторите новый пароль">
+                                        <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-shield-check"></i>
+                </span>
+                                            <input type="password"
+                                                   name="password_confirmation"
+                                                   id="password_confirmation"
+                                                   class="form-control"
+                                                   placeholder="Повторите новый пароль">
+                                            <button class="btn btn-outline-secondary border-start-0"
+                                                    type="button"
+                                                    id="togglePasswordConfirm"
+                                                    style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                                                <i class="bi bi-eye" id="toggleIconConfirm"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <small class="form-hint">Пароль должен содержать минимум 8 символов (только латиница и
@@ -220,6 +244,7 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/pages/auth/eyePassword.js') }}"></script>
     <script>
 
         document.getElementById('avatarInput')?.addEventListener('change', function (e) {
@@ -242,5 +267,7 @@
                 reader.readAsDataURL(file);
             }
         });
+
+
     </script>
 @endpush

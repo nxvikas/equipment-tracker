@@ -20,6 +20,10 @@ class EquipmentSeeder extends Seeder
         $users = User::where('role_id', 2)->get();
         $categories = Category::all();
         $locations = Location::all();
+        $warehouseLocations = $locations->where('type', 'warehouse');
+        $officeLocations = $locations->where('type', 'office');
+        $remoteLocations = $locations->where('type', 'remote');
+        $serviceLocations = $locations->where('type', 'service');
 
         $equipments = [
             [
@@ -33,7 +37,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 189990.00,
                 'warranty_date' => '2026-01-14',
                 'notes' => 'Основной ноутбук разработчика',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -48,7 +51,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 159990.00,
                 'warranty_date' => '2026-02-09',
                 'notes' => 'Ноутбук для дизайнера',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -63,7 +65,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 169990.00,
                 'warranty_date' => '2026-03-04',
                 'notes' => 'Для руководителя IT-отдела',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -78,7 +79,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 45990.00,
                 'warranty_date' => '2026-01-19',
                 'notes' => '4K монитор для разработчика',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -93,7 +93,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 18990.00,
                 'warranty_date' => '2025-02-14',
                 'notes' => 'Черно-белый принтер для офиса',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -108,7 +107,6 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 10990.00,
                 'warranty_date' => '2025-03-09',
                 'notes' => 'Беспроводная мышь',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -124,7 +122,6 @@ class EquipmentSeeder extends Seeder
                 'warranty_date' => '2025-01-24',
                 'status_comment' => 'Не работает подсветка',
                 'notes' => 'Механическая клавиатура',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -139,27 +136,26 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => 24990.00,
                 'warranty_date' => '2026-02-19',
                 'notes' => 'Маршрутизатор для офиса',
-                'qr_code' => null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ];
 
-        foreach ($equipments as $index => $equipment) {
-
-            $userId = ($equipment['status'] === 'in_use') ? $users[$index % count($users)]->id : null;
-            $locationId = match($equipment['status']) {
-                'in_stock' => Location::where('type', 'warehouse')->inRandomOrder()->first()?->id,
-                'in_use' => Location::whereIn('type', ['office', 'remote'])->inRandomOrder()->first()?->id,
-                'repair' => Location::where('type', 'service')->inRandomOrder()->first()?->id,
-                'written' => Location::where('type', 'warehouse')->inRandomOrder()->first()?->id,
-                default => $locations[$index % count($locations)]->id,
-            };
-            if (!$locationId) {
-                $locationId = $locations[$index % count($locations)]->id;
+        foreach ($equipments as $equipment) {
+            $userId = null;
+            if ($equipment['status'] === 'in_use') {
+                $userId = $users->isNotEmpty() ? $users->random()->id : null;
             }
 
-            $categoryId = $categories[$index % count($categories)]->id;
+            $locationId = match ($equipment['status']) {
+                'in_stock' => $warehouseLocations->isNotEmpty() ? $warehouseLocations->random()->id : $locations->random()->id,
+                'in_use' => $officeLocations->isNotEmpty() ? $officeLocations->random()->id : $locations->random()->id,
+                'repair' => $serviceLocations->isNotEmpty() ? $serviceLocations->random()->id : $locations->random()->id,
+                'written' => $warehouseLocations->isNotEmpty() ? $warehouseLocations->random()->id : $locations->random()->id,
+                default => $locations->random()->id,
+            };
+
+            $category = $categories->isNotEmpty() ? $categories->random() : null;
 
             Equipment::create([
                 'name' => $equipment['name'],
@@ -173,10 +169,10 @@ class EquipmentSeeder extends Seeder
                 'purchase_price' => $equipment['purchase_price'],
                 'warranty_date' => $equipment['warranty_date'],
                 'notes' => $equipment['notes'],
-                'qr_code' => null, // QR-код сгенерируется при создании через контроллер
+                'qr_code' => null,
                 'current_user_id' => $userId,
                 'location_id' => $locationId,
-                'category_id' => $categoryId,
+                'category_id' => $category ? $category->id : null,
                 'created_at' => $equipment['created_at'],
                 'updated_at' => $equipment['updated_at'],
             ]);

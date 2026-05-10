@@ -164,11 +164,13 @@ class AuthController extends Controller
             session()->forget('url.intended');
             return redirect($intended);
         }
-        return match ($user->role->name) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'employee' => redirect()->route('employee.dashboard'),
-            default => redirect()->route('auth.login')
-        };
+        return redirect()->intended(
+            match ($user->role->name) {
+                'admin' => route('admin.dashboard'),
+                'employee' => route('employee.dashboard'),
+                default => route('auth.login')
+            }
+        );
 
     }
 

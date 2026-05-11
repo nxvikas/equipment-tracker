@@ -3,7 +3,7 @@
 @section('title', 'Мой профиль')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pages/profile.css') }}">
 @endpush
 
@@ -38,14 +38,22 @@
 
             <div class="row g-4">
 
-
                 <div class="col-lg-4 col-md-5">
                     <div class="equipment-card">
                         <div class="equipment-card-body text-center">
 
                             <div class="avatar-container mb-3">
-                                @if($user->avatar)
-                                    <img src="{{ asset('storage/' . $user->avatar) }}"
+                                @php
+                                    $avatarSrc = null;
+                                    if (old('_avatar_preview')) {
+                                        $avatarSrc = old('_avatar_preview');
+                                    } elseif ($user->avatar) {
+                                        $avatarSrc = asset('storage/' . $user->avatar);
+                                    }
+                                @endphp
+
+                                @if($avatarSrc)
+                                    <img src="{{ $avatarSrc }}"
                                          alt="Аватар"
                                          class="profile-avatar"
                                          id="avatarPreview">
@@ -57,20 +65,34 @@
                                 @endif
                             </div>
 
-                            <div class="mb-3">
-                                <label for="avatarInput" class="btn-outline w-100" style="cursor: pointer;">
+                            <div class="mb-3 d-flex gap-2 justify-content-center">
+                                <label for="avatarInput" class="btn-outline" style="cursor: pointer;">
                                     <i class="bi bi-upload"></i> Выбрать фото
                                 </label>
                                 <input type="file"
                                        name="avatar"
                                        id="avatarInput"
-                                       class="d-none">
-                                <small class="form-hint d-block mt-2">Поддерживаемые форматы: JPEG, PNG, JPG, GIF.
-                                    Максимум 5MB</small>
-                                @error('avatar')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
+                                       class="d-none"
+                                       accept="image/jpeg,image/png,image/jpg,image/gif">
+                                <input type="hidden" name="_avatar_preview" id="avatarPreviewInput"
+                                       value="{{ old('_avatar_preview') }}">
+
+                                @if($user->avatar)
+                                    <button type="button" class="btn-outline text-danger" id="removeAvatarBtn"
+                                            style="border-color: rgba(239, 68, 68, 0.3);"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteAvatarModal">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </button>
+                                @endif
                             </div>
+
+
+                            <small class="form-hint d-block mt-2">Поддерживаемые форматы: JPEG, PNG, JPG, GIF. Максимум
+                                5MB</small>
+                            @error('avatar')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
 
                             <div class="mt-3">
                                 <span
@@ -81,7 +103,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <div class="col-lg-8 col-md-7">
                     <div class="equipment-card">
@@ -179,16 +200,16 @@
                             </div>
 
                             <div class="border-top pt-3 mt-2">
-                                <h6 class="mb-3" style="color: var(--accent);">
+                                <p class="mb-3" style="color: var(--accent);">
                                     <i class="bi bi-lock"></i> Смена пароля
-                                </h6>
+                                </p>
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6">
                                         <label class="form-label">Новый пароль</label>
                                         <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-lock"></i>
-                </span>
+                                            <span class="input-group-text">
+                                                <i class="bi bi-lock"></i>
+                                            </span>
                                             <input type="password"
                                                    name="password"
                                                    id="password"
@@ -205,12 +226,12 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6">
                                         <label class="form-label">Подтверждение пароля</label>
                                         <div class="input-group">
-                <span class="input-group-text">
-                    <i class="bi bi-shield-check"></i>
-                </span>
+                                            <span class="input-group-text">
+                                                <i class="bi bi-shield-check"></i>
+                                            </span>
                                             <input type="password"
                                                    name="password_confirmation"
                                                    id="password_confirmation"
@@ -241,12 +262,39 @@
             </div>
         </form>
     </div>
+    @if($user->avatar)
+        <div class="modal fade" id="deleteAvatarModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите удалить фото профиля?</p>
+                        <p class="text-secondary">Фото будет удалено без возможности восстановления</p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{{ route('profile.avatar.destroy') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
+                                <i class="bi bi-trash"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @endsection
 
 @push('scripts')
     <script src="{{ asset('js/pages/auth/eyePassword.js') }}"></script>
     <script>
-
         document.getElementById('avatarInput')?.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
@@ -263,11 +311,11 @@
                         img.src = event.target.result;
                         parent.replaceChild(img, preview);
                     }
+                    document.getElementById('avatarPreviewInput').value = event.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         });
-
 
     </script>
 @endpush

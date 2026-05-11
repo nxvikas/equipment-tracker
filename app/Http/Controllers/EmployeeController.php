@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+
 class EmployeeController extends Controller
 {
     public function dashboard()
@@ -73,6 +74,7 @@ class EmployeeController extends Controller
 
         ));
     }
+
     public function myEquipment(Request $request)
     {
         $user = Auth::user();
@@ -101,9 +103,24 @@ class EmployeeController extends Controller
             });
         }
 
-        $equipments = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        $direction = $request->query('direction', 'desc');
+        $equipments = $query->select('equipment.*')
+            ->leftJoin('equipment_histories', function ($join) use ($user) {
+                $join->on('equipment.id', '=', 'equipment_histories.equipment_id')
+                    ->where('equipment_histories.action_type', 'assigned')
+                    ->where('equipment_histories.to_user_id', $user->id);
+            })
+            ->selectRaw('MAX(equipment_histories.created_at) as assigned_date')
+            ->groupBy('equipment.id')
+            ->orderBy('assigned_date', $direction)
+            ->with(['category', 'location'])
+            ->paginate(15)
+            ->withQueryString();
 
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::whereHas('equipment', function ($q) use ($user) {
+            $q->where('current_user_id', $user->id)
+                ->whereIn('status', ['in_use', 'repair']);
+        })->orderBy('name')->get();
         $statuses = [
             'in_use' => 'В использовании',
             'repair' => 'В ремонте',
@@ -124,6 +141,7 @@ class EmployeeController extends Controller
 
         return Excel::download(new EmployeeEquipmentExport($equipments, $user), $fileName);
     }
+
     public function globalSearch(Request $request)
     {
         $query = $request->query('q');
@@ -158,6 +176,7 @@ class EmployeeController extends Controller
 
         return response()->json($equipment);
     }
+
     public function returnEquipment($id)
     {
         $user = Auth::user();

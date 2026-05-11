@@ -270,7 +270,7 @@
                                 });
                             }
                         })
-                        .catch(error => console.error('Error:', error));
+                        .catch(() => {});
                 });
             }
 

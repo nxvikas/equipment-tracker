@@ -642,6 +642,18 @@
                             Сотрудник: {{ $equipment->currentUser?->name ?? '—' }}
                         </p>
                         <div class="mb-3">
+                            <label class="form-label">Вернуть на склад <span class="text-danger">*</span></label>
+                            <select name="location_id" class="form-control-custom custom-dark-select">
+                                <option value="">Выберите склад</option>
+                                @foreach($locations->where('type', 'warehouse') as $location)
+                                    <option value="{{ $location->id }}">
+                                        {{ $location->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback" data-error="location_id"></div>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Комментарий</label>
                             <textarea name="comment" class="form-control-custom" rows="2"
                                       placeholder="Необязательно"></textarea>
@@ -770,27 +782,29 @@
                             <select name="user_id" class="form-control-custom custom-dark-select">
                                 <option value="">Выберите сотрудника</option>
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                    <option value="{{ $user->id }}">{{ $user->surname }} {{ $user->name }} ({{ $user->email }})</option>
                                 @endforeach
                             </select>
+                            <div class="invalid-feedback" data-error="user_id"></div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-end mb-2">
-                                <label class="form-label mb-0">Новая локация</label>
+                                <label class="form-label mb-0">Новая локация <span class="text-danger">*</span></label>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
                                    style="font-size: 12px; color: var(--accent); text-decoration: none;">
                                     + Добавить новую
                                 </a>
                             </div>
                             <select name="location_id" class="form-control-custom custom-dark-select">
-                                @foreach($locations->whereNotIn('type', ['service', 'warehouse']) as $location)
+                                <option value="">Выберите локацию</option>
+                                @foreach($locations->whereIn('type', ['office', 'remote']) as $location)
                                     <option value="{{ $location->id }}">
                                         {{ $location->name }}
-                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
-                                        )
+                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }})
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="invalid-feedback" data-error="location_id"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Комментарий</label>
@@ -825,16 +839,16 @@
                             {{ $equipment->inventory_number }}
                         </p>
                         <div class="mb-3">
-                            <label class="form-label">Куда вернуть? <span class="text-danger">*</span></label>
+                            <label class="form-label">Вернуть на склад <span class="text-danger">*</span></label>
                             <select name="location_id" class="form-control-custom custom-dark-select">
-                                <option value="">Выберите локацию</option>
-                                @foreach($locations->whereIn('type', ['warehouse', 'office']) as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}
-                                        ({{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? '' }})
+                                <option value="">Выберите склад</option>
+                                @foreach($locations->where('type', 'warehouse') as $location)
+                                    <option value="{{ $location->id }}">
+                                        {{ $location->name }}
                                     </option>
                                 @endforeach
                             </select>
-                            <small class="form-hint">Склад или офис</small>
+                            <div class="invalid-feedback" data-error="location_id"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Комментарий</label>
@@ -855,7 +869,6 @@
 
 @push('scripts')
     <script>
-
         const allLocationsData = @json($locationsForJs);
 
         const initEditEquipmentDependency = () => {
@@ -867,13 +880,11 @@
 
             if (!statusSelect) return;
 
-
             const allLocations = allLocationsData.map(loc => ({
                 value: loc.id,
                 text: loc.name + ' (' + loc.typeLabel + ')',
                 type: loc.type
             }));
-
 
             const currentLocationId = locationSelect.value;
 
@@ -910,7 +921,6 @@
                     locationSelect.appendChild(option);
                 }
 
-
                 if (currentLocationId && currentLocationId !== '') {
                     const optionToSelect = locationSelect.querySelector(`option[value="${currentLocationId}"]`);
                     if (optionToSelect) {
@@ -921,7 +931,6 @@
 
             const updateForm = () => {
                 const status = statusSelect.value;
-
 
                 if (status === 'in_use') {
                     userField.style.display = 'block';
@@ -961,7 +970,6 @@
                     }
                 }
 
-
                 Array.from(typeSelect.options).forEach(opt => {
                     if (opt.value === '') {
                         opt.style.display = '';
@@ -984,15 +992,18 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             @if(session('edit_modal_open') || ($errors->any() && !$errors->hasBag('categoryModal') && !$errors->hasBag('locationModal')))
-            new bootstrap.Modal(document.getElementById('editEquipmentModal')).show();
+            const editModal = new bootstrap.Modal(document.getElementById('editEquipmentModal'));
+            editModal.show();
             @endif
 
             @if(session('open_category_modal') || $errors->hasBag('categoryModal'))
-            new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+            const categoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+            categoryModal.show();
             @endif
 
             @if(session('open_location_modal') || $errors->hasBag('locationModal'))
-            new bootstrap.Modal(document.getElementById('addLocationModal')).show();
+            const locationModal = new bootstrap.Modal(document.getElementById('addLocationModal'));
+            locationModal.show();
             @endif
 
             initCustomSelects();
@@ -1056,6 +1067,14 @@
                 assignForm.addEventListener('submit', (e) => {
                     e.preventDefault();
                     submitAjaxForm(assignForm, 'assignModal', {reloadOnSuccess: true});
+                });
+            }
+
+            const returnForm = document.querySelector('#returnModal form');
+            if (returnForm) {
+                returnForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    submitAjaxForm(returnForm, 'returnModal', {reloadOnSuccess: true});
                 });
             }
 

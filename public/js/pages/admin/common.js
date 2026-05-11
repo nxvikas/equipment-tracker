@@ -2,7 +2,7 @@
 
 window.showToast = (message, type = 'success') => {
     const toast = Object.assign(document.createElement('div'), {
-        className: `alert alert-${type} position-fixed bottom-0 end-0 m-3`,
+        className: `position-fixed bottom-0 end-0 m-3`,
         textContent: message,
         style: `
             z-index: 9999;
@@ -16,7 +16,6 @@ window.showToast = (message, type = 'success') => {
     setTimeout(() => toast.remove(), 3000);
 };
 
-
 window.showFormErrors = (form, errors) => {
     form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     form.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
@@ -29,14 +28,13 @@ window.showFormErrors = (form, errors) => {
                 className: 'invalid-feedback',
                 textContent: Array.isArray(messages) ? messages[0] : messages
             });
-            (input.closest('.mb-3') || input.parentNode).appendChild(feedback);
+            input.parentNode.appendChild(feedback);
         }
     });
 };
 
-
 window.submitAjaxForm = async (form, modalId, options = {}) => {
-    const { selectName = null, reloadOnSuccess = false, onSuccess = null } = options;
+    const {selectName = null, reloadOnSuccess = false, onSuccess = null} = options;
 
     try {
         const formData = new FormData(form);
@@ -56,6 +54,11 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
 
         const data = await response.json();
 
+        if (data.errors) {
+            window.showFormErrors(form, data.errors);
+            return;
+        }
+
         if (data.success) {
             const modalElement = document.getElementById(modalId);
             if (modalElement) {
@@ -63,9 +66,9 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
                 if (modal) modal.hide();
             }
 
-            if (selectName) {
+            if (selectName && data.item) {
                 const select = document.querySelector(`select[name="${selectName}"]`);
-                if (select && data.item) {
+                if (select) {
                     select.add(new Option(data.item.name, data.item.id, true, true));
                 }
                 window.showToast(data.message || 'Успешно сохранено', 'success');
@@ -84,19 +87,10 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
             } else if (!selectName) {
                 window.showToast(data.message || 'Успешно сохранено', 'success');
             }
-        } else {
-            if (data.errors) {
-                window.showFormErrors(form, data.errors);
-            } else if (data.message) {
-                window.showToast(data.message, 'danger');
-            }
         }
     } catch (error) {
-        console.error('Ошибка:', error);
-        window.showToast('Ошибка соединения с сервером', 'danger');
     }
 };
-
 
 window.initCustomSelects = () => {
     document.querySelectorAll('.custom-select').forEach(select => {
@@ -123,3 +117,35 @@ window.initCustomSelects = () => {
     });
 };
 
+window.initDepartmentPositionFilter = () => {
+    document.querySelectorAll('.edit-user-form, #editUserFullForm').forEach(form => {
+        const departmentSelect = form.querySelector('select[name="department_id"]');
+        const positionSelect = form.querySelector('select[name="position_id"]');
+
+        if (!departmentSelect || !positionSelect) return;
+
+        const allPositions = [...positionSelect.querySelectorAll('option')].map(opt => ({
+            value: opt.value,
+            text: opt.textContent,
+            departmentId: opt.dataset.departmentId
+        }));
+
+        const currentPositionId = positionSelect.value;
+
+        departmentSelect.addEventListener('change', function () {
+            const deptId = this.value;
+            positionSelect.innerHTML = '<option value="">Не назначена</option>';
+
+            allPositions.forEach(pos => {
+                if (!pos.value) return;
+                if (pos.departmentId === deptId || !pos.departmentId) {
+                    positionSelect.innerHTML += `<option value="${pos.value}">${pos.text}</option>`;
+                }
+            });
+
+            if (currentPositionId && positionSelect.querySelector(`option[value="${currentPositionId}"]`)) {
+                positionSelect.value = currentPositionId;
+            }
+        });
+    });
+};

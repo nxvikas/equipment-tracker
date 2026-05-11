@@ -46,7 +46,12 @@
                     data-bs-toggle="dropdown" aria-expanded="false">
     <span class="user-info">
         <span class="user-name">{{ auth()->user()->name ?? 'Не указано' }}</span>
-        <span class="user-role">{{ auth()->user()->role->display_name ?? 'Не указано' }}</span>
+        <span class="user-role">
+    {{ auth()->user()->role->display_name ?? 'Не указано' }}
+            @if(auth()->user()->position)
+                | {{ auth()->user()->position->name }}
+            @endif
+</span>
     </span>
                 <span class="user-avatar">
         @if(auth()->user()->avatar)
@@ -124,8 +129,7 @@
                             searchResults.innerHTML = html;
                             searchResults.classList.add('show');
                         })
-                        .catch(error => {
-                            console.error('Search error:', error);
+                        .catch(() => {
                         });
                 }, 300);
             });

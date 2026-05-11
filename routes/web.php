@@ -20,6 +20,8 @@ Route::middleware('web')->group(function () {
 
         Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
         Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+
 
         Route::get('/equipment/{id}', [\App\Http\Controllers\EquipmentController::class, 'publicShow'])->name('public.equipment');
         Route::get('/equipment/{equipment}/qrcode', [\App\Http\Controllers\EquipmentController::class, 'getQrCode'])->name('equipment.qrcode');

@@ -27,6 +27,15 @@ class Equipment extends Model
         'purchase_date' => 'date',
         'warranty_date' => 'date',
     ];
+
+    public function assignedHistory()
+    {
+        return $this->hasOne(Equipment_history::class)
+            ->where('action_type', 'assigned')
+            ->where('to_user_id', auth()->id())
+            ->latest();
+    }
+
     public function currentUser()
     {
         return $this->belongsTo(User::class, 'current_user_id');

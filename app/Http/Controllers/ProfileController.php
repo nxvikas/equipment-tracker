@@ -48,4 +48,16 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.show')->with('success', 'Профиль успешно обновлён');
     }
+    public function destroyAvatar()
+    {
+        $user = Auth::user();
+
+        if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->update(['avatar' => null]);
+
+        return redirect()->route('profile.show')->with('success', 'Фото профиля успешно удалено');
+    }
 }

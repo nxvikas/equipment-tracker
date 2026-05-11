@@ -3,7 +3,7 @@
 @section('title', 'Сотрудники')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
 @endpush
 
 @section('content')
@@ -328,8 +328,7 @@
                                 <select name="position_id" class="form-control-custom custom-dark-select">
                                     <option value="">Не назначена</option>
                                     @foreach($positions as $pos)
-                                        <option
-                                            value="{{ $pos->id }}" {{ $user->position_id == $pos->id ? 'selected' : '' }}>
+                                        <option value="{{ $pos->id }}" data-department-id="{{ $pos->department_id }}" {{ $user->position_id == $pos->id ? 'selected' : '' }}>
                                             {{ $pos->name }}
                                         </option>
                                     @endforeach
@@ -498,6 +497,7 @@
                     submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
                 });
             });
+            initDepartmentPositionFilter();
         });
         document.querySelector('.add-department-form')?.addEventListener('submit', (e) => {
             e.preventDefault();

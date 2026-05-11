@@ -232,9 +232,7 @@
         max-width: 100%;
     }
 
-    .filters-group {
-        justify-content: space-between;
-    }
+
 }
 
 @media (max-width: 768px) {

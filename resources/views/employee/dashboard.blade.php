@@ -3,7 +3,7 @@
 @section('title', 'Моя панель')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/dashboard.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 @endpush
 

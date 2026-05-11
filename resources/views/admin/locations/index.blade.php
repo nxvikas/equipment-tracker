@@ -3,7 +3,7 @@
 @section('title', 'Управление локациями')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
 @endpush
 
 @section('content')

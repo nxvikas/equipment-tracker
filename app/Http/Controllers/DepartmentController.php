@@ -26,7 +26,7 @@ class DepartmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -65,7 +65,7 @@ class DepartmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }

@@ -56,7 +56,7 @@ class EquipmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
-                ], 422);
+                ]);
             }
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
@@ -134,7 +134,7 @@ class EquipmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => ['current_user_id' => ['Для статуса "В работе" необходимо выбрать сотрудника']]
-                ], 422);
+                ]);
             }
             return redirect()->back()
                 ->with('error', 'Для статуса "В работе" необходимо выбрать сотрудника')
@@ -271,18 +271,19 @@ class EquipmentController extends Controller
 
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'user_id' => ['required', 'exists:users,id'],
-            'location_id' => ['nullable', 'exists:locations,id'],
+            'location_id' => ['required', 'exists:locations,id'],
             'comment' => ['nullable', 'string', 'max:500'],
         ], [
             'user_id.required' => 'Выберите сотрудника',
             'user_id.exists' => 'Выбранный сотрудник не найден',
+            'location_id.required' => 'Выберите локацию',
+            'location_id.exists' => 'Выбранная локация не найдена',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
                 'errors' => $validator->errors()->toArray()
-            ], 422);
+            ]);
         }
 
         $oldLocationId = $equipment->location_id;
@@ -290,7 +291,7 @@ class EquipmentController extends Controller
         $equipment->update([
             'status' => StatusEquipment::IN_USE->value,
             'current_user_id' => $request->user_id,
-            'location_id' => $request->location_id ?? $equipment->location_id,
+            'location_id' => $request->location_id,
         ]);
 
         Equipment_history::create([
@@ -312,18 +313,37 @@ class EquipmentController extends Controller
     public function return(Request $request, Equipment $equipment)
     {
         if ($equipment->status !== StatusEquipment::IN_USE->value) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'errors' => ['status' => ['Оборудование не находится в использовании']]
+                ]);
+            }
             return redirect()->back()->with('error', 'Оборудование не находится в использовании');
         }
 
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'location_id' => ['required', 'exists:locations,id'],
             'comment' => ['nullable', 'string', 'max:500'],
+        ], [
+            'location_id.required' => 'Выберите склад для возврата',
+            'location_id.exists' => 'Выбранный склад не найден',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'errors' => $validator->errors()->toArray()
+                ]);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $oldUserId = $equipment->current_user_id;
 
         $equipment->update([
             'status' => StatusEquipment::IN_STOCK->value,
             'current_user_id' => null,
+            'location_id' => $request->location_id,
         ]);
 
         Equipment_history::create([
@@ -334,6 +354,12 @@ class EquipmentController extends Controller
             'new_status' => StatusEquipment::IN_STOCK->value,
             'comment' => $request->comment ?? 'Возвращено на склад',
         ]);
+
+        session()->flash('success', 'Оборудование возвращено на склад');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('admin.equipment.show', $equipment->id)
             ->with('success', 'Оборудование возвращено на склад');
@@ -361,7 +387,7 @@ class EquipmentController extends Controller
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()->toArray()
-            ], 422);
+            ]);
         }
 
         $oldStatus = $equipment->status;
@@ -412,7 +438,7 @@ class EquipmentController extends Controller
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()->toArray()
-            ], 422);
+            ]);
         }
 
         $newLocation = Location::find($request->location_id);
@@ -474,7 +500,7 @@ class EquipmentController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }

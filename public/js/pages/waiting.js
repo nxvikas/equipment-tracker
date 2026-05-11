@@ -7,7 +7,6 @@ function checkStatus() {
     const checkUrl = document.getElementById('checkStatusBtn')?.dataset.checkUrl;
 
     if (!checkUrl) {
-        console.error('URL для проверки статуса не найден');
         return;
     }
 
@@ -33,7 +32,7 @@ function checkStatus() {
                 handleBlockedStatus(data);
             }
         })
-        .catch(error => console.error('Ошибка при проверке статуса:', error));
+        .catch(() => {});
 }
 
 

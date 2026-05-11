@@ -13,16 +13,12 @@
 
                 if (savedTheme === 'light') {
                     document.documentElement.classList.add('light');
-                    document.body.classList.add('light');
                 } else if (savedTheme === 'dark') {
                     document.documentElement.classList.add('dark');
-                    document.body.classList.add('dark');
                 } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
                     document.documentElement.classList.add('light');
-                    document.body.classList.add('light');
                 }
             } catch (e) {
-                console.warn('Theme error:', e);
             }
         })();
     </script>

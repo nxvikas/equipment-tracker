@@ -3,7 +3,7 @@
 @section('title', 'Панель управления')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/dashboard.css') }}">
 @endpush
 
 @section('content')

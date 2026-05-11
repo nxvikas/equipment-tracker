@@ -3,7 +3,7 @@
 @section('title', 'Моё оборудование')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
 @endpush
 
 @section('content')
@@ -106,6 +106,37 @@
                         <input type="hidden" name="status" class="custom-select-input" value="{{ request('status') }}">
                     </div>
 
+                    <div class="dropdown custom-select">
+                        <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="selected-text">
+            @if(request('direction', 'desc') === 'asc')
+                Сначала старые выдачи
+            @else
+                Сначала новые выдачи
+            @endif
+        </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu custom-select-menu">
+                            <li>
+                                <a class="dropdown-item {{ request('direction', 'desc') === 'desc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="desc">
+                                    Сначала новые выдачи
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request('direction') === 'asc' ? 'active' : '' }}"
+                                   href="#"
+                                   data-direction="asc">
+                                    Сначала старые выдачи
+                                </a>
+                            </li>
+                        </ul>
+                        <input type="hidden" name="direction" class="custom-direction-input"
+                               value="{{ request('direction', 'desc') }}">
+                    </div>
+
                     <button type="submit" class="btn-primary" style="padding: 10px 20px;">
                         <i class="bi bi-funnel"></i> Применить
                     </button>
@@ -121,7 +152,8 @@
                 <table class="custom-table">
                     <thead>
                     <tr>
-                        <th style="width: 60px; text-align: center;">QR</th>
+                        <th>ID</th>
+                        <th>Выдано</th>
                         <th>Инв. номер</th>
                         <th>Название</th>
                         <th>Категория</th>
@@ -135,16 +167,10 @@
                     <tbody>
                     @forelse($equipments as $item)
                         <tr>
-                            <td style="text-align: center;">
-                                @if($item->qr_code)
-                                    <div class="bg-white d-inline-block rounded p-1 shadow-sm">
-                                        <img src="{{ route('equipment.qrcode', $item->id) }}" alt="QR"
-                                             style="width: 40px; height: 40px;">
-                                    </div>
-                                @else
-                                    <span class="text-secondary">—</span>
-                                @endif
+                            <td>
+                                {{$item->id}}
                             </td>
+                            <td class="date">{{ $item->assignedHistory?->created_at?->format('d.m.Y H:i') ?? '—' }}</td>
                             <td class="inv-number">{{ $item->inventory_number }}</td>
                             <td class="equipment-name">
                                 <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}"

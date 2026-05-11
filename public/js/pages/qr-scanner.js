@@ -1,7 +1,6 @@
 (function() {
     const modal = document.getElementById('qrScannerModal');
     if (!modal) {
-        console.error('Модалка не найдена');
         return;
     }
     let scanner = null;
@@ -18,49 +17,50 @@
         if (scanner && isScanning) {
             scanner.stop().then(() => {
                 isScanning = false;
-
-            }).catch(err => console.error('Ошибка остановки:', err));
+            }).catch(() => {});
         }
     }
 
     function startScanner() {
         const readerElement = document.getElementById('qr-reader');
-        if (!readerElement) {
-            console.error('Элемент qr-reader не найден');
-            return;
-        }
+        if (!readerElement) return;
+
         readerElement.innerHTML = '';
         scanner = new Html5Qrcode("qr-reader");
         const config = {
             fps: 10,
             qrbox: { width: 250, height: 250 }
         };
+
         scanner.start(
             { facingMode: "environment" },
             config,
             (decodedText) => {
-
                 const equipmentId = getEquipmentIdFromUrl(decodedText);
-
                 if (equipmentId) {
                     stopScanner();
                     const bsModal = bootstrap.Modal.getInstance(modal);
                     if (bsModal) bsModal.hide();
-
                     window.location.href = '/equipment/' + equipmentId;
                 } else {
                     alert('Неверный QR-код');
                 }
             },
-            (errorMessage) => {
-
-            }
+            () => {}
         ).then(() => {
             isScanning = true;
-
         }).catch(err => {
-            console.error('Ошибка запуска камеры:', err);
-            readerElement.innerHTML = '<div class="text-danger text-center p-3">Ошибка: ' + err + '</div>';
+            let errorMessage = 'Не удалось запустить камеру';
+
+            if (err.name === 'NotFoundError' || err.message?.includes('device not found')) {
+                errorMessage = 'Камера не найдена. Подключите камеру или используйте телефон.';
+            } else if (err.name === 'NotAllowedError') {
+                errorMessage = 'Доступ к камере запрещён. Разрешите использование камеры в настройках браузера.';
+            } else if (err.name === 'NotReadableError') {
+                errorMessage = 'Камера занята другим приложением. Закройте другие программы, использующие камеру.';
+            }
+
+            readerElement.innerHTML = '<div class="text-danger text-center p-3"><i class="bi bi-exclamation-triangle me-2"></i>' + errorMessage + '</div>';
         });
     }
 
@@ -71,7 +71,6 @@
 
 
     modal.addEventListener('hidden.bs.modal', function() {
-
         stopScanner();
         const readerElement = document.getElementById('qr-reader');
         if (readerElement) readerElement.innerHTML = '';

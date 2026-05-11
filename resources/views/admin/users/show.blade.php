@@ -26,7 +26,8 @@
         <div class="page-header">
             <div>
                 @if(request('from_equipment'))
-                    <a href="{{ route('admin.equipment.show', request('from_equipment')) }}" class="text-secondary text-decoration-none">
+                    <a href="{{ route('admin.equipment.show', request('from_equipment')) }}"
+                       class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к оборудованию
                     </a>
                 @elseif(request('from_dashboard'))
@@ -502,8 +503,8 @@
                                         class="form-control-custom custom-dark-select @error('position_id') is-invalid @enderror">
                                     <option value="">Не назначена</option>
                                     @foreach($positions as $pos)
-                                        <option
-                                            value="{{ $pos->id }}" @selected(old('position_id', $user->position_id) == $pos->id)>
+                                        <option value="{{ $pos->id }}"
+                                                data-department-id="{{ $pos->department_id }}" @selected(old('position_id', $user->position_id) == $pos->id)>
                                             {{ $pos->name }}
                                         </option>
                                     @endforeach
@@ -800,6 +801,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            initDepartmentPositionFilter();
             const editForm = document.querySelector('#editUserModal form');
             if (editForm) {
                 editForm.addEventListener('submit', (e) => {

@@ -7,7 +7,6 @@
 /* layouts */
 @import 'layouts/sidebar.css';
 @import 'layouts/header.css';
-@import 'layouts/main.css';
 
 /* components */
 @import 'components/buttons.css';

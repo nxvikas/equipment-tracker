@@ -3,7 +3,7 @@
 @section('title', 'Оборудование')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
 @endpush
 
 @section('content')
@@ -1232,10 +1232,7 @@
                                 window.showFormErrors(categoryForm, data.errors);
                             }
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            window.showToast('Ошибка соединения с сервером', 'danger');
-                        });
+                        .catch(() => {});
                 });
             }
 
@@ -1293,10 +1290,7 @@
                                 window.showFormErrors(locationForm, data.errors);
                             }
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            window.showToast('Ошибка соединения с сервером', 'danger');
-                        });
+                        .catch(() => {});
                 });
             }
         });

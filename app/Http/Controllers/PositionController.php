@@ -30,7 +30,7 @@ class PositionController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -67,7 +67,7 @@ class PositionController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }

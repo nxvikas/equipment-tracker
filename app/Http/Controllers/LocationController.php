@@ -51,7 +51,7 @@ class LocationController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -97,7 +97,7 @@ class LocationController extends Controller
                 return response()->json([
                     'success' => false,
                     'errors' => $validator->errors()->toArray()
-                ], 422);
+                ]);
             }
             return redirect()->back()->withErrors($validator)->withInput();
         }

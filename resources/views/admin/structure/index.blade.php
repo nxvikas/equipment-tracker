@@ -4,7 +4,7 @@
 
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components/tabs.css') }}">
 @endpush
 

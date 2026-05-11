@@ -3,7 +3,7 @@
 @section('title', 'История операций')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/pages/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components/tables.css') }}">
 @endpush
 

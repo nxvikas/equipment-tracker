@@ -75,13 +75,13 @@
 
                     <div class="dropdown custom-select">
                         <button class="custom-select-btn" type="button" data-bs-toggle="dropdown">
-                            <span class="selected-text">
-                                @if(request('department_id'))
-                                    {{ $departments->find(request('department_id'))->name ?? 'Все отделы' }}
-                                @else
-                                    Все отделы
-                                @endif
-                            </span>
+        <span class="selected-text">
+            @if(request('department_id'))
+                {{ $departments->find(request('department_id'))->name ?? 'Все отделы' }}
+            @else
+                Все отделы
+            @endif
+        </span>
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu custom-select-menu">
@@ -192,7 +192,7 @@
                             </td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->phone }}</td>
-                            <td>{{ $user->department->name ?? '—' }}</td>
+                            <td>{{ $user->position?->department?->name ?? '—' }}</td>
                             <td>{{ $user->position->name ?? '—' }}</td>
                             <td>
                                 @php
@@ -303,20 +303,16 @@
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Отдел</label>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"
-                                       style="font-size: 12px; color: var(--accent);">+ Добавить</a>
-                                </div>
-                                <select name="department_id" class="form-control-custom custom-dark-select">
-                                    <option value="">Не назначен</option>
-                                    @foreach($departments as $dept)
-                                        <option
-                                            value="{{ $dept->id }}" {{ $user->department_id == $dept->id ? 'selected' : '' }}>
-                                            {{ $dept->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <label class="form-label">Отдел</label>
+                                <input type="text"
+                                       class="form-control-custom"
+                                       value="{{ $user->position?->department?->name ?? 'Не назначен' }}"
+                                       disabled
+                                       readonly>
+                                <small class="form-hint">
+                                    <i class="bi bi-building"></i>
+                                    Отдел определяется выбранной должностью
+                                </small>
                             </div>
 
                             <div class="mb-3">
@@ -328,7 +324,8 @@
                                 <select name="position_id" class="form-control-custom custom-dark-select">
                                     <option value="">Не назначена</option>
                                     @foreach($positions as $pos)
-                                        <option value="{{ $pos->id }}" data-department-id="{{ $pos->department_id }}" {{ $user->position_id == $pos->id ? 'selected' : '' }}>
+                                        <option value="{{ $pos->id }}"
+                                                data-department-id="{{ $pos->department_id }}" {{ $user->position_id == $pos->id ? 'selected' : '' }}>
                                             {{ $pos->name }}
                                         </option>
                                     @endforeach
@@ -413,7 +410,8 @@
                             <h5 class="modal-title text-warning">
                                 <i class="bi bi-shield-plus me-2"></i>Назначение администратором
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
                         </div>
                         <div class="modal-body">
                             <p>Вы уверены, что хотите назначить администратором?</p>
@@ -445,7 +443,8 @@
                                 <h5 class="modal-title text-danger">
                                     <i class="bi bi-shield-slash me-2"></i>Снятие прав администратора
                                 </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
                             </div>
                             <div class="modal-body">
                                 <p>Вы уверены, что хотите снять права администратора?</p>
@@ -487,9 +486,52 @@
             });
         };
 
+
+        window.updateQuickDepartmentField = (positionSelect) => {
+            const modalBody = positionSelect.closest('.modal-body');
+            const departmentField = modalBody.querySelector('input[disabled][readonly]');
+
+            if (positionSelect && departmentField) {
+                const selectedOption = positionSelect.options[positionSelect.selectedIndex];
+                const departmentId = selectedOption?.dataset.departmentId;
+
+                if (departmentId && window.departmentsList) {
+                    const department = window.departmentsList.find(d => d.id == departmentId);
+                    departmentField.value = department ? department.name : 'Не назначен';
+                } else {
+                    departmentField.value = 'Не назначен';
+                }
+            }
+        };
+
+
+        const initQuickEditDepartmentListener = () => {
+            document.querySelectorAll('.edit-user-form select[name="position_id"]').forEach(select => {
+
+                select.removeEventListener('change', () => {});
+                select.addEventListener('change', function() {
+                    window.updateQuickDepartmentField(this);
+                });
+
+
+                window.updateQuickDepartmentField(select);
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             initCustomSelects();
             initLiveSearch();
+
+
+            if (!window.departmentsList) {
+                window.departmentsList = @json($departments->map(function($d) {
+                    return ['id' => $d->id, 'name' => $d->name];
+                }));
+            }
+
+
+            initQuickEditDepartmentListener();
+
 
             document.querySelectorAll('.edit-user-form').forEach(form => {
                 form.addEventListener('submit', (e) => {
@@ -497,8 +539,10 @@
                     submitAjaxForm(form, form.closest('.modal').id, {reloadOnSuccess: true});
                 });
             });
+
             initDepartmentPositionFilter();
         });
+
         document.querySelector('.add-department-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
             submitAjaxForm(e.target, 'addDepartmentModal', {
@@ -514,7 +558,5 @@
                 reloadOnSuccess: false
             });
         });
-
-
     </script>
 @endpush

@@ -170,7 +170,7 @@
                                     <label class="form-label">Отдел</label>
                                     <input type="text"
                                            class="form-control-custom"
-                                           value="{{ $user->department->name ?? 'Не назначен' }}"
+                                           value="{{ $user->position?->department?->name ?? 'Не назначен' }}"
                                            disabled>
                                 </div>
                                 <div class="col-md-6 mb-3">

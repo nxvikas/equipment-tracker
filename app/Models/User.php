@@ -18,7 +18,6 @@ class User extends Authenticatable
         'phone',
         'avatar',
         'position_id',
-        'department_id',
         'role_id',
         'status',
     ];
@@ -36,10 +35,6 @@ class User extends Authenticatable
         return $this->belongsTo(\App\Models\Position::class);
     }
 
-    public function department()
-    {
-        return $this->belongsTo(\App\Models\Department::class);
-    }
 
     public function equipment()
     {

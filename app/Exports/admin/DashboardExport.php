@@ -98,7 +98,7 @@ class DashboardExport implements FromArray, WithHeadings, WithTitle, WithStyles
             $exportData[] = [
                 $index++,
                 $user->surname . ' ' . $user->name,
-                $user->department->name ?? 'Без отдела',
+                $user->position?->department?->name ?? 'Без отдела',
                 $user->equipment_count
             ];
         }

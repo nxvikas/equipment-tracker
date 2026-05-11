@@ -23,7 +23,7 @@ class UserController extends Controller
     {
         $direction = $request->query('direction', 'desc');
 
-        $query = User::with(['department', 'position', 'role'])
+        $query = User::with(['position.department', 'role'])
             ->where('id', '!=', auth()->id())
             ->orderByRaw("FIELD(status, 'pending', 'active', 'blocked', 'rejected')")
             ->orderBy('created_at', $direction);
@@ -32,7 +32,9 @@ class UserController extends Controller
             $query->where('status', $request->status);
         }
         if ($request->filled('department_id')) {
-            $query->where('department_id', $request->department_id);
+            $query->whereHas('position', function ($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
         }
         if ($request->filled('position_id')) {
             $query->where('position_id', $request->position_id);
@@ -86,7 +88,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['department', 'position', 'role']);
+        $user->load(['position.department', 'role']);
 
         $assignedEquipments = Equipment::where('current_user_id', $user->id)
             ->where('status', 'in_use')

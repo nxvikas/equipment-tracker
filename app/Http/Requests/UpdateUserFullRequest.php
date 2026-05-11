@@ -23,7 +23,6 @@ class UpdateUserFullRequest extends FormRequest
             'email' => ['required', 'email', 'email:rfc', Rule::unique('users')->ignore($userId)],
             'phone' => ['required', 'regex:/^(?:\+7|8)\d{10}$/', Rule::unique('users')->ignore($userId)],
             'status' => ['required', 'string', 'in:' . implode(',', \App\Http\Enums\UserStatus::values())],
-            'department_id' => ['nullable', 'exists:departments,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
         ];
     }
@@ -52,7 +51,6 @@ class UpdateUserFullRequest extends FormRequest
             'status.required' => 'Выберите статус пользователя',
             'status.in' => 'Выбран недопустимый статус',
 
-            'department_id.exists' => 'Выбранный отдел не существует',
 
             'position_id.exists' => 'Выбранная должность не существует',
         ];

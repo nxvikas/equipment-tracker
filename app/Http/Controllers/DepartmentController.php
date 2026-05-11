@@ -90,7 +90,12 @@ class DepartmentController extends Controller
      */
     public function destroy(Request $request, Department $department)
     {
-        if ($department->users()->exists()) {
+
+        $hasEmployees = $department->positions->sum(function ($position) {
+                return $position->users->count();
+            }) > 0;
+
+        if ($hasEmployees) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,

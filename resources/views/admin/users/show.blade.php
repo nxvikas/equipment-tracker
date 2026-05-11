@@ -34,6 +34,11 @@
                     <a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад на главную
                     </a>
+                @elseif(request('from_structure'))
+                    <a href="{{ route('admin.structure.index', ['tab' => request('tab', 'departments')]) }}"
+                       class="text-secondary text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> Назад к структуре
+                    </a>
                 @else
                     <a href="{{ route('admin.users.index') }}" class="text-secondary text-decoration-none">
                         <i class="bi bi-arrow-left"></i> Назад к списку
@@ -102,7 +107,7 @@
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Отдел</span>
-                                <span class="info-value">{{ $user->department->name ?? '—' }}</span>
+                                <span class="info-value">{{ $user->position?->department?->name ?? '—' }}</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Должность</span>
@@ -479,19 +484,14 @@
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addDepartmentModal"
                                        style="font-size: 12px; color: var(--accent);">+ Добавить</a>
                                 </div>
-                                <select name="department_id"
-                                        class="form-control-custom custom-dark-select @error('department_id') is-invalid @enderror">
-                                    <option value="">Не назначен</option>
-                                    @foreach($departments as $dept)
-                                        <option
-                                            value="{{ $dept->id }}" @selected(old('department_id', $user->department_id) == $dept->id)>
-                                            {{ $dept->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('department_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text"
+                                       class="form-control-custom"
+                                       value="{{ $user->position?->department?->name ?? 'Не назначен' }}"
+                                       disabled
+                                       readonly>
+                                <small class="form-hint">
+                                    <i class="bi bi-building"></i> Отдел определяется должностью
+                                </small>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
@@ -837,6 +837,38 @@
                     new bootstrap.Modal(document.getElementById('assignToUserModal')).show();
                 });
             });
+        });
+
+        function updateDepartmentFromPosition() {
+            const positionSelect = document.querySelector('#editUserFullForm select[name="position_id"]');
+            const departmentField = document.querySelector('#editUserFullForm .col-md-4.mb-3 input[disabled]');
+
+            if (positionSelect && departmentField) {
+                const selectedOption = positionSelect.options[positionSelect.selectedIndex];
+                const departmentId = selectedOption?.dataset.departmentId;
+
+                if (departmentId && window.departmentsList) {
+                    const department = window.departmentsList.find(d => d.id == departmentId);
+                    departmentField.value = department ? department.name : 'Не назначен';
+                } else {
+                    departmentField.value = 'Не назначен';
+                }
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.departmentsList) {
+                window.departmentsList = @json($departments->map(function($d) {
+            return ['id' => $d->id, 'name' => $d->name];
+        }));
+            }
+
+            const positionSelect = document.querySelector('#editUserFullForm select[name="position_id"]');
+            if (positionSelect) {
+                positionSelect.addEventListener('change', updateDepartmentFromPosition);
+                updateDepartmentFromPosition();
+            }
         });
     </script>
 @endpush

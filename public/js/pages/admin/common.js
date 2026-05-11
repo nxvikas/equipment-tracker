@@ -82,7 +82,9 @@ window.submitAjaxForm = async (form, modalId, options = {}) => {
                 onSuccess(data);
             }
 
-            if (reloadOnSuccess || data.reload) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else if (reloadOnSuccess || data.reload) {
                 window.location.reload();
             } else if (!selectName) {
                 window.showToast(data.message || 'Успешно сохранено', 'success');

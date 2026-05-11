@@ -299,15 +299,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Закрыть"></button>
                         </div>
-                        <div class="modal-body text-center py-4">
-                            <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                            <p class="mt-3 mb-0">Вы уверены, что хотите удалить локацию?</p>
-                            <p class="text-secondary mt-2">
-                                <strong>{{ $location->name }}</strong>
-                            </p>
-                            <p class="text-danger small mt-3">
-                                <i class="bi bi-exclamation-circle"></i> Это действие нельзя отменить.
-                            </p>
+                        <div class="modal-body">
+                            <p>Вы уверены, что хотите удалить локацию?</p>
+                            <p class="text-secondary"><strong>{{ $location->name }}</strong></p>
                         </div>
                         <div class="modal-footer border-0 pt-0">
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>

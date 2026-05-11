@@ -17,6 +17,7 @@
 @import 'components/badges.css';
 @import 'components/cards.css';
 @import 'components/alerts.css';
+@import 'components/tabs.css';
 
 /* pages — общие */
 @import 'pages/auth.css';

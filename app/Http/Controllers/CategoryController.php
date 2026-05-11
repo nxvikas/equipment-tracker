@@ -133,13 +133,13 @@ class CategoryController extends Controller
 
         $category->delete();
 
-
         session()->flash('success', 'Категория удалена');
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Категория удалена'
+                'message' => 'Категория удалена',
+                'redirect' => route('admin.categories.index')
             ]);
         }
 

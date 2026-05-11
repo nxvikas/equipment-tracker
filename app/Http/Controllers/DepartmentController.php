@@ -91,18 +91,29 @@ class DepartmentController extends Controller
     public function destroy(Request $request, Department $department)
     {
 
-        $hasEmployees = $department->positions->sum(function ($position) {
-                return $position->users->count();
-            }) > 0;
+        $department->load(['positions.users']);
+
+
+        $hasEmployees = false;
+        foreach ($department->positions as $position) {
+            if ($position->users->count() > 0) {
+                $hasEmployees = true;
+                break;
+            }
+        }
 
         if ($hasEmployees) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Нельзя удалить отдел, в котором есть сотрудники'
+                    'message' => 'Нельзя удалить отдел, в котором есть сотрудники. Сначала переведите сотрудников в другие отделы.'
                 ], 400);
             }
             return redirect()->back()->with('error', 'Нельзя удалить отдел, в котором есть сотрудники');
+        }
+
+        foreach ($department->positions as $position) {
+            $position->delete();
         }
 
         $department->delete();
@@ -112,7 +123,8 @@ class DepartmentController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Отдел удалён'
+                'message' => 'Отдел удалён',
+                'redirect' => route('admin.structure.index', ['tab' => 'departments'])
             ]);
         }
 

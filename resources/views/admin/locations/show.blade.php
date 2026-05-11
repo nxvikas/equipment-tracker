@@ -257,17 +257,16 @@
                         <h5 class="modal-title text-danger">
                             <i class="bi bi-exclamation-triangle me-2"></i>Подтверждение удаления
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                     </div>
-                    <div class="modal-body text-center py-4">
-                        <i class="bi bi-trash" style="font-size: 48px; color: var(--danger);"></i>
-                        <p class="mt-3 mb-0">Вы уверены, что хотите удалить локацию?</p>
-                        <p class="text-secondary mt-2"><strong>{{ $location->name }}</strong></p>
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите удалить локацию?</p>
+                        <p class="text-secondary"><strong>{{ $location->name }}</strong></p>
                     </div>
                     <div class="modal-footer border-0 pt-0">
                         <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
                         <form action="{{ route('admin.locations.destroy', $location->id) }}" method="POST"
-                              id="deleteLocationForm">
+                              class="delete-location-form">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-primary" style="background: var(--danger); color: white;">
@@ -287,61 +286,20 @@
 
             const editForm = document.getElementById('editLocationForm');
             if (editForm) {
-                editForm.addEventListener('submit', function (e) {
+                editForm.addEventListener('submit', (e) => {
                     e.preventDefault();
 
-
-                    editForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    editForm.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-
-                    const formData = new FormData(this);
-
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
-                            } else if (data.errors) {
-                                Object.keys(data.errors).forEach(field => {
-                                    const input = editForm.querySelector(`[name="${field}"]`);
-                                    const feedback = editForm.querySelector(`[data-error="${field}"]`);
-                                    if (input) input.classList.add('is-invalid');
-                                    if (feedback) feedback.textContent = data.errors[field][0];
-                                });
-                            }
-                        })
-                        .catch(() => {});
+                    submitAjaxForm(editForm, 'editLocationModal', {reloadOnSuccess: true});
                 });
             }
 
+
             const deleteForm = document.getElementById('deleteLocationForm');
             if (deleteForm) {
-                deleteForm.addEventListener('submit', function (e) {
+                deleteForm.addEventListener('submit', (e) => {
                     e.preventDefault();
 
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: new FormData(this),
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = '{{ route("admin.locations.index") }}';
-                            } else {
-                                alert(data.message || 'Ошибка при удалении');
-                            }
-                        });
+                    submitAjaxForm(deleteForm, 'deleteLocationModal', {reloadOnSuccess: true});
                 });
             }
         });

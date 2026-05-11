@@ -83,16 +83,13 @@ class EmployeeController extends Controller
             ->with(['category', 'location'])
             ->whereIn('status', ['in_use', 'repair']);
 
-
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -103,17 +100,18 @@ class EmployeeController extends Controller
             });
         }
 
+
         $direction = $request->query('direction', 'desc');
-        $equipments = $query->select('equipment.*')
-            ->leftJoin('equipment_histories', function ($join) use ($user) {
-                $join->on('equipment.id', '=', 'equipment_histories.equipment_id')
-                    ->where('equipment_histories.action_type', 'assigned')
-                    ->where('equipment_histories.to_user_id', $user->id);
-            })
-            ->selectRaw('MAX(equipment_histories.created_at) as assigned_date')
-            ->groupBy('equipment.id')
-            ->orderBy('assigned_date', $direction)
-            ->with(['category', 'location'])
+
+        $equipments = $query->orderBy(function ($query) use ($user) {
+            $query->select('created_at')
+                ->from('equipment_histories')
+                ->whereColumn('equipment_histories.equipment_id', 'equipment.id')
+                ->where('equipment_histories.action_type', 'assigned')
+                ->where('equipment_histories.to_user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->limit(1);
+        }, $direction)
             ->paginate(15)
             ->withQueryString();
 
@@ -121,6 +119,7 @@ class EmployeeController extends Controller
             $q->where('current_user_id', $user->id)
                 ->whereIn('status', ['in_use', 'repair']);
         })->orderBy('name')->get();
+
         $statuses = [
             'in_use' => 'В использовании',
             'repair' => 'В ремонте',

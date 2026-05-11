@@ -37,10 +37,6 @@
             </div>
 
             <div class="mt-4">
-                <p class="small mb-3 notification-text">
-                    <i class="bi bi-envelope me-1"></i>
-                    Мы отправим уведомление на вашу почту после подтверждения
-                </p>
 
                 <div class="d-flex gap-2 justify-content-center">
                     <a href="{{ route('auth.login') }}" class="btn btn-outline-custom">

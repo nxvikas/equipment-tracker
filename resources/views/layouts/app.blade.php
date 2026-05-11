@@ -79,13 +79,11 @@
 </div>
 @auth()
     <script src="{{ asset('js/pages/admin/common.js') }}"></script>
-@endauth
-@stack('scripts')
-<script src="{{ asset('js/pages/sidebar.js') }}"></script>
-<script src="{{asset('js/toggleTheme.js')}}"></script>
-@auth()
+    <script src="{{ asset('js/pages/sidebar.js') }}"></script>
     <script src="{{ asset('js/pages/qr-scanner.js') }}"></script>
 @endauth
+@stack('scripts')
+<script src="{{asset('js/toggleTheme.js')}}"></script>
 
 </body>
 </html>

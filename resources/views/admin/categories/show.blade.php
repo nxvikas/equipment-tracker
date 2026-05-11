@@ -242,58 +242,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             const editForm = document.getElementById('editCategoryForm');
             if (editForm) {
-                editForm.addEventListener('submit', function(e) {
+                editForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    editForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    editForm.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-
-                    const formData = new FormData(this);
-
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
-                            } else if (data.errors) {
-                                Object.keys(data.errors).forEach(field => {
-                                    const input = editForm.querySelector(`[name="${field}"]`);
-                                    const feedback = editForm.querySelector(`[data-error="${field}"]`);
-                                    if (input) input.classList.add('is-invalid');
-                                    if (feedback) feedback.textContent = data.errors[field][0];
-                                });
-                            }
-                        })
-                        .catch(() => {});
+                    submitAjaxForm(editForm, 'editCategoryModal', {reloadOnSuccess: true});
                 });
             }
 
             const deleteForm = document.getElementById('deleteCategoryForm');
             if (deleteForm) {
-                deleteForm.addEventListener('submit', function(e) {
+                deleteForm.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    fetch(this.action, {
-                        method: 'POST',
-                        body: new FormData(this),
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                window.location.href = '{{ route("admin.categories.index") }}';
-                            } else {
-                                alert(data.message || 'Ошибка при удалении');
-                            }
-                        });
+                    submitAjaxForm(deleteForm, 'deleteCategoryModal', {reloadOnSuccess: true});
                 });
             }
         });

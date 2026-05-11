@@ -227,25 +227,18 @@ class AdminController extends Controller
 
         $equipments = Equipment::orderBy('name')->get(['id', 'name', 'inventory_number']);
 
-        return view('admin.history', compact('operations', 'actionTypes','equipments'));
+        return view('admin.history', compact('operations', 'actionTypes', 'equipments'));
     }
 
     public function structure(Request $request)
     {
         $activeTab = $request->query('tab', 'departments');
 
-
-        $departmentsQuery = Department::with(['positions', 'positions.users']);
-
-
-        $departments = $departmentsQuery->get();
-
-
-        foreach ($departments as $department) {
-            $department->users_count = $department->positions->sum(function ($position) {
-                return $position->users->count();
-            });
-        }
+        $departments = Department::with(['positions'])
+            ->withCount(['positions as users_count' => function ($query) {
+                $query->whereHas('users');
+            }])
+            ->get();
 
 
         $direction = $request->query('direction', 'desc');
@@ -255,7 +248,7 @@ class AdminController extends Controller
 
 
         $perPage = 15;
-        $currentPage = $request->get('departments_page', 1);
+        $currentPage = $request->query('departments_page', 1);
         $departments = new \Illuminate\Pagination\LengthAwarePaginator(
             $departments->forPage($currentPage, $perPage),
             $departments->count(),

@@ -15,7 +15,6 @@ class UpdateUserQuickRequest extends FormRequest
     {
         return [
             'status' => ['sometimes', 'string', 'in:' . implode(',', \App\Http\Enums\UserStatus::values())],
-            'department_id' => ['nullable', 'exists:departments,id'],
             'position_id' => ['nullable', 'exists:positions,id'],
         ];
     }
@@ -25,7 +24,6 @@ class UpdateUserQuickRequest extends FormRequest
         return [
             'status.string' => 'Статус должен быть текстовым',
             'status.in' => 'Выбран недопустимый статус',
-            'department_id.exists' => 'Выбранный отдел не существует',
             'position_id.exists' => 'Выбранная должность не существует',
         ];
     }

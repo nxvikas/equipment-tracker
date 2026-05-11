@@ -27,7 +27,7 @@ class EmployeeEquipmentExport implements FromArray, WithHeadings, WithTitle, Wit
 
         $exportData[] = ['ОТЧЕТ О ЗАКРЕПЛЕННОМ ОБОРУДОВАНИИ'];
         $exportData[] = ['Сотрудник:', $this->user->surname . ' ' . $this->user->name . ' ' . ($this->user->patronymic ?? '')];
-        $exportData[] = ['Отдел:', $this->user->department->name ?? 'Не назначен'];
+        $exportData[] = ['Отдел:', $this->user->position?->department?->name ?? 'Не назначен'];
         $exportData[] = ['Должность:', $this->user->position->name ?? 'Не назначена'];
         $exportData[] = ['Дата формирования:', now()->format('d.m.Y H:i:s')];
         $exportData[] = [' '];

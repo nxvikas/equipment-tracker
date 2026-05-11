@@ -324,7 +324,15 @@
                                     aria-label="Закрыть"></button>
                         </div>
                         <div class="modal-body">
-                            @if($department->users->count() > 0)
+                            @php
+
+                                $departmentUsers = collect();
+                                foreach($department->positions as $position) {
+                                    $departmentUsers = $departmentUsers->concat($position->users);
+                                }
+                            @endphp
+
+                            @if($departmentUsers->count() > 0)
                                 <div class="table-responsive">
                                     <table class="custom-table" style="width: 100%;">
                                         <thead>
@@ -334,10 +342,10 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach($department->users as $user)
+                                        @foreach($departmentUsers as $user)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.users.show', $user->id) }}"
+                                                    <a href="{{ route('admin.users.show', ['user' => $user->id, 'from_structure' => 1, 'tab' => $activeTab]) }}"
                                                        class="equipment-name" style="text-decoration: underline;">
                                                         {{ $user->surname }} {{ $user->name }}{{ $user->patronymic ? ' ' . $user->patronymic : '' }}
                                                     </a>
@@ -392,7 +400,7 @@
                                         @foreach($position->users as $user)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.users.show', $user->id) }}"
+                                                    <a href="{{ route('admin.users.show', ['user' => $user->id, 'from_structure' => 1, 'tab' => $activeTab]) }}"
                                                        class="equipment-name" style="text-decoration: underline;">
                                                         {{ $user->surname }} {{ $user->name }}{{ $user->patronymic ? ' ' . $user->patronymic : '' }}
                                                     </a>

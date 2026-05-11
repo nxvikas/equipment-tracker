@@ -138,7 +138,6 @@ class EmployeeController extends Controller
             ->get();
 
         $fileName = 'report_' . $user->surname . '_' . $user->name . '_' . now()->format('Y-m-d') . '.xlsx';
-
         return Excel::download(new EmployeeEquipmentExport($equipments, $user), $fileName);
     }
 

@@ -21,7 +21,6 @@ return new class extends Migration {
             $table->string('phone')->unique();
             $table->string('avatar')->nullable();
             $table->foreignIdFor(\App\Models\Position::class)->nullable()->constrained();
-            $table->foreignIdFor(\App\Models\Department::class)->nullable()->constrained();
             $table->foreignIdFor(\App\Models\Role::class)->constrained();
 
             $table->enum('status', \App\Http\Enums\UserStatus::values())->default(\App\Http\Enums\UserStatus::PENDING->value);

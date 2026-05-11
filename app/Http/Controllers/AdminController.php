@@ -107,6 +107,7 @@ class AdminController extends Controller
         $monthlyAssigns = collect($monthlyAssigns);
 
         $topUsers = User::where('status', 'active')
+            ->with(['position.department'])
             ->withCount(['equipment as equipment_count' => function ($query) {
                 $query->where('status', 'in_use');
             }])
@@ -234,15 +235,41 @@ class AdminController extends Controller
         $activeTab = $request->query('tab', 'departments');
 
 
-        $departmentsQuery = Department::withCount('users')
-            ->with(['users:id,surname,name,patronymic,email,department_id', 'positions:id,name,department_id']);
+        $departmentsQuery = Department::with(['positions', 'positions.users']);
+
+
+        $departments = $departmentsQuery->get();
+
+
+        foreach ($departments as $department) {
+            $department->users_count = $department->positions->sum(function ($position) {
+                return $position->users->count();
+            });
+        }
+
+
         $direction = $request->query('direction', 'desc');
-        $departmentsQuery->orderBy('users_count', $direction)->orderBy('name', 'asc');
-        $departments = $departmentsQuery->paginate(15, ['*'], 'departments_page')->withQueryString();
+        $departments = $direction === 'desc'
+            ? $departments->sortByDesc('users_count')
+            : $departments->sortBy('users_count');
 
 
-        $positionsQuery = Position::with('department')->withCount('users')
+        $perPage = 15;
+        $currentPage = $request->get('departments_page', 1);
+        $departments = new \Illuminate\Pagination\LengthAwarePaginator(
+            $departments->forPage($currentPage, $perPage),
+            $departments->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+        $departments->withQueryString();
+
+
+        $positionsQuery = Position::with('department')
+            ->withCount('users')
             ->with('users:id,surname,name,patronymic,email,position_id');
+
         $posDirection = $request->query('pos_direction', 'desc');
         $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
         $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();

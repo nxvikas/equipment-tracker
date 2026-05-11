@@ -39,7 +39,7 @@ class UserExport implements FromArray, WithHeadings, WithTitle, WithStyles
                 $user->patronymic ?? '—',
                 $user->email,
                 $user->phone ?? '—',
-                $user->department->name ?? '—',
+                $user->position?->department?->name ?? '—',
                 $user->position->name ?? '—',
                 \App\Http\Enums\UserStatus::ruValues()[$statusValue] ?? $statusValue
             ];

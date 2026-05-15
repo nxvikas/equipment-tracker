@@ -9,6 +9,7 @@ use App\Http\Enums\UserStatus;
 
 class User extends Authenticatable
 {
+    use Notifiable;
     protected $fillable = [
         'surname',
         'name',

@@ -7,8 +7,10 @@ use App\Http\Requests\AuthRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -181,6 +183,84 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('auth.login');
+    }
+
+    public function showForgotForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => ['required', 'email']
+        ], [
+            'email.required' => 'Введите email',
+            'email.email' => 'Введите корректный email'
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->onlyInput('email');
+        }
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        $messages = [
+            Password::RESET_LINK_SENT => 'Ссылка для сброса пароля отправлена на ваш email',
+            Password::INVALID_USER => 'Пользователь с таким email не найден',
+            Password::RESET_THROTTLED => 'Слишком много попыток. Пожалуйста, повторите через минуту',
+        ];
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return back()->with(['success' => $messages[$status]]);
+        }
+
+        return back()->withErrors(['email' => $messages[$status] ?? 'Ошибка при отправке ссылки'])->onlyInput('email');
+    }
+
+    public function showResetForm($token)
+    {
+        return view('auth.reset-password', ['token' => $token]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ], [
+            'token.required' => 'Отсутствует токен сброса пароля',
+            'email.required' => 'Введите email',
+            'email.email' => 'Введите корректный email',
+            'password.required' => 'Введите новый пароль',
+            'password.min' => 'Пароль должен содержать не менее 8 символов',
+            'password.confirmed' => 'Пароли не совпадают',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->onlyInput('email');
+        }
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        $messages = [
+            Password::PASSWORD_RESET => 'Пароль успешно изменён. Войдите с новым паролем.',
+            Password::INVALID_TOKEN => 'Недействительная ссылка для сброса пароля',
+            Password::INVALID_USER => 'Пользователь с таким email не найден',
+        ];
+
+        if ($status === Password::PASSWORD_RESET) {
+            return redirect()->route('auth.login')->with('success', $messages[$status]);
+        }
+
+        return back()->withErrors(['email' => $messages[$status] ?? 'Ошибка при сбросе пароля'])->onlyInput('email');
     }
 
 }

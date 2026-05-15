@@ -81,7 +81,6 @@
                             <span class="small text-secondary">Запомнить меня</span>
                         </label>
                     </div>
-                    <a href="{{ route('password.request') }}" class="auth-link small">Забыли пароль?</a>
                 </div>
 
 

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Вход')
+@section('title', 'Сброс пароля')
+
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/pages/auth.css') }}">
 @endpush
@@ -14,46 +15,33 @@
         </div>
 
         <div class="register-card">
-
             <div class="text-center mb-4">
-                <div class="logo-text">
-                    {{ config('app.company.name') }}
-                </div>
-                <div class="logo-sub">
-                    {{ config('app.company.description') }}
-                </div>
+                <div class="logo-text">{{ config('app.company.name') }}</div>
+                <div class="logo-sub">Создание нового пароля</div>
             </div>
 
-            <form method="POST" action="{{ route('auth') }}">
+            <form method="POST" action="{{ route('password.update') }}">
                 @csrf
-                @method('post')
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <div class="mb-3">
-                    <label for="email" class="form-label-custom">Email</label>
+                    <label class="form-label-custom">Email</label>
                     <div class="input-group">
-            <span class="input-group-text">
-                <i class="bi bi-envelope"></i>
-            </span>
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input type="email"
                                name="email"
-                               id="email"
-                               value="{{ old('email') }}"
-                               class="form-control form-control-lg @error('email') is-invalid @enderror">
+                               class="form-control form-control-lg @error('email') is-invalid @enderror"
+                               value="{{ old('email') }}">
                     </div>
                     @error('email')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-
                 <div class="mb-3">
-                    <label for="password" class="form-label-custom">Пароль</label>
+                    <label class="form-label-custom">Новый пароль</label>
                     <div class="input-group">
-            <span class="input-group-text">
-                <i class="bi bi-lock"></i>
-            </span>
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
                         <input type="password"
                                name="password"
                                id="password"
@@ -66,43 +54,37 @@
                         </button>
                     </div>
                     @error('password')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-
-                <div class="d-flex align-items-center justify-content-between mt-2 mb-3">
-                    <div class="form-check" style="padding-left: 0 !important;">
-                        <label class="remember-wrapper">
-                            <input type="checkbox" name="remember" value="1">
-                            <span class="remember-check"></span>
-                            <span class="small text-secondary">Запомнить меня</span>
-                        </label>
+                <div class="mb-3">
+                    <label class="form-label-custom">Подтверждение пароля</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
+                        <input type="password"
+                               name="password_confirmation"
+                               id="password_confirmation"
+                               class="form-control form-control-lg">
+                        <button class="btn btn-outline-secondary border-start-0"
+                                type="button"
+                                id="togglePasswordConfirm"
+                                style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                            <i class="bi bi-eye" id="toggleIconConfirm"></i>
+                        </button>
                     </div>
-                    <a href="{{ route('password.request') }}" class="auth-link small">Забыли пароль?</a>
                 </div>
 
+                <button class="btn btn-primary-custom w-100 mt-2">Сбросить пароль</button>
 
-                <button class="btn btn-lg w-100 btn-primary-custom mt-2">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                    Войти
-                </button>
-
-
-                <div class="text-center mt-3 small">
-                    <span class="text-secondary">Нет аккаунта?</span>
-                    <a href="{{ route('auth.register') }}" class="auth-link ms-1">
-                        Отправить заявку
-                    </a>
+                <div class="text-center mt-3">
+                    <a href="{{ route('auth.login') }}" class="auth-link">← Вернуться ко входу</a>
                 </div>
             </form>
-
         </div>
-
     </div>
 @endsection
+
 @push('scripts')
     <script src="{{ asset('js/pages/auth/eyePassword.js') }}"></script>
     <script>
@@ -125,6 +107,7 @@
                 applyTheme('light');
                 themeToggle.innerHTML = '<i class="bi bi-sun"></i>';
             } else {
+                applyTheme('dark');
                 themeToggle.innerHTML = '<i class="bi bi-moon"></i>';
             }
 

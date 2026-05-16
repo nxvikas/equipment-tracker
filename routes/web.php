@@ -97,6 +97,7 @@ Route::middleware('web')->group(function () {
         Route::post('/users/{user}/activate', [\App\Http\Controllers\UserController::class, 'activate'])->name('users.activate');
         Route::put('/users/{user}/quick', [\App\Http\Controllers\UserController::class, 'updateQuick'])->name('users.update.quick');
         Route::put('/users/{user}/full', [\App\Http\Controllers\UserController::class, 'updateFull'])->name('users.update.full');
+        Route::post('/users/{user}/change-password', [\App\Http\Controllers\UserController::class, 'changePassword'])->name('users.change-password');
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
 
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');

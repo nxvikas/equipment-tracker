@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\UpdateUserQuickRequest;
 use App\Http\Requests\UpdateUserFullRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -156,6 +157,43 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.show', $user);
+    }
+
+    public function changePassword(Request $request, User $user)
+    {
+
+        if ($user->id === auth()->id()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Изменить свой пароль можно в разделе "Мой профиль"'
+                ], 403);
+            }
+            return redirect()->back()->with('error', 'Изменить свой пароль можно в разделе "Мой профиль"');
+        }
+
+
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/^[A-Za-z0-9]+$/u'],
+        ], [
+            'password.required' => 'Введите новый пароль',
+            'password.confirmed' => 'Пароли не совпадают',
+            'password.min' => 'Пароль должен содержать не менее 8 символов',
+            'password.regex' => 'Пароль может содержать только латинские буквы (A-Z, a-z) и цифры (0-9)',
+        ]);
+
+
+        $user->update([
+            'password' => Hash::make($validated['password'])
+        ]);
+
+        session()->flash('success', 'Пароль для сотрудника "' . $user->surname . ' ' . $user->name . '" успешно изменён');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Пароль успешно изменён']);
+        }
+
+        return redirect()->back()->with('success', 'Пароль успешно изменён');
     }
 
     public function destroy(Request $request, User $user)

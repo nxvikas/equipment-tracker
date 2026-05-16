@@ -4,6 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/pages/profile.css') }}">
 @endpush
 
 @section('content')
@@ -137,6 +138,10 @@
             <div class="actions-grid">
                 <button type="button" class="action-button" data-bs-toggle="modal" data-bs-target="#editUserModal">
                     <i class="bi bi-pencil"></i> Редактировать
+                </button>
+
+                <button type="button" class="action-button" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                    <i class="bi bi-key"></i> Сменить пароль
                 </button>
 
                 @php $currentStatus = $user->status->value ?? $user->status; @endphp
@@ -796,9 +801,88 @@
             </div>
         @endif
     @endif
+
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-key me-2" style="color: var(--accent);"></i>
+                        Смена пароля
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <form action="{{ route('admin.users.change-password', $user) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <p class="text-secondary mb-2">
+                                <strong>{{ $user->surname }} {{ $user->name }}</strong>
+                            </p>
+                            <p class="small text-secondary">
+                                <i class="bi bi-envelope"></i> {{ $user->email }}
+                            </p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Новый пароль <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                                <input type="password"
+                                       name="password"
+                                       id="password"
+                                       class="form-control @error('password') is-invalid @enderror"
+                                       placeholder="Минимум 8 символов, латиница и цифры">
+                                <button class="btn btn-outline-secondary border-start-0"
+                                        type="button"
+                                        id="togglePassword"
+                                        style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Подтверждение пароля <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-shield-check"></i>
+                            </span>
+                                <input type="password"
+                                       name="password_confirmation"
+                                       id="password_confirmation"
+                                       class="form-control"
+                                       placeholder="Повторите пароль">
+                                <button class="btn btn-outline-secondary border-start-0"
+                                        type="button"
+                                        id="togglePasswordConfirm"
+                                        style="border-color: var(--border); border-radius: 0 14px 14px 0; background: rgba(255,255,255,0.04); color: var(--text-secondary);">
+                                    <i class="bi bi-eye" id="toggleIconConfirm"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <small class="form-hint">
+                            <i class="bi bi-info-circle"></i> Пароль должен содержать минимум 8 символов (только латиница и цифры)
+                        </small>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="bi bi-save"></i> Сохранить пароль
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('js/pages/auth/eyePassword.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initDepartmentPositionFilter();
@@ -870,5 +954,13 @@
                 updateDepartmentFromPosition();
             }
         });
+
+        const changePasswordForm = document.querySelector('#changePasswordModal form');
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitAjaxForm(changePasswordForm, 'changePasswordModal', {reloadOnSuccess: true});
+            });
+        }
     </script>
 @endpush

@@ -14,18 +14,6 @@ Route::middleware('web')->group(function () {
         Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register'])->name('register');
         Route::post('/auth', [\App\Http\Controllers\AuthController::class, 'auth'])->name('auth');
 
-        Route::get('/forgot-password', [\App\Http\Controllers\AuthController::class, 'showForgotForm'])
-            ->name('password.request');
-
-        Route::post('/forgot-password', [\App\Http\Controllers\AuthController::class, 'sendResetLink'])
-            ->name('password.email');
-
-        Route::get('/reset-password/{token}', [\App\Http\Controllers\AuthController::class, 'showResetForm'])
-            ->name('password.reset');
-
-        Route::post('/reset-password', [\App\Http\Controllers\AuthController::class, 'resetPassword'])
-            ->name('password.update');
-
     });
     Route::middleware('auth')->group(function () {
         Route::get('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
@@ -109,6 +97,7 @@ Route::middleware('web')->group(function () {
         Route::post('/users/{user}/activate', [\App\Http\Controllers\UserController::class, 'activate'])->name('users.activate');
         Route::put('/users/{user}/quick', [\App\Http\Controllers\UserController::class, 'updateQuick'])->name('users.update.quick');
         Route::put('/users/{user}/full', [\App\Http\Controllers\UserController::class, 'updateFull'])->name('users.update.full');
+        Route::post('/users/{user}/change-password', [\App\Http\Controllers\UserController::class, 'changePassword'])->name('users.change-password');
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
 
         Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');

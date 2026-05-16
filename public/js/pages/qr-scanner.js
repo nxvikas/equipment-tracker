@@ -41,7 +41,6 @@
                     stopScanner();
                     const bsModal = bootstrap.Modal.getInstance(modal);
                     if (bsModal) bsModal.hide();
-                    sessionStorage.setItem('redirect_after_login', '/equipment/' + equipmentId);
                     window.location.href = '/equipment/' + equipmentId;
                 } else {
                     alert('Неверный QR-код');

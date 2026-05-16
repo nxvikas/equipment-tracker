@@ -17,7 +17,7 @@ class StoreIntendedUrl
     {
         if ($request->isMethod('GET')
             && !$request->ajax()
-            && !$request->is('login', 'register', 'logout', 'waiting')
+            && !$request->is('login', 'register', 'logout', 'waiting','login-redirect')
             && $this->isInternalUrl($request->fullUrl())) {
 
             session(['url.intended' => $request->fullUrl()]);

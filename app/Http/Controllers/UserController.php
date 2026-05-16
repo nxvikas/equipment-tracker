@@ -199,19 +199,28 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         if ($user->id === auth()->id()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Нельзя удалить самого себя'
+                ], 403);
+            }
             return redirect()->back()->with('error', 'Нельзя удалить самого себя');
         }
 
         if ($user->role_id === 1) {
             $adminsCount = User::where('role_id', 1)->where('status', 'active')->count();
             if ($adminsCount <= 1) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Нельзя удалить последнего администратора'
+                    ], 400);
+                }
                 return redirect()->back()->with('error', 'Нельзя удалить последнего администратора');
             }
         }
 
-        if (!$request->has('confirm_delete')) {
-            return redirect()->back()->with('confirm_delete_user', $user->id);
-        }
 
         $equipments = Equipment::where('current_user_id', $user->id)->get();
 
@@ -231,11 +240,18 @@ class UserController extends Controller
             'current_user_id' => null,
         ]);
 
+
         Equipment_history::where('user_id', $user->id)->update(['user_id' => null]);
         Equipment_history::where('from_user_id', $user->id)->update(['from_user_id' => null]);
         Equipment_history::where('to_user_id', $user->id)->update(['to_user_id' => null]);
 
         $user->delete();
+
+        session()->flash('success', 'Сотрудник удалён. Оборудование возвращено на склад.');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Сотрудник удалён']);
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'Сотрудник удалён. Оборудование возвращено на склад.');
     }

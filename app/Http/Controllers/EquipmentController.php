@@ -540,6 +540,9 @@ class EquipmentController extends Controller
 
     public function publicShow($id)
     {
+        if (session()->has('url.intended') && session('url.intended') !== url()->current()) {
+            return redirect(session('url.intended'));
+        }
         $equipment = Equipment::with(['category', 'location', 'currentUser'])
             ->findOrFail($id);
 

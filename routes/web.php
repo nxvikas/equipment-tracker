@@ -130,13 +130,3 @@ Route::middleware('web')->group(function () {
         Route::get('/search', [\App\Http\Controllers\EmployeeController::class, 'globalSearch'])->name('global.search');
     });
 });
-
-
-
-
-
-
-
-
-
-

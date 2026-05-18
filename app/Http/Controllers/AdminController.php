@@ -234,38 +234,32 @@ class AdminController extends Controller
     {
         $activeTab = $request->query('tab', 'departments');
 
-        $departments = Department::with(['positions'])
-            ->withCount(['positions as users_count' => function ($query) {
-                $query->whereHas('users');
-            }])
-            ->get();
+        if ($activeTab == 'departments') {
 
+            $direction = $request->query('direction', 'desc');
 
-        $direction = $request->query('direction', 'desc');
-        $departments = $direction === 'desc'
-            ? $departments->sortByDesc('users_count')
-            : $departments->sortBy('users_count');
+            $departments = Department::with(['positions'])
+                ->withCount(['positions as users_count' => function ($query) {
+                    $query->whereHas('users');
+                }])
+                ->orderBy('users_count', $direction)
+                ->paginate(15, ['*'], 'departments_page')
+                ->withQueryString();
 
+            $positions = collect();
+        } else {
 
-        $perPage = 15;
-        $currentPage = $request->query('departments_page', 1);
-        $departments = new \Illuminate\Pagination\LengthAwarePaginator(
-            $departments->forPage($currentPage, $perPage),
-            $departments->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-        $departments->withQueryString();
+            $posDirection = $request->query('pos_direction', 'desc');
 
+            $positions = Position::with('department')
+                ->withCount('users')
+                ->orderBy('users_count', $posDirection)
+                ->orderBy('name', 'asc')
+                ->paginate(15, ['*'], 'positions_page')
+                ->withQueryString();
 
-        $positionsQuery = Position::with('department')
-            ->withCount('users')
-            ->with('users:id,surname,name,patronymic,email,position_id');
-
-        $posDirection = $request->query('pos_direction', 'desc');
-        $positionsQuery->orderBy('users_count', $posDirection)->orderBy('name', 'asc');
-        $positions = $positionsQuery->paginate(15, ['*'], 'positions_page')->withQueryString();
+            $departments = collect();
+        }
 
         return view('admin.structure.index', compact('departments', 'positions', 'activeTab'));
     }

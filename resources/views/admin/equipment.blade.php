@@ -233,13 +233,97 @@
                     </tbody>
                 </table>
             </div>
+            <div class="equipment-cards-view">
+                @forelse($equipments as $equipment)
+                    <div class="equipment-card" data-id="{{ $equipment->id }}">
+                        <div class="card-row">
+                            <span class="card-label">ID</span>
+                            <span class="card-value">{{ $equipment->id }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Создано</span>
+                            <span class="card-value">{{ $equipment->created_at->format('d.m.y H:i') }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Инв. номер</span>
+                            <span class="card-value">{{ $equipment->inventory_number }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Название</span>
+                            <span class="card-value">
+                    <a href="{{ route('admin.equipment.show', $equipment->id) }}" class="equipment-name">
+                        {{ $equipment->name }}
+                    </a>
+                </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Категория</span>
+                            <span class="card-value">{{ $equipment->category->name ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Серийный номер</span>
+                            <span class="card-value">{{ $equipment->serial_number ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Статус</span>
+                            <span class="card-value card-status">
+                    @php
+                        $statusClass = match($equipment->status) {
+                            'in_use' => 'success',
+                            'in_stock' => 'neutral',
+                            'repair' => 'warning',
+                            'written' => 'danger',
+                            default => 'neutral'
+                        };
+                    @endphp
+                    <span class="status-badge {{ $statusClass }}">
+                        {{ \App\Http\Enums\StatusEquipment::ruValues()[$equipment->status] ?? $equipment->status }}
+                    </span>
+                </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Сотрудник</span>
+                            <span
+                                class="card-value">{{ $equipment->currentUser ? $equipment->currentUser->surname . ' ' . $equipment->currentUser->name : '—' }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editEquipmentModal{{ $equipment->id }}"
+                                    title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </button>
 
-            @if($equipments->hasPages())
-                <div class="pagination-wrapper">
-                    {{ $equipments->links() }}
-                </div>
-            @endif
+                            @if(in_array($equipment->status, ['written', 'in_stock']))
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteEquipmentModal{{ $equipment->id }}"
+                                        title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <h4 class="empty-title">Здесь пока пусто</h4>
+                        <p class="empty-desc">Самое время добавить первую технику в базу.</p>
+                        <button class="btn-outline mt-3" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+                            <i class="bi bi-plus-lg me-2"></i>Добавить оборудование
+                        </button>
+                    </div>
+                @endforelse
+            </div>
         </div>
+        @if($equipments->hasPages())
+            <div class="pagination-wrapper">
+                {{ $equipments->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+
     </div>
 
     <div class="modal fade" id="addEquipmentModal" tabindex="-1" data-bs-backdrop="static">
@@ -267,9 +351,11 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="d-flex justify-content-between align-items-end mb-2">
-                                    <label class="form-label mb-0">Категория <span class="text-danger">*</span></label>
+                                    <label class="form-label mb-0">Категория <span
+                                            class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+
+                                        Добавить
                                         новую</a>
                                 </div>
                                 <select name="category_id"
@@ -429,7 +515,8 @@
                                     <label class="form-label mb-0">Выбор локации <span
                                             class="text-danger">*</span></label>
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
-                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+ Добавить
+                                       style="font-size: 12px; color: var(--accent); text-decoration: none;">+
+                                        Добавить
                                         новую</a>
                                 </div>
                                 <select name="location_id" id="locationSelect"
@@ -467,7 +554,6 @@
             </div>
         </div>
     </div>
-
 
 
     @foreach($equipments as $equipment)
@@ -553,7 +639,8 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Стоимость (₽)</label>
-                                    <input type="number" step="0.01" name="purchase_price" class="form-control-custom"
+                                    <input type="number" step="0.01" name="purchase_price"
+                                           class="form-control-custom"
                                            value="{{ old('purchase_price', $equipment->purchase_price) }}">
                                 </div>
                                 <div class="col-md-4 mb-3">
@@ -604,7 +691,8 @@
                             <div class="row justify-content-end">
                                 <div class="col-md-6 mb-3 edit-user-field" id="editUserField{{ $equipment->id }}"
                                      style="display: {{ $equipment->status === 'in_use' ? 'block' : 'none' }};">
-                                    <label class="form-label edit-user-label" id="editUserLabel{{ $equipment->id }}">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
+                                    <label class="form-label edit-user-label"
+                                           id="editUserLabel{{ $equipment->id }}">Сотрудник {!! $equipment->status === 'in_use' ? '<span class="text-danger">*</span>' : '' !!}</label>
                                     <select name="current_user_id" class="form-control-custom custom-dark-select">
                                         <option value="">Не назначен</option>
                                         @foreach($users as $user)
@@ -618,7 +706,8 @@
 
                                 <div class="col-md-6 mb-3">
                                     <div class="d-flex justify-content-between align-items-end mb-2">
-                                        <label class="form-label mb-0">Выбор локации <span class="text-danger">*</span></label>
+                                        <label class="form-label mb-0">Выбор локации <span
+                                                class="text-danger">*</span></label>
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#addLocationModal"
                                            class="add-location-from-edit"
                                            style="font-size: 12px; color: var(--accent); text-decoration: none;">+
@@ -770,7 +859,8 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Название <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control-custom" placeholder="Например: Склад №5">
+                            <input type="text" name="name" class="form-control-custom"
+                                   placeholder="Например: Склад №5">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Тип <span class="text-danger">*</span></label>
@@ -805,16 +895,36 @@
             const searchInput = document.getElementById('searchEquipment');
             if (!searchInput) return;
 
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
+            const filterItems = (term) => {
+
                 document.querySelectorAll('.custom-table tbody tr').forEach(row => {
                     const text = [
                         row.querySelector('.inv-number')?.textContent || '',
-                        row.querySelector('.equipment-name')?.textContent || '',
+                        row.querySelector('.equipment-name a')?.textContent || row.querySelector('.equipment-name')?.textContent || '',
                         row.querySelector('.serial-number')?.textContent || ''
                     ].join(' ').toLowerCase();
                     row.style.display = text.includes(term) ? '' : 'none';
                 });
+
+
+                document.querySelectorAll('.equipment-card').forEach(card => {
+                    const text = [
+                        card.querySelectorAll('.card-value')[0]?.textContent || '',
+                        card.querySelectorAll('.card-value')[2]?.textContent || '',
+                        card.querySelectorAll('.card-value')[3]?.textContent || ''
+                    ].join(' ').toLowerCase();
+
+
+                    if (text.includes(term)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                filterItems(e.target.value.toLowerCase());
             });
         };
 
@@ -1232,7 +1342,8 @@
                                 window.showFormErrors(categoryForm, data.errors);
                             }
                         })
-                        .catch(() => {});
+                        .catch(() => {
+                        });
                 });
             }
 
@@ -1290,7 +1401,8 @@
                                 window.showFormErrors(locationForm, data.errors);
                             }
                         })
-                        .catch(() => {});
+                        .catch(() => {
+                        });
                 });
             }
         });

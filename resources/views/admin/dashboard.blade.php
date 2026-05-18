@@ -345,6 +345,72 @@
                 </table>
             </div>
         </div>
+        <div class="operations-cards-view">
+            @forelse($recentOperations as $operation)
+                @php
+                    $operationClass = match($operation->action_type) {
+                        'assigned' => 'assign',
+                        'returned' => 'return',
+                        'repair' => 'repair',
+                        'written' => 'repair',
+                        default => 'receive'
+                    };
+                    $operationText = \App\Http\Enums\TypeEquipmentHistory::ruValues()[$operation->action_type] ?? $operation->action_type;
+
+                    $statusClass = match($operation->new_status) {
+                        'in_use' => 'success',
+                        'in_stock' => 'neutral',
+                        'repair' => 'warning',
+                        'written' => 'danger',
+                        default => 'info'
+                    };
+                    $statusText = \App\Http\Enums\StatusEquipment::ruValues()[$operation->new_status] ?? $operation->new_status;
+                @endphp
+                <div class="operation-card">
+                    <div class="operation-card-header">
+                <span class="operation-equipment">
+                    <a href="{{ route('admin.equipment.show', $operation->equipment_id) }}">
+                        {{ $operation->equipment->name ?? '—' }}
+                    </a>
+                </span>
+                        <span class="operation-date">
+                    <i class="bi bi-calendar3"></i>
+                    {{ $operation->created_at->format('d.m.Y H:i') }}
+                </span>
+                    </div>
+                    <div class="operation-details">
+                        <div class="operation-detail-item">
+                            <i class="bi bi-upc-scan"></i>
+                            <span>Инв. №: {{ $operation->equipment->inventory_number ?? '—' }}</span>
+                        </div>
+                        <div class="operation-detail-item">
+                            <i class="bi bi-person"></i>
+                            <span>{{ $operation->toUser->name ?? $operation->user->name ?? '—' }}</span>
+                        </div>
+                    </div>
+                    <div class="operation-details">
+                        <div class="operation-detail-item">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>Операция:</span>
+                            <span class="operation-badge {{ $operationClass }}">{{ $operationText }}</span>
+                        </div>
+                        <div class="operation-detail-item operation-status">
+                            <i class="bi bi-circle-fill" style="font-size: 8px; color: var(--accent);"></i>
+                            <span>Статус:</span>
+                            <span class="status-badge {{ $statusClass }}" style="margin-left: 4px;">{{ $statusText ?? '—' }}</span>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="empty-state">
+                    <div class="empty-icon-wrapper">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h4 class="empty-title">Нет операций</h4>
+                    <p class="empty-desc">Здесь будут отображаться последние действия с оборудованием</p>
+                </div>
+            @endforelse
+        </div>
     </div>
 @endsection
 @push('scripts')

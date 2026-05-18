@@ -55,13 +55,13 @@
                 <div class="filters-group">
                     <div class="dropdown custom-select">
                         <button class="custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="selected-text">
-                                @if(request('category_id'))
-                                    {{ $categories->find(request('category_id'))->name ?? 'Все категории' }}
-                                @else
-                                    Все категории
-                                @endif
-                            </span>
+        <span class="selected-text">
+            @if(request('category_id'))
+                {{ $categories->find(request('category_id'))->name ?? 'Все категории' }}
+            @else
+                Все категории
+            @endif
+        </span>
                             <i class="bi bi-chevron-down"></i>
                         </button>
                         <ul class="dropdown-menu custom-select-menu">
@@ -174,7 +174,8 @@
                             <td class="inv-number">{{ $item->inventory_number }}</td>
                             <td class="equipment-name">
                                 <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}"
-                                   class="equipment-name" style="color: var(--accent); text-decoration: underline; text-underline-offset: 2px;">
+                                   class="equipment-name"
+                                   style="color: var(--accent); text-decoration: underline; text-underline-offset: 2px;">
                                     {{ $item->name }}
                                 </a>
                             </td>
@@ -229,12 +230,100 @@
                     </tbody>
                 </table>
             </div>
-            @if($equipments->hasPages())
-                <div class="pagination-wrapper">
-                    {{ $equipments->appends(request()->query())->links() }}
-                </div>
-            @endif
+
+            <div class="equipment-cards-view">
+                @forelse($equipments as $item)
+                    <div class="equipment-card" data-id="{{ $item->id }}">
+                        <div class="card-row">
+                            <span class="card-label">ID</span>
+                            <span class="card-value">{{ $item->id }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Выдано</span>
+                            <span
+                                class="card-value">{{ $item->assignedHistory?->created_at?->format('d.m.Y H:i') ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Инв. номер</span>
+                            <span class="card-value">{{ $item->inventory_number }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Название</span>
+                            <span class="card-value">
+                                <a href="{{ route('public.equipment', ['id' => $item->id, 'from' => 'employee_equipment']) }}"
+                                   style="color: var(--accent); text-decoration: underline;">
+                                    {{ $item->name }}
+                                </a>
+                            </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Категория</span>
+                            <span class="card-value">{{ $item->category->name ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Модель</span>
+                            <span class="card-value">{{ $item->model ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Серийный номер</span>
+                            <span class="card-value">{{ $item->serial_number ?? '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Статус</span>
+                            <span class="card-value">
+                                @php
+                                    $statusClass = match($item->status) {
+                                        'in_use' => 'success',
+                                        'repair' => 'warning',
+                                        default => 'neutral'
+                                    };
+                                    $statusText = match($item->status) {
+                                        'in_use' => 'В использовании',
+                                        'repair' => 'В ремонте',
+                                        default => $item->status
+                                    };
+                                @endphp
+                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                            </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Локация</span>
+                            <span class="card-value">{{ $item->location->name ?? '—' }}</span>
+                        </div>
+                        <div class="card-actions">
+                            @if($item->status === 'in_use')
+                                <button type="button"
+                                        class="action-btn return-btn"
+                                        data-equipment-id="{{ $item->id }}"
+                                        data-equipment-name="{{ $item->name }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#returnConfirmModal{{ $item->id }}"
+                                        title="Вернуть на склад">
+                                    <i class="bi bi-box-arrow-in-right" style="color: #10b981;"></i>
+                                </button>
+                            @else
+                                <span class="text-secondary">—</span>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <h4 class="empty-title">Здесь пока пусто</h4>
+                        <p class="empty-desc">У вас нет закреплённого оборудования</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
+
+        @if($equipments->hasPages())
+            <div class="pagination-wrapper">
+                {{ $equipments->appends(request()->query())->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
+
     </div>
 
 
@@ -247,7 +336,8 @@
                             <h5 class="modal-title text-warning">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Подтверждение возврата
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Закрыть"></button>
                         </div>
                         <div class="modal-body">
                             <p>Вы уверены, что хотите вернуть оборудование на склад?</p>
@@ -260,7 +350,8 @@
                             <button type="button" class="btn-outline" data-bs-dismiss="modal">Отмена</button>
                             <form action="{{ route('employee.equipment.return', $item->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn-primary" style="background: var(--warning); color: #02040a;">
+                                <button type="submit" class="btn-primary"
+                                        style="background: var(--warning); color: #02040a;">
                                     <i class="bi bi-box-arrow-in-right"></i> Подтвердить возврат
                                 </button>
                             </form>
@@ -278,16 +369,35 @@
             const searchInput = document.getElementById('searchEquipment');
             if (!searchInput) return;
 
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
+            const filterItems = (term) => {
+
                 document.querySelectorAll('.custom-table tbody tr').forEach(row => {
                     const text = [
                         row.querySelector('.inv-number')?.textContent || '',
-                        row.querySelector('.equipment-name')?.textContent || '',
+                        row.querySelector('.equipment-name a')?.textContent || row.querySelector('.equipment-name')?.textContent || '',
                         row.querySelector('.serial-number')?.textContent || ''
                     ].join(' ').toLowerCase();
                     row.style.display = text.includes(term) ? '' : 'none';
                 });
+
+
+                document.querySelectorAll('.equipment-card').forEach(card => {
+                    const text = [
+                        card.querySelectorAll('.card-value')[2]?.textContent || '',
+                        card.querySelectorAll('.card-value')[3]?.textContent || '',
+                        card.querySelectorAll('.card-value')[6]?.textContent || ''
+                    ].join(' ').toLowerCase();
+
+                    if (text.includes(term)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                filterItems(e.target.value.toLowerCase());
             });
         };
 

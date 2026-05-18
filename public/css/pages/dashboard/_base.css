@@ -308,6 +308,128 @@
     margin-bottom: 0;
 }
 
+/*КАРТОЧКИ ПОСЛЕДНИХ ОПЕРАЦИЙ ДЛЯ МОБИЛОК*/
+.operations-cards-view {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: var(--bg-card);
+
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.operation-card {
+    background: var(--bg-card);
+    padding: 16px;
+    margin-bottom: 0;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.operation-card:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--border);
+}
+
+.operation-card:hover {
+    background: rgba(190, 242, 100, 0.02);
+}
+
+.operation-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.operation-equipment {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+}
+
+.operation-equipment a {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.operation-equipment a:hover {
+    color: var(--accent-hover);
+}
+
+.operation-date {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.operation-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.operation-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.operation-detail-item i {
+    font-size: 13px;
+    color: var(--accent);
+}
+
+.operation-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.operation-badge.assign {
+    background: rgba(190, 242, 100, 0.12);
+    color: var(--accent);
+}
+
+.operation-badge.return {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+.operation-badge.repair {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.operation-badge.receive {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3b82f6;
+}
+
+.operation-status {
+    display: inline-flex;
+    align-items: center;
+}
+
+.operation-card:not(:last-child) {
+    position: relative;
+}
 
 /*Адаптив*/
 @media (max-width: 1200px) {
@@ -378,6 +500,19 @@
 
     .chart-body {
         padding: 16px 20px;
+    }
+
+    .table-wrapper .table-responsive {
+        display: none !important;
+    }
+
+    .operations-cards-view {
+        display: flex !important;
+    }
+    .pagination-wrapper {
+        display: flex !important;
+        border-top: 1px solid var(--border);
+        margin-top: 0;
     }
 }
 

@@ -250,10 +250,106 @@
                     </tbody>
                 </table>
             </div>
-            @if($users->hasPages())
-                <div class="pagination-wrapper">{{ $users->appends(request()->query())->links() }}</div>
-            @endif
+            <div class="equipment-cards-view">
+                @forelse($users as $user)
+                    @php
+                        $statusValue = $user->status->value ?? $user->status;
+                        $statusClass = match($statusValue) {
+                            'active' => 'success',
+                            'pending' => 'warning',
+                            'blocked' => 'danger',
+                            'rejected' => 'neutral',
+                            default => 'info'
+                        };
+                    @endphp
+                    <div class="equipment-card" data-id="{{ $user->id }}">
+                        <div class="card-row">
+                            <span class="card-label">ID</span>
+                            <span class="card-value">{{ $user->id }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Создано</span>
+                            <span class="card-value">{{ $user->created_at->format('d.m.y H:i') }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">ФИО</span>
+                            <span class="card-value">
+                                <a href="{{ route('admin.users.show', $user) }}">
+                                    {{ $user->surname }} {{ $user->name }} {{ $user->patronymic }}
+                                </a>
+                                @if($user->role->name === 'admin')
+                                    <span class="role-indicator" style="margin-left: 6px;">(Админ)</span>
+                                @endif
+                            </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Email</span>
+                            <span class="card-value">{{ $user->email }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Телефон</span>
+                            <span class="card-value">{{ $user->phone ?: '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Отдел</span>
+                            <span class="card-value">{{ $user->position?->department?->name ?: '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Должность</span>
+                            <span class="card-value">{{ $user->position?->name ?: '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Статус</span>
+                            <span class="card-value">
+                                <span class="status-badge {{ $statusClass }}">
+                                    {{ \App\Http\Enums\UserStatus::ruValues()[$statusValue] ?? $statusValue }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editUserModal{{ $user->id }}"
+                                    title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            @if($user->status->value !== 'pending' && $user->role->name !== 'admin')
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#makeAdminModal{{ $user->id }}"
+                                        title="Сделать администратором">
+                                    <i class="bi bi-shield-plus"></i>
+                                </button>
+                            @elseif($user->status->value !== 'pending' && $user->role->name === 'admin')
+                                @if($user->id !== auth()->id())
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#removeAdminModal{{ $user->id }}"
+                                            title="Снять права администратора">
+                                        <i class="bi bi-shield-slash"></i>
+                                    </button>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <h4 class="empty-title">Нет сотрудников</h4>
+                        <p class="empty-desc">Список пользователей пока пуст</p>
+                    </div>
+                @endforelse
+            </div>
+
         </div>
+            @if($users->hasPages())
+                <div class="pagination-wrapper">
+                    {{ $users->appends(request()->query())->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
     </div>
 
     @foreach($users as $user)
@@ -477,12 +573,31 @@
         const initLiveSearch = () => {
             const searchInput = document.getElementById('searchUser');
             if (!searchInput) return;
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
+
+            const filterItems = (term) => {
+
                 document.querySelectorAll('.custom-table tbody tr').forEach(row => {
                     const text = Array.from(row.querySelectorAll('td')).map(td => td.textContent.toLowerCase()).join(' ');
                     row.style.display = text.includes(term) ? '' : 'none';
                 });
+
+
+                document.querySelectorAll('.equipment-card').forEach(card => {
+                    const text = [
+                        card.querySelectorAll('.card-value')[2]?.textContent.toLowerCase() || '',
+                        card.querySelectorAll('.card-value')[3]?.textContent.toLowerCase() || '',
+                        card.querySelectorAll('.card-value')[4]?.textContent.toLowerCase() || ''
+                    ].join(' ');
+                    if (text.includes(term)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                filterItems(e.target.value.toLowerCase());
             });
         };
 
@@ -508,8 +623,9 @@
         const initQuickEditDepartmentListener = () => {
             document.querySelectorAll('.edit-user-form select[name="position_id"]').forEach(select => {
 
-                select.removeEventListener('change', () => {});
-                select.addEventListener('change', function() {
+                select.removeEventListener('change', () => {
+                });
+                select.addEventListener('change', function () {
                     window.updateQuickDepartmentField(this);
                 });
 

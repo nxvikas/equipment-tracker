@@ -206,6 +206,87 @@
     margin-bottom: 0;
 }
 
+/*КАРТОЧКИ ДЛЯ МОБИЛОК*/
+.equipment-cards-view {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.equipment-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    transition: all 0.2s;
+    display: block;
+}
+
+.equipment-card:hover {
+    border-color: var(--accent);
+    background: rgba(190, 242, 100, 0.02);
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+}
+
+.card-row:last-child {
+    border-bottom: none;
+}
+
+.card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 100px;
+}
+
+.card-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    text-align: right;
+    font-weight: 500;
+    word-break: break-word;
+    flex: 1;
+}
+
+
+.card-value a {
+    color: var(--accent);
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+.card-value a:hover {
+    color: var(--accent-hover);
+}
+
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 8px;
+
+}
+
+.card-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
 /* АДАПТИВ  */
 @media (max-width: 1200px) {
     .equipment-page {
@@ -267,12 +348,23 @@
     }
 
 
-    /*.custom-table th:nth-child(1),*/
-    /*.custom-table td:nth-child(1),*/
-    /*.custom-table th:nth-child(4),*/
-    /*.custom-table td:nth-child(4) {*/
-    /*    display: none;*/
-    /*}*/
+    .table-wrapper .custom-table,
+    .table-wrapper .table-responsive {
+        display: none !important;
+    }
+
+    .equipment-cards-view {
+        display: flex !important;
+    }
+    .card-label {
+        min-width: 85px;
+        font-size: 11px;
+    }
+
+    .card-value {
+        font-size: 13px;
+    }
+
 
 
     .equipment-card-body {

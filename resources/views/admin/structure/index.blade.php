@@ -186,8 +186,92 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="equipment-cards-view">
+                    @forelse($departments as $department)
+                        <div class="equipment-card" data-id="{{ $department->id }}">
+                            <div class="card-row">
+                                <span class="card-label">ID</span>
+                                <span class="card-value">{{ $department->id }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Создано</span>
+                                <span class="card-value">{{ $department->created_at->format('d.m.y H:i') }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Название</span>
+                                <span class="card-value">{{ $department->name }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Должности</span>
+                                <span class="card-value">
+                                @if($department->positions->count() > 0)
+                                        <div
+                                            style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end;">
+                                        @foreach($department->positions->take(3) as $position)
+                                                <span
+                                                    style="background: rgba(190, 242, 100, 0.08); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--accent);">
+                                                {{ $position->name }}
+                                            </span>
+                                            @endforeach
+                                            @if($department->positions->count() > 3)
+                                                <span
+                                                    style="background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 12px; font-size: 11px; color: var(--text-secondary);">
+                                                +{{ $department->positions->count() - 3 }}
+                                            </span>
+                                            @endif
+                                    </div>
+                                    @else
+                                        —
+                                    @endif
+                            </span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Кол-во сотрудников</span>
+                                <span class="card-value">{{ $department->users_count }} чел.</span>
+                            </div>
+                            <div class="card-actions">
+                                @if($department->users_count > 0)
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewDepartmentUsersModal{{ $department->id }}"
+                                            title="Список сотрудников">
+                                        <i class="bi bi-people"></i>
+                                    </button>
+                                @endif
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editDepartmentModal{{ $department->id }}"
+                                        title="Редактировать">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                @if($department->users_count == 0)
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteDepartmentModal{{ $department->id }}"
+                                            title="Удалить">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <div class="empty-icon-wrapper">
+                                <i class="bi bi-inbox"></i>
+                            </div>
+                            <h4 class="empty-title">Нет отделов</h4>
+                            <p class="empty-desc">Добавьте первый отдел в структуру компании</p>
+                            <button class="btn-outline mt-3" data-bs-toggle="modal"
+                                    data-bs-target="#addDepartmentModal">
+                                <i class="bi bi-plus-lg me-2"></i>Добавить отдел
+                            </button>
+                        </div>
+                    @endforelse
+                </div>
                 @if($departments->hasPages())
-                    <div class="pagination-wrapper">{{ $departments->appends(request()->query())->links() }}</div>
+                    <div class="pagination-wrapper">
+                        {{ $departments->appends(request()->query())->links('pagination::bootstrap-5') }}
+                    </div>
                 @endif
             </div>
 
@@ -281,10 +365,10 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     @endif
-                                        <button class="action-btn" data-bs-toggle="modal"
-                                                data-bs-target="#editPositionModal{{ $position->id }}">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
+                                    <button class="action-btn" data-bs-toggle="modal"
+                                            data-bs-target="#editPositionModal{{ $position->id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @empty
@@ -301,8 +385,80 @@
                     </table>
 
                 </div>
+                <div class="equipment-cards-view">
+                    @forelse($positions as $position)
+                        <div class="equipment-card" data-id="{{ $position->id }}">
+                            <div class="card-row">
+                                <span class="card-label">ID</span>
+                                <span class="card-value">{{ $position->id }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Создано</span>
+                                <span class="card-value">{{ $position->created_at->format('d.m.y H:i') }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Название</span>
+                                <span class="card-value">{{ $position->name }}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Отдел</span>
+                                <span class="card-value">
+                                @if($position->department)
+                                        <span
+                                            style="background: rgba(190, 242, 100, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 12px;">
+                                        {{ $position->department->name }}
+                                    </span>
+                                    @else
+                                        —
+                                    @endif
+                            </span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Кол-во сотрудников</span>
+                                <span class="card-value">{{ $position->users_count }} чел.</span>
+                            </div>
+                            <div class="card-actions">
+                                @if($position->users_count > 0)
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewPositionUsersModal{{ $position->id }}"
+                                            title="Список сотрудников">
+                                        <i class="bi bi-people"></i>
+                                    </button>
+                                @endif
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editPositionModal{{ $position->id }}"
+                                        title="Редактировать">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                @if($position->users_count == 0)
+                                    <button class="action-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deletePositionModal{{ $position->id }}"
+                                            title="Удалить">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            <div class="empty-icon-wrapper">
+                                <i class="bi bi-inbox"></i>
+                            </div>
+                            <h4 class="empty-title">Нет должностей</h4>
+                            <p class="empty-desc">Добавьте первую должность в структуру компании</p>
+                            <button class="btn-outline mt-3" data-bs-toggle="modal" data-bs-target="#addPositionModal">
+                                <i class="bi bi-plus-lg me-2"></i>Добавить должность
+                            </button>
+                        </div>
+                    @endforelse
+                </div>
                 @if($positions->hasPages())
-                    <div class="pagination-wrapper">{{ $positions->appends(request()->query())->links() }}</div>
+                    <div class="pagination-wrapper">
+                        {{ $positions->appends(request()->query())->links('pagination::bootstrap-5') }}
+                    </div>
                 @endif
             </div>
         @endif
@@ -652,22 +808,37 @@
 
 @push('scripts')
     <script>
-        const initLiveSearch = (inputId) => {
+        const initLiveSearch = (inputId, cardValueIndex = 2) => {
             const searchInput = document.getElementById(inputId);
             if (!searchInput) return;
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
+
+            const filterItems = (term) => {
+
                 document.querySelectorAll('.custom-table tbody tr').forEach(row => {
                     const name = row.querySelector('.equipment-name')?.textContent.toLowerCase() || '';
                     row.style.display = name.includes(term) ? '' : 'none';
                 });
+
+
+                document.querySelectorAll('.equipment-card').forEach(card => {
+                    const name = card.querySelectorAll('.card-value')[cardValueIndex]?.textContent.toLowerCase() || '';
+                    if (name.includes(term)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                filterItems(e.target.value.toLowerCase());
             });
         };
 
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof initCustomSelects === 'function') initCustomSelects();
-            initLiveSearch('searchDepartment');
-            initLiveSearch('searchPosition');
+            initLiveSearch('searchDepartment',2);
+            initLiveSearch('searchPosition',2);
 
 
             const addDeptForm = document.getElementById('addDepartmentForm');

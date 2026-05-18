@@ -5,6 +5,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/aggregator/admin/equipment.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components/tables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/aggregator/admin/dashboard.css') }}">
 @endpush
 
 @section('content')
@@ -203,15 +204,122 @@
                     </tbody>
                 </table>
             </div>
+            <div class="operations-cards-view">
+                @forelse($operations as $operation)
+                    @php
+                        $operationClass = match($operation->action_type) {
+                            'assigned' => 'assign',
+                            'returned' => 'return',
+                            'repair' => 'repair',
+                            'written' => 'repair',
+                            'moved' => 'receive',
+                            default => 'receive'
+                        };
+                        $operationText = $actionTypes[$operation->action_type] ?? $operation->action_type;
 
-
+                        $statusClass = match($operation->new_status) {
+                            'in_use' => 'success',
+                            'in_stock' => 'neutral',
+                            'repair' => 'warning',
+                            'written' => 'danger',
+                            default => 'info'
+                        };
+                        $statusText = \App\Http\Enums\StatusEquipment::ruValues()[$operation->new_status] ?? $operation->new_status;
+                    @endphp
+                    <div class="operation-card">
+                        <div class="operation-card-header">
+                            <span class="operation-equipment">
+                                <a href="{{ route('admin.equipment.show', ['equipment' => $operation->equipment_id, 'from_history' => 1]) }}">
+                                    {{ $operation->equipment->name ?? '—' }}
+                                </a>
+                            </span>
+                            <span class="operation-date">
+                                <i class="bi bi-calendar3"></i>
+                                {{ $operation->created_at->format('d.m.Y H:i') }}
+                            </span>
+                        </div>
+                        <div class="operation-details">
+                            <div class="operation-detail-item">
+                                <i class="bi bi-upc-scan"></i>
+                                <span>Инв. №: {{ $operation->equipment->inventory_number ?? '—' }}</span>
+                            </div>
+                            <div class="operation-detail-item">
+                                <i class="bi bi-person"></i>
+                                <span>{{ $operation->user->name ?? 'Система' }}</span>
+                            </div>
+                        </div>
+                        <div class="operation-details">
+                            <div class="operation-detail-item">
+                                <i class="bi bi-arrow-repeat"></i>
+                                <span>Операция:</span>
+                                <span class="operation-badge {{ $operationClass }}">{{ $operationText }}</span>
+                            </div>
+                            <div class="operation-detail-item operation-status">
+                                <i class="bi bi-circle-fill" style="font-size: 8px; color: var(--accent);"></i>
+                                <span>Статус:</span>
+                                <span class="status-badge {{ $statusClass }}"
+                                      style="margin-left: 4px;">{{ $statusText ?? '—' }}</span>
+                            </div>
+                        </div>
+                        @if($operation->fromUser || $operation->fromLocation || $operation->toUser || $operation->toLocation)
+                            <div class="operation-details">
+                                @if($operation->fromUser || $operation->fromLocation)
+                                    <div class="operation-detail-item">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        <span>Откуда:
+                                            @if($operation->fromUser)
+                                                <i class="bi bi-person"></i> {{ $operation->fromUser->name }}
+                                            @endif
+                                            @if($operation->fromLocation)
+                                                <i class="bi bi-geo-alt"></i> {{ $operation->fromLocation->name }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+                                @if($operation->toUser || $operation->toLocation)
+                                    <div class="operation-detail-item">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        <span>Куда:
+                                            @if($operation->toUser)
+                                                <i class="bi bi-person"></i> {{ $operation->toUser->name }}
+                                            @endif
+                                            @if($operation->toLocation)
+                                                <i class="bi bi-geo-alt"></i> {{ $operation->toLocation->name }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                        @if($operation->comment)
+                            <div class="operation-details">
+                                <div class="operation-detail-item">
+                                    <i class="bi bi-chat"></i>
+                                    <span>Комментарий: {{ $operation->comment }}</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <h4 class="empty-title">Здесь пока пусто</h4>
+                        <p class="empty-desc">История операций появится после первых действий с оборудованием.</p>
+                    </div>
+                @endforelse
+            </div>
             @if($operations->hasPages())
                 <div class="pagination-wrapper">
-                    {{ $operations->appends(request()->query())->links() }}
+                    {{ $operations->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             @endif
         </div>
+
     </div>
+
+
 @endsection
 @push('scripts')
     <script>

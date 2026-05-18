@@ -191,12 +191,74 @@
                     </tbody>
                 </table>
             </div>
+            <div class="equipment-cards-view">
+                @forelse($locations as $location)
+                    <div class="equipment-card" data-id="{{ $location->id }}">
+                        <div class="card-row">
+                            <span class="card-label">ID</span>
+                            <span class="card-value">{{ $location->id }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Создано</span>
+                            <span class="card-value">{{ $location->created_at->format('d.m.y H:i') }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Название</span>
+                            <span class="card-value">
+                                <a href="{{ route('admin.locations.show', $location->id) }}">
+                                    {{ $location->name }}
+                                </a>
+                            </span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Тип</span>
+                            <span
+                                class="card-value">{{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Адрес</span>
+                            <span class="card-value">{{ $location->address ?: '—' }}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">Кол-во оборудования</span>
+                            <span class="card-value">{{ $location->equipment_count }} ед.</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editLocationModal{{ $location->id }}"
+                                    title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            @if($location->equipment_count == 0)
+                                <button class="action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteLocationModal{{ $location->id }}"
+                                        title="Удалить">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-inbox"></i>
+                        </div>
+                        <h4 class="empty-title">Нет локаций</h4>
+                        <p class="empty-desc">Добавьте первую локацию для размещения оборудования</p>
+                        <button class="btn-outline mt-3" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                            <i class="bi bi-plus-lg me-2"></i>Добавить локацию
+                        </button>
+                    </div>
+                @endforelse
+            </div>
+        </div>
             @if($locations->hasPages())
                 <div class="pagination-wrapper">
-                    {{ $locations->appends(request()->query())->links() }}
+                    {{ $locations->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             @endif
-        </div>
     </div>
 
 
@@ -329,13 +391,28 @@
             const searchInput = document.getElementById('searchLocation');
             if (!searchInput) return;
 
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
+            const filterItems = (term) => {
+
                 document.querySelectorAll('.custom-table tbody tr').forEach(row => {
                     const name = row.querySelector('.equipment-name')?.textContent.toLowerCase() || '';
                     const address = row.querySelector('.location-address')?.textContent.toLowerCase() || '';
                     row.style.display = (name.includes(term) || address.includes(term)) ? '' : 'none';
                 });
+
+
+                document.querySelectorAll('.equipment-card').forEach(card => {
+                    const name = card.querySelectorAll('.card-value')[2]?.textContent.toLowerCase() || '';
+                    const address = card.querySelectorAll('.card-value')[4]?.textContent.toLowerCase() || '';
+                    if (name.includes(term) || address.includes(term)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            searchInput.addEventListener('input', (e) => {
+                filterItems(e.target.value.toLowerCase());
             });
         };
 

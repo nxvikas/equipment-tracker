@@ -427,7 +427,6 @@
                 const data = chartData.map(item => item.count);
                 const backgroundColor = chartData.map(item => item.color);
                 const total = data.reduce((sum, val) => sum + val, 0);
-
                 new Chart(statusCtx, {
                     type: 'doughnut',
                     data: {

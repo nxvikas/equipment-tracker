@@ -214,7 +214,49 @@ a.equipment-name:hover {
 }
 
 
+body.light .custom-table th {
+    background: rgba(190, 242, 100, 0.12);
+    color: #475569;
+}
 
+body.light .custom-table td {
+    color: #1e293b;
+}
+
+body.light .custom-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+body.light .custom-table td a.equipment-name {
+    color: var(--accent);
+}
+
+body.light .custom-table td a.equipment-name:hover {
+    color: var(--accent-hover);
+}
+
+
+body.light .history-table th {
+    background: rgba(190, 242, 100, 0.12);
+    color: #475569;
+}
+
+body.light .history-table td {
+    color: #1e293b;
+}
+
+body.light .history-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+body.light .history-detail {
+    background: rgba(132, 204, 22, 0.1);
+    color: #4d7c0f;
+}
+
+body.light .history-empty {
+    color: #64748b;
+}
 
 body.light .custom-table tbody tr:hover {
     background: rgba(132, 204, 22, 0.08);

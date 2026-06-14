@@ -1,4 +1,4 @@
-// ОБЩИЕ УТИЛИТНЫЕ ФУНКЦИИ ДЛЯ АДМИН-ПАНЕЛИ
+// ОБЩИЕ УТИЛИТНЫЕ ФУНКЦИИ
 
 window.showToast = (message, type = 'success') => {
     const toast = Object.assign(document.createElement('div'), {

@@ -351,6 +351,13 @@
     border-radius: 10px;
     overflow: hidden;
 }
+body.light .progress-bar-bg {
+    background: #e2e8f0;
+}
+
+body.light .progress-bar-fill {
+    background: var(--accent);
+}
 
 .progress-bar-fill {
     height: 100%;

@@ -223,10 +223,11 @@
     display: block;
 }
 
-.equipment-card:hover {
-    border-color: var(--accent);
-    background: rgba(190, 242, 100, 0.02);
-}
+/*.equipment-card:hover {*/
+/*    border-color: var(--accent);*/
+/*    background: rgba(190, 242, 100, 0.02);*/
+/*}*/
+
 
 .card-row {
     display: flex;
@@ -285,7 +286,15 @@
     align-items: center;
     justify-content: flex-end;
 }
-
+body.light .location-progress-item:hover{
+    background: rgba(190, 242, 100, 0.12) !important;
+}
+body.light .avatar-placeholder{
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    background: rgba(190, 242, 100, 0.12) !important;
+}
 
 /* АДАПТИВ  */
 @media (max-width: 1200px) {

@@ -133,9 +133,11 @@
                                     $operationClass = match($operation->action_type) {
                                         'assigned' => 'assign',
                                         'returned' => 'return',
-                                        'repair' => 'repair',
+                                        'sent_to_repair' => 'repair',
+                                        'repaired' => 'repair',
                                         'written' => 'repair',
                                         'moved' => 'receive',
+
                                         default => 'receive'
                                     };
                                 @endphp
@@ -210,7 +212,8 @@
                         $operationClass = match($operation->action_type) {
                             'assigned' => 'assign',
                             'returned' => 'return',
-                            'repair' => 'repair',
+                            'sent_to_repair' => 'repair',
+                            'repaired' => 'repair',
                             'written' => 'repair',
                             'moved' => 'receive',
                             default => 'receive'

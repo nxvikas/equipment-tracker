@@ -56,22 +56,16 @@
                                 'remote' => 'bi-wifi',
                                 default => 'bi-geo-alt'
                             };
-                            $typeColor = match($location->type) {
-                                'office' => '#3b82f6',
-                                'warehouse' => '#f59e0b',
-                                'service' => '#ef4444',
-                                'remote' => '#10b981',
-                                default => '#94a3b8'
-                            };
+
                         @endphp
 
 
                         <div class="d-flex align-items-center gap-4 mb-4">
                             <div class="flex-shrink-0">
-                                <i class="bi {{ $typeIcon }}" style="font-size: 48px; color: {{ $typeColor }};"></i>
+                                <i class="bi {{ $typeIcon }}" style="font-size: 48px; color: var(--accent);"></i>
                             </div>
                             <div>
-                                <h5 style="color: {{ $typeColor }}; margin-bottom: 4px;">
+                                <h5 style=" margin-bottom: 4px; color: var(--accent);">
                                     {{ \App\Http\Enums\TypeLocation::ruValues()[$location->type] ?? $location->type }}
                                 </h5>
                                 <p class="text-secondary mb-0" style="font-size: 13px;">

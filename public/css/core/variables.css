@@ -33,4 +33,9 @@ body.light {
     --text-secondary: #64748b;
     --accent: #84cc16;
     --accent-hover: #65a30d;
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --progress-bg: #e2e8f0;
 }

@@ -50,7 +50,6 @@ class EquipmentController extends Controller
     public function store(StoreEquipmentRequest $request)
     {
         $validated = $request->validated();
-
         if ($validated['status'] === 'in_use' && empty($validated['current_user_id'])) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -63,23 +62,18 @@ class EquipmentController extends Controller
                 ->with('reopen_equipment_modal', true)
                 ->withInput();
         }
-
         if ($validated['status'] !== 'in_use') {
             $validated['current_user_id'] = null;
         }
-
         if (empty($validated['inventory_number'])) {
             $year = date('Y');
             $nextId = Equipment::max('id') + 1;
             $validated['inventory_number'] = 'IT-' . $year . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
         }
-
         $equipment = Equipment::create($validated);
-
         $equipment->update([
             'qr_code' => route('public.equipment', $equipment->id)
         ]);
-
         Equipment_history::create([
             'equipment_id' => $equipment->id,
             'action_type' => TypeEquipmentHistory::CREATED->value,
@@ -88,9 +82,7 @@ class EquipmentController extends Controller
             'new_status' => $equipment->status,
             'comment' => 'Оборудование добавлено в систему'
         ]);
-
         session()->flash('success', 'Оборудование "' . $equipment->name . '" успешно добавлено');
-
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -99,7 +91,6 @@ class EquipmentController extends Controller
                 'reload' => true
             ]);
         }
-
         return redirect()->route('admin.equipment')
             ->with('success', 'Оборудование успешно добавлено в базу');
     }
@@ -128,7 +119,6 @@ class EquipmentController extends Controller
     public function update(UpdateEquipmentRequest $request, Equipment $equipment)
     {
         $validated = $request->validated();
-
         if ($validated['status'] === 'in_use' && empty($validated['current_user_id'])) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
@@ -141,20 +131,15 @@ class EquipmentController extends Controller
                 ->with('edit_modal_open', true)
                 ->withInput();
         }
-
         if ($validated['status'] !== 'in_use') {
             $validated['current_user_id'] = null;
         }
-
 
         $oldStatus = $equipment->status;
         $oldUserId = $equipment->current_user_id;
         $oldLocationId = $equipment->location_id;
         $oldCategoryId = $equipment->category_id;
-
         $equipment->update($validated);
-
-
         if ($oldUserId != $equipment->current_user_id && $equipment->current_user_id !== null) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -167,8 +152,6 @@ class EquipmentController extends Controller
                 'comment' => 'Изменён ответственный сотрудник при редактировании'
             ]);
         }
-
-
         if ($oldUserId !== null && $equipment->current_user_id === null && $equipment->status === 'in_stock') {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -179,8 +162,6 @@ class EquipmentController extends Controller
                 'comment' => 'Возвращено на склад при редактировании'
             ]);
         }
-
-
         if ($oldStatus !== $equipment->status && $equipment->status !== 'in_stock') {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -191,8 +172,6 @@ class EquipmentController extends Controller
                 'comment' => 'Изменён статус оборудования'
             ]);
         }
-
-
         if ($oldLocationId != $equipment->location_id) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -204,8 +183,6 @@ class EquipmentController extends Controller
                 'comment' => 'Изменена локация оборудования'
             ]);
         }
-
-
         if ($oldCategoryId != $equipment->category_id) {
             Equipment_history::create([
                 'equipment_id' => $equipment->id,
@@ -215,9 +192,7 @@ class EquipmentController extends Controller
                 'comment' => 'Изменена категория оборудования'
             ]);
         }
-
         session()->flash('success', 'Оборудование обновлено');
-
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -225,7 +200,6 @@ class EquipmentController extends Controller
                 'item' => $equipment
             ]);
         }
-
         return redirect()->route('admin.equipment.show', $equipment->id)
             ->with('success', 'Оборудование обновлено');
     }
@@ -403,7 +377,7 @@ class EquipmentController extends Controller
 
         Equipment_history::create([
             'equipment_id' => $equipment->id,
-            'action_type' => TypeEquipmentHistory::REPAIRED->value,
+            'action_type' => TypeEquipmentHistory::SENT_TO_REPAIR->value,
             'user_id' => Auth::id(),
             'from_user_id' => $oldUserId,
             'from_location_id' => $oldLocationId,
@@ -415,7 +389,7 @@ class EquipmentController extends Controller
 
         session()->flash('success', 'Оборудование отправлено в ремонт');
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true,'message' => 'Оборудование отправлено в ремонт']);
     }
 
     public function returnFromRepair(Request $request, Equipment $equipment)

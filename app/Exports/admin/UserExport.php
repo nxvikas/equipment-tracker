@@ -15,7 +15,7 @@ class UserExport implements FromArray, WithHeadings, WithTitle, WithStyles
 
     public function __construct($users = null)
     {
-        $this->users = $users ?? User::with(['department', 'position'])->get();
+        $this->users = $users ?? User::with(['position.department'])->get();
     }
 
     public function array(): array
